@@ -11,6 +11,32 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const SOURCE = path.join(ROOT, 'dolomites-garda-itinerary.md');
 
+function toYAML(obj, indent = 0) {
+  const pad = '  '.repeat(indent);
+  if (obj === null || obj === undefined) return 'null';
+  if (typeof obj === 'string') {
+    if (obj.includes('\n') || obj.includes(': ') || obj.startsWith('- ')) {
+      return JSON.stringify(obj);
+    }
+    return obj;
+  }
+  if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) return '[]';
+    return '\n' + obj.map(item => `${pad}- ${typeof item === 'object' ? toYAML(item, indent + 1).trim().replace(/\n/g, '\n  ') : toYAML(item, indent)}`).join('\n');
+  }
+  if (typeof obj === 'object') {
+    const keys = Object.keys(obj).filter(k => !k.startsWith('_'));
+    if (keys.length === 0) return '{}';
+    return '\n' + keys.map(k => {
+      const val = obj[k];
+      const isComplex = (typeof val === 'object' && val !== null);
+      return `${pad}${k}: ${isComplex ? toYAML(val, indent + 1) : toYAML(val, indent)}`;
+    }).join('\n');
+  }
+  return String(obj);
+}
+
 // --- Helpers ---
 
 const slugify = (s) => s.toLowerCase()
@@ -258,6 +284,141 @@ function inferCategory(label) {
   return 'other';
 }
 
+function writeFile(rel, content) {
+  const target = path.join(ROOT, rel);
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.writeFileSync(target, content);
+  console.log(`  ✓ ${rel}`);
+}
+
+function emitDay(day) {
+  const slug = `${day.date}-${slugify(day.theme.split('→').pop().split(',')[0])}`;
+  const fm = {
+    date: day.date,
+    theme: day.theme,
+    driving: day.driving,
+    schedule: day.schedule,
+    hikeSlugs: day.hikeSlugs,
+    lodgingSlug: day.lodgingSlug,
+    weatherFor: day.weatherFor,
+  };
+  const yaml = toYAML(fm).trim();
+  writeFile(`src/content/days/${slug}.md`, `---\n${yaml}\n---\n\n`);
+}
+
+function emitHike(hike) {
+  const fm = { ...hike };
+  delete fm._rawBlock;
+  const yaml = toYAML(fm).trim();
+  writeFile(`src/content/hikes/${hike.slug}.md`, `---\n${yaml}\n---\n\n`);
+}
+
+function emitBookings(bookings) {
+  const yaml = bookings.map(b => `- ${toYAML(b, 1).trim().replace(/\n/g, '\n  ')}`).join('\n');
+  writeFile(`src/content/bookings.yaml`, yaml + '\n');
+}
+
+function emitTrip() {
+  const trip = {
+    name: 'Dolomites',
+    startDate: '2026-07-15',
+    endDate: '2026-07-20',
+    travelers: ['Kevin', '+ party'],
+    flights: {
+      outbound: [
+        { flightNumber: 'LX1267', airline: 'Swiss', from: 'CPH', to: 'ZRH', depart: '2026-07-15T09:40', arrive: '2026-07-15T11:35' },
+        { flightNumber: 'LX1662', airline: 'Swiss', from: 'ZRH', to: 'VCE', depart: '2026-07-15T12:55', arrive: '2026-07-15T14:00' },
+      ],
+      return: [
+        { flightNumber: 'OS548', airline: 'Austrian Airlines', operatedBy: 'Air Dolomiti', from: 'VCE', to: 'VIE', depart: '2026-07-27T19:10', arrive: '2026-07-27T20:15' },
+        { flightNumber: 'OS989', airline: 'Austrian Airlines', from: 'VIE', to: 'CPH', depart: '2026-07-27T21:00', arrive: '2026-07-27T22:40' },
+      ],
+    },
+    rentalCar: {
+      provider: 'Greenmotion',
+      confirmationNumber: '798336606',
+      model: 'Peugeot 308 or similar',
+      pickup: { time: '2026-07-15T15:00', location: 'Venice Marco Polo Airport (VCE)', address: 'Via Orlanda 219 c/o ParkingGo Venezia, Venice 30173', phone: '+390418040448' },
+      dropoff: { time: '2026-07-27T18:00', location: 'Venice Marco Polo Airport (VCE)' },
+      insurance: 'Zurich Full Insurance EEA',
+      cost: { amount: 6284, currency: 'SEK' },
+    },
+  };
+  writeFile('src/content/trip.yaml', toYAML(trip).trim() + '\n');
+}
+
+function emitLodgings() {
+  const lodgings = [
+    {
+      slug: 'baita-fraina',
+      name: 'Baita Fraina',
+      location: "Cortina d'Ampezzo",
+      checkIn: '2026-07-15T20:00',
+      checkOut: '2026-07-18T11:00',
+      nights: 3,
+      phone: '+39 0436 3634',
+      address: "Località Fraina 1, Cortina d'Ampezzo, BL",
+      lat: 46.5237,
+      lon: 12.1528,
+      bookingUrl: 'https://www.booking.com/hotel/it/baita-fraina.html',
+      notes: 'One-lane access road. Restaurant on site (book ahead). Great breakfast.',
+    },
+    {
+      slug: 'pension-kircher-sepp',
+      name: 'Garni / Pension Kircher Sepp',
+      location: 'Barbiano (Barbian), BZ',
+      checkIn: '2026-07-18T15:00',
+      checkOut: '2026-07-20T11:00',
+      nights: 2,
+      phone: '+390471650008',
+      address: 'Via Rosengarten 30, Barbiano (Barbian), BZ 39040',
+      lat: 46.6109,
+      lon: 11.5226,
+      bookingUrl: 'https://www.booking.com/hotel/it/gasthof-albergo-kircher-sepp.html',
+      notes: 'Family-run. Ask for balcony room facing Dolomites.',
+    },
+  ];
+  for (const l of lodgings) {
+    writeFile(`src/content/lodgings/${l.slug}.yaml`, toYAML(l).trim() + '\n');
+  }
+}
+
+function emitRestaurants() {
+  const groups = [
+    {
+      area: "Cortina d'Ampezzo",
+      items: [
+        { name: 'Baita Fraina', type: 'Refined Tyrolean', priceRange: '$$$', needsReservation: true, notes: 'Hotel restaurant — book ahead.' },
+        { name: 'Al Camin', type: 'Modern mountain food', priceRange: '$$', needsReservation: true },
+        { name: 'El Camineto', type: 'Traditional alpine', priceRange: '$$', needsReservation: false },
+        { name: 'Ospitale', type: 'Old stagecoach inn', priceRange: '$$', needsReservation: true, notes: '8 km north of Cortina.' },
+        { name: 'Enoteca Baita Fraina', type: 'Wine bar / aperitivo', priceRange: '$', needsReservation: false, notes: 'Sister wine bar in town centre.' },
+        { name: 'Panificio Alvera', type: 'Bakery', priceRange: '$', needsReservation: false, notes: 'Trail sandwiches and pastries.' },
+      ],
+    },
+    {
+      area: 'Brixen / Eisacktal',
+      items: [
+        { name: 'Vitis (Brixen)', type: 'Modern South Tyrolean tasting menu', priceRange: '$$$', needsReservation: true },
+        { name: 'Decantei (Brixen)', type: 'Wine bar with small plates', priceRange: '$$', needsReservation: false },
+        { name: "Hofschank Klausnerhof (Klausen)", type: "Hyper-traditional, locals' favourite", priceRange: '$$', needsReservation: true },
+        { name: 'Sunnegg (Brixen)', type: 'Panoramic spot above town', priceRange: '$$', needsReservation: true },
+      ],
+    },
+    {
+      area: 'Ortisei (Val Gardena)',
+      items: [
+        { name: 'Cascade', type: 'Mid-range reliable', priceRange: '$$', needsReservation: false },
+        { name: 'Bar Anna', type: 'Quick panini and coffee', priceRange: '$', needsReservation: false },
+        { name: 'Restaurant Concordia', type: 'Traditional Ladin', priceRange: '$$', needsReservation: false },
+      ],
+    },
+  ];
+  for (const g of groups) {
+    writeFile(`src/content/restaurants/${slugify(g.area)}.yaml`, toYAML(g).trim() + '\n');
+  }
+}
+
 // --- Main ---
 
 export async function runMigration() {
@@ -266,7 +427,14 @@ export async function runMigration() {
   const hikes = parseHikes(md);
   const bookings = parseBookings(md);
   console.log(`Parsed ${days.length} days, ${hikes.length} hikes, ${bookings.length} bookings.`);
-  // Emit functions added in subsequent tasks
+
+  console.log('Emitting trip metadata...'); emitTrip();
+  console.log('Emitting lodgings...'); emitLodgings();
+  console.log('Emitting restaurants...'); emitRestaurants();
+  console.log('Emitting days...'); for (const d of days) emitDay(d);
+  console.log('Emitting hikes...'); for (const h of hikes) emitHike(h);
+  console.log('Emitting bookings...'); emitBookings(bookings);
+  console.log('Done.');
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
