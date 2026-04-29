@@ -1,0 +1,82 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getDays, getHike, getLodgings } from '@/lib/content';
+
+export async function getStaticPaths() {
+  const days = await getDays();
+  return days.map((d) => ({ params: { date: d.data.date }, props: { day: d } }));
+}
+
+const { day } = Astro.props;
+const days = await getDays();
+const dayIndex = days.findIndex((d) => d.data.date === day.data.date);
+const prev = days[dayIndex - 1];
+const next = days[dayIndex + 1];
+
+const hikes = await Promise.all(day.data.hikeSlugs.map((slug: string) => getHike(slug)));
+const lodgings = await getLodgings();
+const lodging = lodgings.find((l) => l.id === day.data.lodgingSlug);
+
+const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+---
+<BaseLayout title={`Day ${dayIndex + 1} — ${day.data.theme}`}>
+  <section class="px-4 pt-5 pb-3 bg-bg-2/60 border-b border-border">
+    <p class="eyebrow">Day {dayIndex + 1}</p>
+    <h1 class="text-xl font-semibold tracking-tight mt-1">{day.data.theme}</h1>
+    <p class="text-sm text-ink-muted mt-1">{fmtDate(day.data.date)}</p>
+  </section>
+
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Schedule</p>
+    <ol class="space-y-1.5">
+      {day.data.schedule.map((s: { time: string; action: string }) => (
+        <li class="flex gap-3 text-sm">
+          <span class="text-ink-muted tabular-nums w-12 flex-shrink-0">{s.time}</span>
+          <span>{s.action}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  {hikes.length > 0 && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">Hikes</p>
+      <div class="space-y-2">
+        {hikes.filter(Boolean).map((h: any) => (
+          <a href={`/hike/${h.slug}`} class="card block">
+            <div class="text-sm font-semibold">{h.data.name}</div>
+            <div class="text-[11px] text-ink-muted mt-0.5">
+              {h.data.distanceKm} km · {h.data.elevationGainM} m · {h.data.movingTimeHours.min}–{h.data.movingTimeHours.max}h · {h.data.difficulty}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {day.data.driving.distanceKm > 0 && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">Driving</p>
+      <div class="card text-sm">
+        <span class="font-semibold">{day.data.driving.distanceKm} km</span>
+        <span class="text-ink-muted"> · {Math.floor(day.data.driving.durationMin / 60)}h {day.data.driving.durationMin % 60}m</span>
+        {day.data.driving.notes && <p class="text-xs text-ink-muted mt-1">{day.data.driving.notes}</p>}
+      </div>
+    </section>
+  )}
+
+  {lodging && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">Lodging</p>
+      <a href="/lodgings" class="card block">
+        <div class="text-sm font-semibold">{lodging.data.name}</div>
+        <div class="text-[11px] text-ink-muted">{lodging.data.location}</div>
+      </a>
+    </section>
+  )}
+
+  <nav class="px-4 py-4 flex justify-between text-sm">
+    {prev ? <a href={`/day/${prev.data.date}`} class="text-sage">← {fmtDate(prev.data.date)}</a> : <span></span>}
+    {next ? <a href={`/day/${next.data.date}`} class="text-sage">{fmtDate(next.data.date)} →</a> : <span></span>}
+  </nav>
+</BaseLayout>
