@@ -1,0 +1,14 @@
+area: Ortisei (Val Gardena)
+items: 
+  - name: Cascade
+    type: Mid-range reliable
+    priceRange: $$
+    needsReservation: false
+  - name: Bar Anna
+    type: Quick panini and coffee
+    priceRange: $
+    needsReservation: false
+  - name: Restaurant Concordia
+    type: Traditional Ladin
+    priceRange: $$
+    needsReservation: false

@@ -15,7 +15,16 @@ function toYAML(obj, indent = 0) {
   const pad = '  '.repeat(indent);
   if (obj === null || obj === undefined) return 'null';
   if (typeof obj === 'string') {
-    if (obj.includes('\n') || obj.includes(': ') || obj.startsWith('- ')) {
+    // Quote strings that contain characters YAML would misinterpret
+    // Also quote ISO date (YYYY-MM-DD) and ISO datetime strings so YAML parses them as strings
+    if (obj.includes('\n') || obj.includes(': ') || obj.startsWith('- ')
+        || obj.includes('*') || obj.includes('#') || obj.includes('{') || obj.includes('}')
+        || obj.includes('[') || obj.includes(']') || obj.includes(',') || obj.includes('|')
+        || obj.includes('>') || obj.includes('?') || obj.startsWith('!') || obj.startsWith('@')
+        || obj.startsWith('`') || obj.startsWith('"') || obj.startsWith("'")
+        || /^\d{4}-\d{2}-\d{2}/.test(obj)
+        || /^\+\d/.test(obj)
+        || /^\d+$/.test(obj)) {
       return JSON.stringify(obj);
     }
     return obj;
@@ -23,10 +32,26 @@ function toYAML(obj, indent = 0) {
   if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
   if (Array.isArray(obj)) {
     if (obj.length === 0) return '[]';
-    return '\n' + obj.map(item => `${pad}- ${typeof item === 'object' ? toYAML(item, indent + 1).trim().replace(/\n/g, '\n  ') : toYAML(item, indent)}`).join('\n');
+    return '\n' + obj.map(item => {
+      if (typeof item === 'object' && item !== null) {
+        // Render object items: first key goes inline after "- ", rest aligned to same column
+        const keys = Object.keys(item).filter(k => !k.startsWith('_') && item[k] !== undefined);
+        if (keys.length === 0) return `${pad}- {}`;
+        const childPad = pad + '  '; // 2 spaces after "- " prefix
+        const lines = keys.map((k, i) => {
+          const val = item[k];
+          const isComplex = (typeof val === 'object' && val !== null);
+          const rendered = isComplex ? toYAML(val, indent + 2).replace(/\n/g, '\n' + childPad) : toYAML(val, indent);
+          const prefix = i === 0 ? `${pad}- ` : `${childPad}`;
+          return `${prefix}${k}: ${rendered}`;
+        });
+        return lines.join('\n');
+      }
+      return `${pad}- ${toYAML(item, indent)}`;
+    }).join('\n');
   }
   if (typeof obj === 'object') {
-    const keys = Object.keys(obj).filter(k => !k.startsWith('_'));
+    const keys = Object.keys(obj).filter(k => !k.startsWith('_') && obj[k] !== undefined);
     if (keys.length === 0) return '{}';
     return '\n' + keys.map(k => {
       const val = obj[k];
@@ -276,9 +301,9 @@ export function parseBookings(md) {
 function inferCategory(label) {
   const l = label.toLowerCase();
   if (l.includes('lx ') || l.includes('os ') || l.includes('flight')) return 'flight';
+  if (l.includes('cable car') || l.includes('seceda')) return 'cable-car';
   if (l.includes('rental') || l.includes('greenmotion') || l.includes('car')) return 'car';
   if (l.includes('parking')) return 'parking';
-  if (l.includes('cable car') || l.includes('seceda')) return 'cable-car';
   if (l.includes('hotel') || l.includes('baita') || l.includes('kircher') || l.includes('airbnb')) return 'lodging';
   if (l.includes('dinner') || l.includes('restaurant')) return 'restaurant';
   return 'other';

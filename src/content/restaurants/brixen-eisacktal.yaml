@@ -1,0 +1,18 @@
+area: Brixen / Eisacktal
+items: 
+  - name: Vitis (Brixen)
+    type: Modern South Tyrolean tasting menu
+    priceRange: $$$
+    needsReservation: true
+  - name: Decantei (Brixen)
+    type: Wine bar with small plates
+    priceRange: $$
+    needsReservation: false
+  - name: Hofschank Klausnerhof (Klausen)
+    type: "Hyper-traditional, locals' favourite"
+    priceRange: $$
+    needsReservation: true
+  - name: Sunnegg (Brixen)
+    type: Panoramic spot above town
+    priceRange: $$
+    needsReservation: true

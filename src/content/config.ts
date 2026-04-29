@@ -48,7 +48,7 @@ export const DaySchema = z.object({
 });
 
 export const HikeSchema = z.object({
-  slug: z.string(),
+  slug: z.string().optional(),
   name: z.string(),
   region: z.string(),
   alltrailsUrl: z.string().url().optional(),

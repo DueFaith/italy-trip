@@ -1,0 +1,50 @@
+name: Dolomites
+startDate: "2026-07-15"
+endDate: "2026-07-20"
+travelers: 
+  - Kevin
+  - + party
+flights: 
+  outbound: 
+    - flightNumber: LX1267
+      airline: Swiss
+      from: CPH
+      to: ZRH
+      depart: "2026-07-15T09:40"
+      arrive: "2026-07-15T11:35"
+    - flightNumber: LX1662
+      airline: Swiss
+      from: ZRH
+      to: VCE
+      depart: "2026-07-15T12:55"
+      arrive: "2026-07-15T14:00"
+  return: 
+    - flightNumber: OS548
+      airline: Austrian Airlines
+      operatedBy: Air Dolomiti
+      from: VCE
+      to: VIE
+      depart: "2026-07-27T19:10"
+      arrive: "2026-07-27T20:15"
+    - flightNumber: OS989
+      airline: Austrian Airlines
+      from: VIE
+      to: CPH
+      depart: "2026-07-27T21:00"
+      arrive: "2026-07-27T22:40"
+rentalCar: 
+  provider: Greenmotion
+  confirmationNumber: "798336606"
+  model: Peugeot 308 or similar
+  pickup: 
+    time: "2026-07-15T15:00"
+    location: Venice Marco Polo Airport (VCE)
+    address: "Via Orlanda 219 c/o ParkingGo Venezia, Venice 30173"
+    phone: "+390418040448"
+  dropoff: 
+    time: "2026-07-27T18:00"
+    location: Venice Marco Polo Airport (VCE)
+  insurance: Zurich Full Insurance EEA
+  cost: 
+    amount: 6284
+    currency: SEK
