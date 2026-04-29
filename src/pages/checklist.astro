@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BookingChecklist from '@/components/BookingChecklist';
+import { getBookings } from '@/lib/content';
+const bookings = getBookings();
+---
+<BaseLayout title="Booking checklist">
+  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
+    <h1 class="text-xl font-semibold">Booking checklist</h1>
+    <p class="text-[12px] text-ink-muted mt-1">Saved on this device only.</p>
+  </section>
+  <section class="px-4 py-4">
+    <BookingChecklist bookings={bookings} client:load />
+  </section>
+</BaseLayout>
