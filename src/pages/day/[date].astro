@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getDays, getHike, getLodgings } from '@/lib/content';
+import WeatherWidget from '@/components/WeatherWidget';
 
 export async function getStaticPaths() {
   const days = await getDays();
@@ -36,6 +37,11 @@ const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en
         </li>
       ))}
     </ol>
+  </section>
+
+  <section class="px-4 pb-2">
+    <p class="eyebrow mb-2">Weather</p>
+    <WeatherWidget lat={day.data.weatherFor.lat} lon={day.data.weatherFor.lon} label={day.data.weatherFor.label} date={day.data.date} client:visible />
   </section>
 
   {hikes.length > 0 && (
