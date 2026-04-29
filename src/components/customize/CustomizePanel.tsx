@@ -1,10 +1,42 @@
 import { useState } from 'react';
+import { DndContext, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core';
 import { useLocalState } from '@/stores/localState';
 import { listEffectiveDays, listEffectiveHikes } from '@/stores/selectors';
 import type { DayShape, HikeShape } from '@/stores/types';
 import HikeForm from './HikeForm';
 
 type Props = { canonicalDays: DayShape[]; canonicalHikes: HikeShape[] };
+
+function DraggableHike({ slug }: { slug: string }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: `hike-${slug}` });
+  const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
+  return (
+    <span ref={setNodeRef} style={style} {...listeners} {...attributes}
+      className="inline-block px-2 py-1 bg-forest/10 border border-forest/30 rounded text-[11px] mr-1 cursor-move">
+      {slug}
+    </span>
+  );
+}
+
+function DroppableDay({ date, hikeSlugs, theme, fmt }: { date: string; hikeSlugs: string[]; theme: string; fmt: (s: string) => string }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `day-${date}` });
+  return (
+    <div ref={setNodeRef} className={`card ${isOver ? 'border-forest' : ''}`}>
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="font-semibold text-sm">{fmt(date)}</div>
+          <div className="text-[11px] text-ink-muted">{theme}</div>
+        </div>
+        <a href={`/day/${date}`} className="text-[11px] text-sage">Edit →</a>
+      </div>
+      <div className="mt-2 min-h-[28px]">
+        {hikeSlugs.length === 0
+          ? <span className="text-[11px] text-ink-muted">No hikes</span>
+          : hikeSlugs.map((s) => <DraggableHike key={s} slug={s} />)}
+      </div>
+    </div>
+  );
+}
 
 export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props) {
   const state = useLocalState();
@@ -49,23 +81,26 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
       </section>
 
       <section>
-        <p className="eyebrow mb-2">Days</p>
-        <div className="space-y-2">
-          {days.map((d) => (
-            <div key={d.date} className="card">
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="font-semibold text-sm">{fmt(d.date)}</div>
-                  <div className="text-[11px] text-ink-muted">{d.theme}</div>
-                </div>
-                <a href={`/day/${d.date}`} className="text-[11px] text-sage">Edit →</a>
-              </div>
-              <div className="mt-2 text-[11px] text-ink-muted">
-                Hikes: {d.hikeSlugs.join(', ') || '(none)'}
-              </div>
-            </div>
-          ))}
-        </div>
+        <p className="eyebrow mb-2">Days (drag a hike to move it)</p>
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={(event) => {
+            const { active, over } = event;
+            if (!over) return;
+            const slug = String(active.id).replace(/^hike-/, '');
+            const toDate = String(over.id).replace(/^day-/, '');
+            const fromDay = days.find((d) => d.hikeSlugs.includes(slug));
+            const toDay = days.find((d) => d.date === toDate);
+            if (!fromDay || !toDay || fromDay.date === toDate) return;
+            state.moveHikeToDay(slug, fromDay.date, toDate, fromDay.hikeSlugs, toDay.hikeSlugs);
+          }}
+        >
+          <div className="space-y-2">
+            {days.map((d) => (
+              <DroppableDay key={d.date} date={d.date} hikeSlugs={d.hikeSlugs} theme={d.theme} fmt={fmt} />
+            ))}
+          </div>
+        </DndContext>
       </section>
     </div>
   );
