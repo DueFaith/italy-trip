@@ -1,0 +1,35 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import MapView from '@/components/MapView';
+import { getHikes, getLodgings } from '@/lib/content';
+
+const hikes = await getHikes();
+const lodgings = await getLodgings();
+
+type Pin = { lat: number; lon: number; label: string; href?: string; category: 'trailhead' | 'lodging' | 'parking' | 'restaurant' };
+
+const pins: Pin[] = [];
+
+for (const h of hikes) {
+  pins.push({
+    lat: h.data.trailhead.lat,
+    lon: h.data.trailhead.lon,
+    label: `${h.data.name} (trailhead)`,
+    href: `/hike/${h.slug}`,
+    category: 'trailhead',
+  });
+}
+
+for (const l of lodgings) {
+  pins.push({
+    lat: l.data.lat,
+    lon: l.data.lon,
+    label: l.data.name,
+    href: '/lodgings',
+    category: 'lodging',
+  });
+}
+---
+<BaseLayout title="Map">
+  <MapView pins={pins} client:only="react" />
+</BaseLayout>
