@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getHikes, getDays } from '@/lib/content';
+import EditHikeButton from '@/components/customize/EditHikeButton';
 
 export async function getStaticPaths() {
   const hikes = await getHikes();
@@ -21,6 +22,9 @@ const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en
         <a class="underline decoration-dotted" href={`/day/${dayForHike.data.date}`}>{fmtDate(dayForHike.data.date)}</a>
       </p>
     )}
+    <div class="mt-3">
+      <EditHikeButton canonical={hike.data} client:load />
+    </div>
   </section>
 
   <section class="px-4 py-4 grid grid-cols-3 gap-2">
