@@ -1,0 +1,7 @@
+---
+import { getDays } from '@/lib/content';
+const days = await getDays();
+const today = new Date().toISOString().slice(0, 10);
+const target = days.find((d) => d.data.date >= today) ?? days[0];
+return Astro.redirect(`/day/${target.data.date}`);
+---

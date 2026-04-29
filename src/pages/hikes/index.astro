@@ -1,0 +1,27 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getHikes, getDays } from '@/lib/content';
+const hikes = await getHikes();
+const days = await getDays();
+const dayForSlug = (slug: string) => days.find(d => d.data.hikeSlugs.includes(slug))?.data.date;
+const fmt = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+---
+<BaseLayout title="Hikes">
+  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
+    <h1 class="text-xl font-semibold">Hikes</h1>
+  </section>
+  <section class="px-4 py-4 space-y-2">
+    {hikes.map((h: any) => {
+      const date = dayForSlug(h.slug);
+      return (
+        <a href={`/hike/${h.slug}`} class="card block">
+          <div class="text-sm font-semibold">{h.data.name}</div>
+          <div class="text-[11px] text-ink-muted mt-0.5">
+            {date && <span>{fmt(date)} · </span>}
+            {h.data.distanceKm} km · {h.data.elevationGainM} m · {h.data.difficulty}
+          </div>
+        </a>
+      );
+    })}
+  </section>
+</BaseLayout>
