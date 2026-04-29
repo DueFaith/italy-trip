@@ -1,0 +1,20 @@
+---
+import '@/styles/global.css';
+import Header from '@/components/Header.astro';
+import BottomNav from '@/components/BottomNav.astro';
+const { title = 'Dolomites Trip', headerTitle } = Astro.props as { title?: string; headerTitle?: string };
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fbfaf6" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Header title={headerTitle} />
+    <main class="max-w-screen-md mx-auto"><slot /></main>
+    <BottomNav />
+  </body>
+</html>
