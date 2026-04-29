@@ -1,10 +1,95 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getDays, getHikes, getTrip, getBookings } from '@/lib/content';
+
+const trip = getTrip();
+const days = await getDays();
+const hikes = await getHikes();
+const bookings = getBookings();
+
+const today = new Date();
+const start = new Date(trip.startDate);
+const daysToGo = Math.max(0, Math.ceil((start.getTime() - today.getTime()) / 86400000));
+const bookedCount = bookings.filter(b => b.status === 'booked').length;
+const hikesCount = hikes.length;
+
+// First upcoming day with a hike
+const firstHikeDay = days.find(d => d.data.hikeSlugs.length > 0);
+const firstHike = firstHikeDay ? hikes.find(h => h.slug === firstHikeDay.data.hikeSlugs[0]) : null;
+
+const fmtDate = (iso: string) => {
+  const d = new Date(iso + 'T00:00');
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+};
 ---
-<BaseLayout>
-  <section class="px-4 py-6">
+<BaseLayout title={trip.name}>
+  <section class="px-4 pt-6 pb-4 bg-bg-2/60 border-b border-border">
     <p class="eyebrow">A trip to</p>
-    <h1 class="text-2xl font-semibold tracking-tight">The Dolomites</h1>
-    <p class="text-sm text-ink-muted mt-1">Scaffold ready · content collections next.</p>
+    <h1 class="text-3xl font-semibold tracking-tight mt-1">The {trip.name}</h1>
+    <p class="text-sm text-ink-muted mt-1">
+      {fmtDate(trip.startDate)} → {fmtDate(trip.endDate)} · {days.length} days
+    </p>
+
+    <div class="grid grid-cols-3 gap-2 mt-4">
+      <div class="stat text-center">
+        <div class="text-xl font-bold text-forest">{daysToGo}</div>
+        <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">Days to go</div>
+      </div>
+      <div class="stat text-center">
+        <div class="text-xl font-bold text-forest">{hikesCount}/{hikesCount}</div>
+        <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">Hikes</div>
+      </div>
+      <div class="stat text-center">
+        <div class="text-xl font-bold text-forest">{bookedCount}/{bookings.length}</div>
+        <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">Booked</div>
+      </div>
+    </div>
+  </section>
+
+  {firstHike && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">First up</p>
+      <a href={`/hike/${firstHike.slug}`} class="card flex items-center gap-3">
+        <div class="w-10 h-10 rounded-md flex-shrink-0 bg-gradient-to-br from-sage-2 to-forest"></div>
+        <div>
+          <div class="font-semibold text-sm">{firstHike.data.name}</div>
+          <div class="text-[11px] text-ink-muted mt-0.5">
+            {fmtDate(firstHikeDay.data.date)} · {firstHike.data.distanceKm} km · {firstHike.data.elevationGainM} m
+          </div>
+        </div>
+      </a>
+    </section>
+  )}
+
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Days</p>
+    <div class="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+      {days.map((d, i) => (
+        <a href={`/day/${d.data.date}`} class:list={['pill', 'whitespace-nowrap', i === 0 ? 'pill-active' : '']}>
+          {fmtDate(d.data.date).replace(/^\w+,? /, '')}
+        </a>
+      ))}
+    </div>
+    <div class="mt-3 space-y-2">
+      {days.map((d) => (
+        <a href={`/day/${d.data.date}`} class="card block">
+          <div class="text-sm font-semibold">{fmtDate(d.data.date)}</div>
+          <div class="text-[11px] text-ink-muted mt-0.5">{d.data.theme}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Booking checklist</p>
+    <a href="/checklist" class="card block">
+      <div class="flex justify-between text-sm">
+        <span>{bookedCount} of {bookings.length} confirmed</span>
+        <span class="font-semibold">{Math.round(bookedCount / bookings.length * 100)}%</span>
+      </div>
+      <div class="h-1.5 bg-bg-2 rounded-full mt-2 overflow-hidden">
+        <div class="h-full bg-forest" style={`width: ${bookedCount / bookings.length * 100}%`}></div>
+      </div>
+    </a>
   </section>
 </BaseLayout>
