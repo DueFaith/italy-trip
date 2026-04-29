@@ -1,0 +1,116 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getHikes, getDays } from '@/lib/content';
+
+export async function getStaticPaths() {
+  const hikes = await getHikes();
+  return hikes.map((h) => ({ params: { slug: h.slug }, props: { hike: h } }));
+}
+
+const { hike } = Astro.props;
+const days = await getDays();
+const dayForHike = days.find((d) => d.data.hikeSlugs.includes(hike.slug));
+const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+---
+<BaseLayout title={hike.data.name}>
+  <section class="px-4 pt-5 pb-3 bg-bg-2/60 border-b border-border">
+    <p class="eyebrow">{hike.data.region} · {hike.data.type.replace('-', ' ')}</p>
+    <h1 class="text-xl font-semibold tracking-tight mt-1">{hike.data.name}</h1>
+    {dayForHike && (
+      <p class="text-sm text-ink-muted mt-1">
+        <a class="underline decoration-dotted" href={`/day/${dayForHike.data.date}`}>{fmtDate(dayForHike.data.date)}</a>
+      </p>
+    )}
+  </section>
+
+  <section class="px-4 py-4 grid grid-cols-3 gap-2">
+    <div class="stat text-center">
+      <div class="text-base font-bold text-forest">{hike.data.distanceKm}</div>
+      <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">km</div>
+    </div>
+    <div class="stat text-center">
+      <div class="text-base font-bold text-forest">{hike.data.elevationGainM}</div>
+      <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">m gain</div>
+    </div>
+    <div class="stat text-center">
+      <div class="text-base font-bold text-forest">{hike.data.movingTimeHours.min}–{hike.data.movingTimeHours.max}h</div>
+      <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">moving</div>
+    </div>
+  </section>
+
+  {hike.data.alltrailsUrl && (
+    <section class="px-4 pb-2">
+      <a href={hike.data.alltrailsUrl} class="card block text-sm">
+        AllTrails — {hike.data.alltrailsUrl.replace(/^https?:\/\//, '')}
+        {hike.data.rating && <span class="text-ink-muted text-xs"> · {hike.data.rating.stars}★ ({hike.data.rating.reviews})</span>}
+      </a>
+    </section>
+  )}
+
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Trailhead</p>
+    <div class="card text-sm">
+      <div class="font-semibold">{hike.data.trailhead.name}</div>
+      <div class="text-[11px] text-ink-muted mt-0.5">
+        <a href={`https://www.google.com/maps?q=${hike.data.trailhead.lat},${hike.data.trailhead.lon}`} class="underline decoration-dotted">
+          {hike.data.trailhead.lat}, {hike.data.trailhead.lon}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Parking</p>
+    <div class="card text-sm">
+      <div>
+        {hike.data.parking.name}
+        {hike.data.parking.costEur > 0 && <span class="text-ink-muted"> · €{hike.data.parking.costEur}</span>}
+      </div>
+      {hike.data.parking.mustBook && (
+        <div class="text-xs text-forest mt-1">
+          ⚠ Booking required.
+          {hike.data.parking.bookingUrl && <a href={hike.data.parking.bookingUrl} class="underline decoration-dotted ml-1">Book here</a>}
+        </div>
+      )}
+    </div>
+  </section>
+
+  {hike.data.routeHighlights.length > 0 && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">Route highlights</p>
+      <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
+        {hike.data.routeHighlights.map((h: string) => <li>{h}</li>)}
+      </ul>
+    </section>
+  )}
+
+  {hike.data.foodOnTrail.length > 0 && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">Food on the trail</p>
+      <div class="space-y-2">
+        {hike.data.foodOnTrail.map((f: { name: string; notes: string }) => (
+          <div class="card text-sm">
+            <div class="font-semibold">{f.name}</div>
+            <div class="text-[11px] text-ink-muted mt-0.5">{f.notes}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {hike.data.hazards.length > 0 && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">Hazards & tips</p>
+      <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
+        {hike.data.hazards.map((h: string) => <li>{h}</li>)}
+      </ul>
+    </section>
+  )}
+
+  {hike.data.badWeatherOption && (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">Bad weather option</p>
+      <div class="card text-sm">{hike.data.badWeatherOption}</div>
+    </section>
+  )}
+</BaseLayout>
