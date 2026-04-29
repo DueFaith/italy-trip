@@ -23,7 +23,7 @@ const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en
       </p>
     )}
     <div class="mt-3">
-      <EditHikeButton canonical={hike.data} client:load />
+      <EditHikeButton canonical={{ ...hike.data, slug: hike.slug }} client:load />
     </div>
   </section>
 

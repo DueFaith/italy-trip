@@ -8,7 +8,7 @@ const days = await getDays();
 const hikes = await getHikes();
 
 const canonicalDays = days.map((d) => d.data);
-const canonicalHikes = hikes.map((h) => ({ ...h.data }));
+const canonicalHikes = hikes.map((h) => ({ ...h.data, slug: h.slug }));
 ---
 <BaseLayout title="Customize">
   <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
