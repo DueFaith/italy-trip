@@ -43,6 +43,9 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
   const days = listEffectiveDays(canonicalDays, state);
   const hikes = listEffectiveHikes(canonicalHikes, state);
   const [showHikeForm, setShowHikeForm] = useState(false);
+  const [showDayForm, setShowDayForm] = useState(false);
+  const [newDayDate, setNewDayDate] = useState('');
+  const [newDayTheme, setNewDayTheme] = useState('');
 
   const fmt = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 
@@ -81,7 +84,38 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
       </section>
 
       <section>
-        <p className="eyebrow mb-2">Days (drag a hike to move it)</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="eyebrow">Days (drag a hike to move it)</p>
+          <button onClick={() => setShowDayForm(true)} className="text-xs text-forest font-semibold">+ New</button>
+        </div>
+        {showDayForm && (
+          <div className="card mb-2 space-y-2 text-sm">
+            <label className="block">
+              <span className="text-[11px] text-ink-muted">Date</span>
+              <input type="date" value={newDayDate} onChange={(e) => setNewDayDate(e.target.value)} className="w-full border border-border rounded px-2 py-1 bg-bg" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] text-ink-muted">Theme</span>
+              <input type="text" value={newDayTheme} onChange={(e) => setNewDayTheme(e.target.value)} className="w-full border border-border rounded px-2 py-1 bg-bg" />
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  if (!newDayDate || !newDayTheme) return;
+                  state.addDay({
+                    date: newDayDate, theme: newDayTheme,
+                    driving: { distanceKm: 0, durationMin: 0 },
+                    schedule: [], hikeSlugs: [],
+                    lodgingSlug: 'baita-fraina',
+                    weatherFor: { lat: 46.5237, lon: 12.1528, label: 'Cortina' },
+                  });
+                  setShowDayForm(false); setNewDayDate(''); setNewDayTheme('');
+                }}
+                className="flex-1 bg-forest text-white py-2 rounded text-sm">Save</button>
+              <button onClick={() => setShowDayForm(false)} className="px-3 py-2 border border-border rounded text-sm">Cancel</button>
+            </div>
+          </div>
+        )}
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={(event) => {
