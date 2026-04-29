@@ -1,55 +1,55 @@
 - id: b-1
-  label: LX 1267 (CPH→ZRH) Jul 15
-  category: flight
-  status: booked
-  notes: Booked
+    label: LX 1267 (CPH→ZRH) Jul 15
+    category: flight
+    status: booked
+    notes: Booked
 - id: b-2
-  label: LX 1662 (ZRH→VCE) Jul 15
-  category: flight
-  status: booked
-  notes: Booked
+    label: LX 1662 (ZRH→VCE) Jul 15
+    category: flight
+    status: booked
+    notes: Booked
 - id: b-3
-  label: Greenmotion rental
-  category: car
-  status: booked
-  notes: Booked
+    label: Greenmotion rental
+    category: car
+    status: booked
+    notes: Booked
 - id: b-4
-  label: Baita Fraina (Jul 15–18)
-  category: lodging
-  status: booked
-  notes: Booked
+    label: Baita Fraina (Jul 15–18)
+    category: lodging
+    status: booked
+    notes: Booked
 - id: b-5
-  label: Pension Kircher Sepp (Jul 18–20)
-  category: lodging
-  status: booked
-  notes: Booked
+    label: Pension Kircher Sepp (Jul 18–20)
+    category: lodging
+    status: booked
+    notes: Booked
 - id: b-6
-  label: Salò AirBnB (Jul 20–27)
-  category: lodging
-  status: booked
-  notes: Booked
+    label: Salò AirBnB (Jul 20–27)
+    category: lodging
+    status: booked
+    notes: Booked
 - id: b-7
-  label: "Tre Cime parking (Jul 16, 07:00)"
-  category: parking
-  status: pending-window
-  notes: Open Jun 16
+    label: "Tre Cime parking (Jul 16, 07:00)"
+    category: parking
+    status: pending-window
+    notes: Open Jun 16
 - id: b-8
-  label: "Cadini parking (Jul 18, 11:00)"
-  category: parking
-  status: pending-window
-  notes: Open Jun 18
+    label: "Cadini parking (Jul 18, 11:00)"
+    category: parking
+    status: pending-window
+    notes: Open Jun 18
 - id: b-9
-  label: "Seceda cable car (Jul 19, 08:30)"
-  category: cable-car
-  status: pending-window
-  notes: Open ~Jun 19
+    label: "Seceda cable car (Jul 19, 08:30)"
+    category: cable-car
+    status: pending-window
+    notes: Open ~Jun 19
 - id: b-10
-  label: Lago di Braies parking
-  category: parking
-  status: not-needed
-  notes: Not needed (arrive before 09:30)
+    label: Lago di Braies parking
+    category: parking
+    status: not-needed
+    notes: Not needed (arrive before 09:30)
 - id: b-11
-  label: Baita Fraina dinner
-  category: lodging
-  status: pending-window
-  notes: On arrival
+    label: Baita Fraina dinner
+    category: lodging
+    status: pending-window
+    notes: On arrival
