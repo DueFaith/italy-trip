@@ -1,2 +1,4 @@
 [tools]
 gh = "latest"
+node = "22"
+pnpm = "9"
