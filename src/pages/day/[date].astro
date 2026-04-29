@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getDays, getHike, getLodgings } from '@/lib/content';
 import WeatherWidget from '@/components/WeatherWidget';
+import EditDayButton from '@/components/customize/EditDayButton';
 
 export async function getStaticPaths() {
   const days = await getDays();
@@ -25,6 +26,9 @@ const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en
     <p class="eyebrow">Day {dayIndex + 1}</p>
     <h1 class="text-xl font-semibold tracking-tight mt-1">{day.data.theme}</h1>
     <p class="text-sm text-ink-muted mt-1">{fmtDate(day.data.date)}</p>
+    <div class="mt-2">
+      <EditDayButton canonical={day.data} client:load />
+    </div>
   </section>
 
   <section class="px-4 py-4">
