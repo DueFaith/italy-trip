@@ -8,3 +8,5 @@ build/
 .next/
 .cache/
 .astro/
+test-results/
+playwright-report/
