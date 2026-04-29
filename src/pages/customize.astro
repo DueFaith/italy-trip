@@ -1,0 +1,20 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CustomizePanel from '@/components/customize/CustomizePanel';
+import { getDays, getHikes } from '@/lib/content';
+
+const days = await getDays();
+const hikes = await getHikes();
+
+const canonicalDays = days.map((d) => d.data);
+const canonicalHikes = hikes.map((h) => ({ ...h.data }));
+---
+<BaseLayout title="Customize">
+  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
+    <h1 class="text-xl font-semibold">Customize</h1>
+    <p class="text-[12px] text-ink-muted mt-1">Edits stay on this device. Use share-link to send to others.</p>
+  </section>
+  <section class="px-4 py-4">
+    <CustomizePanel canonicalDays={canonicalDays} canonicalHikes={canonicalHikes} client:load />
+  </section>
+</BaseLayout>
