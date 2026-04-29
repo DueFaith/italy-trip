@@ -18,7 +18,7 @@ function DraggableHike({ slug }: { slug: string }) {
   );
 }
 
-function DroppableDay({ date, hikeSlugs, theme, fmt }: { date: string; hikeSlugs: string[]; theme: string; fmt: (s: string) => string }) {
+function DroppableDay({ date, hikeSlugs, theme, fmt, isCustom }: { date: string; hikeSlugs: string[]; theme: string; fmt: (s: string) => string; isCustom: boolean }) {
   const { setNodeRef, isOver } = useDroppable({ id: `day-${date}` });
   return (
     <div ref={setNodeRef} className={`card ${isOver ? 'border-forest' : ''}`}>
@@ -27,7 +27,7 @@ function DroppableDay({ date, hikeSlugs, theme, fmt }: { date: string; hikeSlugs
           <div className="font-semibold text-sm">{fmt(date)}</div>
           <div className="text-[11px] text-ink-muted">{theme}</div>
         </div>
-        <a href={`/day/${date}`} className="text-[11px] text-sage">Edit →</a>
+        <a href={isCustom ? `/custom-day#${date}` : `/day/${date}`} className="text-[11px] text-sage">Edit →</a>
       </div>
       <div className="mt-2 min-h-[28px]">
         {hikeSlugs.length === 0
@@ -131,7 +131,7 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
         >
           <div className="space-y-2">
             {days.map((d) => (
-              <DroppableDay key={d.date} date={d.date} hikeSlugs={d.hikeSlugs} theme={d.theme} fmt={fmt} />
+              <DroppableDay key={d.date} date={d.date} hikeSlugs={d.hikeSlugs} theme={d.theme} fmt={fmt} isCustom={state.customDays[d.date] !== undefined} />
             ))}
           </div>
         </DndContext>
