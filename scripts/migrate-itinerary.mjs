@@ -339,7 +339,10 @@ function emitHike(hike) {
 }
 
 function emitBookings(bookings) {
-  const yaml = bookings.map(b => `- ${toYAML(b, 1).trim().replace(/\n/g, '\n  ')}`).join('\n');
+  // toYAML(b, 0) emits `field: value` per line with no leading indent; we then
+  // prefix `- ` for the item marker and `  ` for subsequent lines so each booking
+  // becomes a YAML mapping under a single list item.
+  const yaml = bookings.map(b => `- ${toYAML(b, 0).trim().replace(/\n/g, '\n  ')}`).join('\n');
   writeFile(`src/content/bookings.yaml`, yaml + '\n');
 }
 
