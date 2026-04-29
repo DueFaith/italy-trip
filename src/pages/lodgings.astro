@@ -1,0 +1,28 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLodgings } from '@/lib/content';
+const lodgings = await getLodgings();
+const fmt = (iso: string) => new Date(iso).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+---
+<BaseLayout title="Lodgings">
+  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
+    <h1 class="text-xl font-semibold">Lodgings</h1>
+  </section>
+  <section class="px-4 py-4 space-y-3">
+    {lodgings.map((l: any) => (
+      <div class="card">
+        <div class="font-semibold">{l.data.name}</div>
+        <div class="text-[12px] text-ink-muted">{l.data.location}</div>
+        <div class="text-xs mt-2">
+          <div>Check-in: {fmt(l.data.checkIn)}</div>
+          <div>Check-out: {fmt(l.data.checkOut)}</div>
+          <div class="mt-1">{l.data.address}</div>
+          {l.data.phone && <a href={`tel:${l.data.phone}`} class="text-forest underline decoration-dotted">{l.data.phone}</a>}
+          {l.data.bookingUrl && <a href={l.data.bookingUrl} class="block text-forest underline decoration-dotted mt-0.5">Booking.com</a>}
+          <a href={`https://www.google.com/maps?q=${l.data.lat},${l.data.lon}`} class="block text-sage mt-0.5">Open in Maps</a>
+          {l.data.notes && <p class="mt-2 text-ink-muted">{l.data.notes}</p>}
+        </div>
+      </div>
+    ))}
+  </section>
+</BaseLayout>

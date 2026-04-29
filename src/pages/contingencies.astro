@@ -1,0 +1,43 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+<BaseLayout title="Contingencies">
+  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
+    <h1 class="text-xl font-semibold">Weather & Contingencies</h1>
+  </section>
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Forecast sources</p>
+    <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
+      <li><a class="underline decoration-dotted" href="https://www.meteo.bz.it">meteo.bz.it</a> — South Tyrol official</li>
+      <li><a class="underline decoration-dotted" href="https://www.meteotrentino.it">meteotrentino.it</a> — Trentino official</li>
+      <li><a class="underline decoration-dotted" href="https://www.mountain-forecast.com">mountain-forecast.com</a> — peak-specific</li>
+    </ul>
+  </section>
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Decision rules</p>
+    <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
+      <li>Storms above 2,500 m by 14:00 → start by 06:30, off ridges by 13:00.</li>
+      <li>Full-day rain → swap to indoor day (Bolzano Ötzi museum, Brixen old town, Klausen).</li>
+      <li>Sorapis cables become dangerous when wet — swap to a different day if storms forecast.</li>
+    </ul>
+  </section>
+  <section class="px-4 py-4">
+    <p class="eyebrow mb-2">Backup activities</p>
+    <div class="card text-sm">
+      <div class="font-semibold">Cortina area</div>
+      <ul class="text-[12px] mt-1 space-y-1 list-disc list-inside marker:text-sage">
+        <li>5 Torri WWI open-air museum (Bai de Dones cable car)</li>
+        <li>Lagazuoi cable car + WWI tunnels</li>
+        <li>Drive the Falzarego pass</li>
+      </ul>
+    </div>
+    <div class="card text-sm mt-2">
+      <div class="font-semibold">Eisacktal area</div>
+      <ul class="text-[12px] mt-1 space-y-1 list-disc list-inside marker:text-sage">
+        <li>Brixen old town + Hofburg cathedral</li>
+        <li>Bolzano Ötzi museum</li>
+        <li>Lago di Carezza (always nice, even in light rain)</li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

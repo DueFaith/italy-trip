@@ -1,0 +1,28 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getRestaurants } from '@/lib/content';
+const groups = await getRestaurants();
+---
+<BaseLayout title="Restaurants">
+  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
+    <h1 class="text-xl font-semibold">Restaurants</h1>
+  </section>
+  {groups.map((g: any) => (
+    <section class="px-4 py-4">
+      <p class="eyebrow mb-2">{g.data.area}</p>
+      <div class="space-y-2">
+        {g.data.items.map((r: any) => (
+          <div class="card">
+            <div class="flex justify-between items-start gap-2">
+              <div class="font-semibold text-sm">{r.name}</div>
+              <div class="text-[11px] text-ink-muted">{r.priceRange ?? ''}{r.needsReservation ? ' · book' : ''}</div>
+            </div>
+            <div class="text-[11px] text-ink-muted">{r.type}</div>
+            {r.notes && <p class="text-[11px] text-ink-muted mt-1">{r.notes}</p>}
+            {r.phone && <a href={`tel:${r.phone}`} class="text-[11px] text-forest underline decoration-dotted">{r.phone}</a>}
+          </div>
+        ))}
+      </div>
+    </section>
+  ))}
+</BaseLayout>
