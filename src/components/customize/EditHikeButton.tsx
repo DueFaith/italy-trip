@@ -10,7 +10,12 @@ export default function EditHikeButton({ canonical }: { canonical: HikeShape }) 
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="text-xs text-forest font-semibold underline decoration-dotted">
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Edit hike details"
+        className="text-xs text-forest font-semibold underline decoration-dotted"
+        style={{ minHeight: 44, padding: '10px 0' }}
+      >
         Edit details
       </button>
       {open && (

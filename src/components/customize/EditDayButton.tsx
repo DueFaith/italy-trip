@@ -12,7 +12,12 @@ export default function EditDayButton({ canonical }: { canonical: DayShape }) {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="text-xs text-forest font-semibold underline decoration-dotted">
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Edit day details"
+        className="text-xs text-forest font-semibold underline decoration-dotted"
+        style={{ minHeight: 44, padding: '10px 0' }}
+      >
         Edit day
       </button>
       {open && (

@@ -19,7 +19,12 @@ export default function ShareLinkButton() {
   };
 
   return (
-    <button onClick={onClick} className="bg-forest text-white px-4 py-2 rounded text-sm font-semibold w-full">
+    <button
+      onClick={onClick}
+      aria-label="Copy share link to clipboard"
+      className="bg-forest text-white px-4 py-3 rounded text-sm font-semibold w-full"
+      style={{ minHeight: 44 }}
+    >
       {copied ? 'Copied!' : 'Share my plan'}
     </button>
   );

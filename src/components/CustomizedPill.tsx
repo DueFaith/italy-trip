@@ -16,7 +16,12 @@ export default function CustomizedPill() {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)} className="text-[11px] bg-forest text-white px-2 py-1 rounded-full">
+      <button
+        onClick={() => setOpen(!open)}
+        aria-label={`Customized · ${editCount} edits — tap to view options`}
+        className="text-[11px] bg-forest text-white px-3 py-2 rounded-full"
+        style={{ minHeight: 32, minWidth: 44 }}
+      >
         Customized · {editCount}
       </button>
       {open && (
@@ -30,6 +35,7 @@ export default function CustomizedPill() {
               }
             }}
             className="mt-2 text-forest underline decoration-dotted"
+            style={{ minHeight: 44, padding: '8px 0' }}
           >
             Reset to plan
           </button>
