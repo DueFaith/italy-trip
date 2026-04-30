@@ -277,6 +277,132 @@ h1 { font-variation-settings: 'opsz' 144; }
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* Hike poster — the canonical hike card used on home + day pages.
+     Mirrors the detail-page hero: meta eyebrow / serif title / star rating / 4-stat block. */
+  .hike-poster {
+    display: block;
+    background: var(--bg-paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    padding: 20px 20px 18px;
+    box-shadow: var(--shadow-paper-md);
+    position: relative;
+    overflow: hidden;
+    transition: transform 220ms var(--ease-out), border-color 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+  }
+  .hike-poster::before {
+    /* faint diagonal gold sun in the corner — sun-on-paper feel */
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(212, 162, 76, 0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .hike-poster:active {
+    transform: translateY(1px) scale(0.992);
+    border-color: var(--gold);
+    box-shadow: var(--shadow-paper-sm);
+  }
+  .hike-poster .poster-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px dashed var(--hairline);
+    position: relative;
+  }
+  .hike-poster .stat-num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-variation-settings: 'opsz' 80;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    transform: scale(0.92);
+    opacity: 0;
+    animation: stat-pop 600ms var(--ease-overshoot) forwards;
+  }
+  .hike-poster .poster-stats > div:nth-child(1) .stat-num { animation-delay: 220ms; }
+  .hike-poster .poster-stats > div:nth-child(2) .stat-num { animation-delay: 290ms; }
+  .hike-poster .poster-stats > div:nth-child(3) .stat-num { animation-delay: 360ms; }
+  .hike-poster .poster-stats > div:nth-child(4) .stat-num { animation-delay: 430ms; }
+  @keyframes stat-pop {
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* Stamp gets a gentle wobble when pressed (tap/hover) */
+  .stamp {
+    transition: transform 250ms var(--ease-overshoot);
+  }
+  .stamp:hover, .stamp:active {
+    transform: rotate(-3deg) translateY(-1px);
+    box-shadow: 1px 4px 0 rgba(14, 59, 67, 0.22);
+  }
+  .stamp.wobbly {
+    animation: stamp-wobble 5s ease-in-out infinite;
+    animation-delay: 1.2s;
+  }
+  @keyframes stamp-wobble {
+    0%, 100%   { transform: rotate(-3deg); }
+    50%        { transform: rotate(-2deg); }
+    52%, 56%   { transform: rotate(-4.5deg); }
+    54%        { transform: rotate(-1.5deg); }
+  }
+
+  /* Eyebrow gets a subtle gold rule that draws in on first paint */
+  .eyebrow.with-rule {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    padding-bottom: 4px;
+  }
+  .eyebrow.with-rule::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 1px;
+    background: var(--gold);
+    width: 0;
+    animation: rule-draw 800ms var(--ease-out) forwards;
+    animation-delay: 200ms;
+  }
+  @keyframes rule-draw {
+    to { width: 100%; }
+  }
+
+  /* Booking ring — the gold stroke fills from 0 on first paint */
+  .ring-fill {
+    transform: rotate(-90deg);
+    transform-origin: center;
+    stroke-dasharray: 0 var(--ring-c, 1);
+    animation: ring-fill 1100ms var(--ease-overshoot) forwards;
+    animation-delay: 350ms;
+  }
+  @keyframes ring-fill {
+    to { stroke-dasharray: var(--ring-target) var(--ring-rest); }
+  }
+
+  /* Active day pill gets a gentle gold pulse at rest */
+  .day-pill[aria-current="true"]::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    border: 1.5px solid var(--gold);
+    opacity: 0;
+    animation: pill-pulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+  @keyframes pill-pulse {
+    0%   { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.18); }
+  }
+  .day-pill { position: relative; }
+
   /* legacy classes retained so unmigrated pages still render readably */
   .card {
     background: var(--bg-paper);
@@ -315,4 +441,10 @@ h1 { font-variation-settings: 'opsz' 144; }
   body.home-bg::after { animation: none; }
   .stagger > * { animation: none; opacity: 1; transform: none; }
   .postcard { transition: none; }
+  .hike-poster .stat-num { animation: none; opacity: 1; transform: none; }
+  .stamp.wobbly { animation: none; }
+  .eyebrow.with-rule::after { animation: none; width: 100%; }
+  .ring-fill { animation: none; stroke-dasharray: var(--ring-target) var(--ring-rest); }
+  .day-pill[aria-current="true"]::after { animation: none; opacity: 0; }
+  .postcard .arrow, .arrow { animation: none; }
 }
