@@ -28,8 +28,9 @@ const { title = 'Dolomites Trip', headerTitle, bodyClass } = Astro.props as {
     />
   </head>
   <body class={bodyClass}>
+    <a href="#main" class="skip-link">Skip to main content</a>
     <Header title={headerTitle} />
-    <main class="mx-auto" style="max-width: var(--max-content);"><slot /></main>
+    <main id="main" class="mx-auto" style="max-width: var(--max-content);"><slot /></main>
     <BottomNav />
     <ReceiveShareLink client:load />
     <RegisterServiceWorker />
