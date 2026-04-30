@@ -82,58 +82,46 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
     <WeatherWidget lat={day.data.weatherFor.lat} lon={day.data.weatherFor.lon} label={day.data.weatherFor.label} date={day.data.date} client:visible />
   </section>
 
-  {/* Hikes */}
+  {/* Hikes — uniform .hike-poster cards (same shape as the home page) */}
   {hikes.length > 0 && (
     <section class="stagger" style="padding: 22px var(--page-x) 8px;">
       <p class="eyebrow" style="margin: 0 0 12px;">{hikes.length === 1 ? 'Hike' : 'Hikes'}</p>
       <div style="display: grid; gap: 14px;">
         {hikes.filter(Boolean).map((h: any) => (
-          <a
-            href={`/hike/${h.slug}`}
-            class="hike-card"
-            style="
-              display: block;
-              background: var(--bg-paper);
-              border: 1px solid var(--hairline);
-              border-radius: var(--r-md);
-              padding: 16px 16px 14px;
-              box-shadow: var(--shadow-paper-md);
-              position: relative;
-              transition: transform 180ms var(--ease-out), border-color 180ms var(--ease-out);
-            "
-          >
-            <span class="mono-cap" style="font-size: 9px; color: var(--gold);">{h.data.region}</span>
+          <a href={`/hike/${h.slug}`} class="hike-poster">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span class="mono-cap" style="font-size: 9.5px; color: var(--gold); letter-spacing: 0.18em; font-weight: 700;">Tap For Full Detail →</span>
+              <span style="color: var(--gold); opacity: 0.6;">·</span>
+              <span class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft);">{h.data.region}</span>
+            </div>
             <h3 style="
               font-family: var(--font-display);
-              font-weight: 700;
+              font-style: italic;
+              font-weight: 800;
               font-variation-settings: 'opsz' 80;
-              font-size: 22px;
-              line-height: 1.1;
-              letter-spacing: -0.015em;
-              margin: 4px 0 12px;
+              font-size: clamp(24px, 6.5vw, 30px);
+              line-height: 1.02;
+              letter-spacing: -0.018em;
+              color: var(--ink);
+              margin: 12px 0 10px;
+              max-width: 96%;
             ">{h.data.name}</h3>
-            <div style="
-              display: grid;
-              grid-template-columns: repeat(4, 1fr);
-              gap: 8px;
-              padding: 10px 0 4px;
-              border-top: 1px dashed var(--hairline);
-            ">
+            <div class="poster-stats">
               <div style="text-align: center;">
-                <div class="mono tabular" style="font-size: 17px; font-weight: 700; color: var(--ink);">{h.data.distanceKm}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">km</div>
+                <div class="stat-num tabular">{h.data.distanceKm}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">km</div>
               </div>
-              <div style="text-align: center;">
-                <div class="mono tabular" style="font-size: 17px; font-weight: 700; color: var(--ink);">{h.data.elevationGainM}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">m gain</div>
+              <div style="text-align: center; border-left: 1px dashed var(--hairline);">
+                <div class="stat-num tabular">{h.data.elevationGainM}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">m gain</div>
               </div>
-              <div style="text-align: center;">
-                <div class="mono tabular" style="font-size: 17px; font-weight: 700; color: var(--ink);">{h.data.movingTimeHours.min}–{h.data.movingTimeHours.max}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">hours</div>
+              <div style="text-align: center; border-left: 1px dashed var(--hairline);">
+                <div class="stat-num tabular">{h.data.movingTimeHours.min}–{h.data.movingTimeHours.max}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">hours</div>
               </div>
-              <div style="text-align: center;">
-                <div class="mono" style="font-size: 12px; font-weight: 700; color: var(--ink); padding-top: 2px; text-transform: uppercase; letter-spacing: 0.06em;">{h.data.difficulty.slice(0, 4)}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">grade</div>
+              <div style="text-align: center; border-left: 1px dashed var(--hairline);">
+                <div class="stat-num" style="text-transform: capitalize; font-size: 16px; padding-top: 4px;">{h.data.difficulty}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">grade</div>
               </div>
             </div>
           </a>

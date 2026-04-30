@@ -1,13 +1,19 @@
 ---
 /*
  * Hike detail — vintage poster aesthetic.
- * Hero with name + AllTrails star rating; 2x2 stat block; numbered route
- * highlights with vintage circle stamps; hazards in signal red rotated -1deg;
- * food-on-trail with refuge-house glyphs.
+ *
+ * Two-part structure:
+ *   PART I  — the route itself (stats, trailhead, parking, highlights, food, hazards)
+ *   PART II — THE DAY (this hike's day in full: schedule, driving, lodging,
+ *             "also today" cross-links to other hikes scheduled the same day)
+ *
+ * That way, opening any hike gives you the complete operational picture for
+ * that day — you never have to hop back and forth between hike and day pages.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import EditHikeButton from '@/components/customize/EditHikeButton';
-import { getHikes, getDays } from '@/lib/content';
+import WeatherWidget from '@/components/WeatherWidget';
+import { getHikes, getDays, getHike, getLodgings } from '@/lib/content';
 
 export async function getStaticPaths() {
   const hikes = await getHikes();
@@ -17,25 +23,43 @@ export async function getStaticPaths() {
 const { hike } = Astro.props;
 const days = await getDays();
 const dayForHike = days.find((d) => d.data.hikeSlugs.includes(hike.slug));
-const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+const dayIndex = dayForHike ? days.findIndex((d) => d.data.date === dayForHike.data.date) : -1;
+const totalDays = days.length;
 
-// Render star rating as 5 SVG stars filled to the rating
+// Lodging for this hike's day
+const lodgings = await getLodgings();
+const dayLodging = dayForHike ? lodgings.find((l) => l.id === dayForHike.data.lodgingSlug) : null;
+
+// Other hikes scheduled the same day as this one
+const otherHikeRefs = dayForHike
+  ? dayForHike.data.hikeSlugs.filter((slug: string) => slug !== hike.slug)
+  : [];
+const otherHikes = await Promise.all(otherHikeRefs.map((slug: string) => getHike(slug)));
+
+const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+const fmtFull = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+// Star rating
 const stars = hike.data.rating?.stars ?? null;
 const fullStars = stars ? Math.floor(stars) : 0;
 const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
 ---
 <BaseLayout title={hike.data.name}>
 
+  {/* ════════ PART I — THE ROUTE ════════ */}
+
   {/* Hero */}
   <section class="stagger" style="padding: 24px var(--page-x) 12px;">
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-      <span class="mono-cap" style="font-size: 10px; color: var(--gold);">{hike.data.region}</span>
+      {dayForHike && (
+        <span class="mono-cap" style="font-size: 10px; color: var(--gold); font-weight: 700;">
+          Day {String(dayIndex + 1).padStart(2, '0')} / {String(totalDays).padStart(2, '0')}
+        </span>
+      )}
+      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">·</span>
+      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">{hike.data.region}</span>
       <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">·</span>
       <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">{hike.data.type.replace('-', ' ')}</span>
-      {dayForHike && (<>
-        <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">·</span>
-        <a class="mono-cap" href={`/day/${dayForHike.data.date}`} style="font-size: 10px; color: var(--ink-soft); border-bottom: 1px dashed var(--gold); padding-bottom: 1px;">{fmtDate(dayForHike.data.date)}</a>
-      </>)}
     </div>
     <h1 style="
       font-family: var(--font-display);
@@ -166,7 +190,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
     </div>
   </section>
 
-  {/* Route highlights ─ numbered with vintage circle stamps */}
+  {/* Route highlights */}
   {hike.data.routeHighlights.length > 0 && (
     <section class="stagger" style="padding: 18px var(--page-x);">
       <p class="eyebrow" style="margin: 0 0 12px;">Route Highlights</p>
@@ -201,7 +225,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
     </section>
   )}
 
-  {/* Food on trail ─ refuge house glyph */}
+  {/* Food on trail */}
   {hike.data.foodOnTrail.length > 0 && (
     <section class="stagger" style="padding: 18px var(--page-x);">
       <p class="eyebrow" style="margin: 0 0 12px;">Food on the Trail</p>
@@ -222,7 +246,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
     </section>
   )}
 
-  {/* Hazards ─ signal red label */}
+  {/* Hazards */}
   {hike.data.hazards.length > 0 && (
     <section class="stagger" style="padding: 18px var(--page-x);">
       <p class="eyebrow signal" style="margin: 0 0 12px;">Hazards & Tips</p>
@@ -246,11 +270,210 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
     </section>
   )}
 
-  {/* Bad weather option */}
+  {/* Bad weather option (for the hike itself) */}
   {hike.data.badWeatherOption && (
-    <section class="stagger" style="padding: 18px var(--page-x) 28px;">
+    <section class="stagger" style="padding: 18px var(--page-x);">
       <p class="eyebrow signal" style="margin: 0 0 12px;">If The Weather Turns</p>
       <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 12px 14px; font-size: 13.5px; color: var(--ink);">{hike.data.badWeatherOption}</div>
     </section>
+  )}
+
+  {/* ════════ PART II — THE DAY ════════ */}
+  {dayForHike && (
+    <>
+      {/* Chapter break */}
+      <div style="
+        margin: 36px var(--page-x) 0;
+        position: relative;
+        padding: 18px 0 6px;
+      ">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="flex: 1; height: 1px; background: var(--gold);"></span>
+          <span style="flex: 1; height: 1px; background: var(--gold); transform: translateY(-3px);"></span>
+        </div>
+        <div style="text-align: center; margin-top: 14px;">
+          <span class="mono-cap" style="font-size: 11px; color: var(--gold); letter-spacing: 0.32em; font-weight: 700;">Part II · The Day</span>
+          <h2 style="
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 800;
+            font-variation-settings: 'opsz' 100;
+            font-size: clamp(28px, 7vw, 40px);
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            margin: 14px 0 8px;
+          ">{dayForHike.data.theme}</h2>
+          <p class="mono-cap" style="font-size: 10.5px; color: var(--ink-soft); margin: 0;">
+            {fmtFull(dayForHike.data.date)} · Day {dayIndex + 1} of {totalDays}
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 18px;">
+          <span style="flex: 1; height: 1px; background: var(--gold); transform: translateY(3px);"></span>
+          <span style="flex: 1; height: 1px; background: var(--gold);"></span>
+        </div>
+      </div>
+
+      {/* Schedule timeline */}
+      {dayForHike.data.schedule.length > 0 && (
+        <section class="stagger" style="padding: 24px var(--page-x) 8px;">
+          <p class="eyebrow" style="margin: 0 0 12px;">Schedule</p>
+          <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 0;">
+            {dayForHike.data.schedule.map((s: { time: string; action: string }) => (
+              <li style="display: flex; gap: 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px dashed var(--hairline);">
+                <span class="mono tabular" style="
+                  flex: 0 0 56px;
+                  font-size: 13px;
+                  color: var(--gold);
+                  letter-spacing: 0.04em;
+                  font-weight: 700;
+                ">{s.time}</span>
+                <span style="font-size: 14.5px; line-height: 1.4; color: var(--ink); font-weight: 400;">{s.action}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {/* Weather */}
+      <section class="stagger" style="padding: 14px var(--page-x);">
+        <p class="eyebrow" style="margin: 0 0 10px;">Weather</p>
+        <WeatherWidget lat={dayForHike.data.weatherFor.lat} lon={dayForHike.data.weatherFor.lon} label={dayForHike.data.weatherFor.label} date={dayForHike.data.date} client:visible />
+      </section>
+
+      {/* Driving */}
+      {dayForHike.data.driving.distanceKm > 0 && (
+        <section class="stagger" style="padding: 14px var(--page-x);">
+          <p class="eyebrow" style="margin: 0 0 10px;">Driving</p>
+          <div style="
+            background: var(--bg-paper);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-md);
+            padding: 14px 16px;
+            box-shadow: var(--shadow-paper-sm);
+          ">
+            <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
+              <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
+                {dayForHike.data.driving.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">km</span>
+              </div>
+              <div style="flex: 1; min-width: 60px; display: flex; align-items: center; gap: 8px;">
+                <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
+              </div>
+              <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
+                {Math.floor(dayForHike.data.driving.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">h</span>
+                {dayForHike.data.driving.durationMin % 60 > 0 && (<>
+                  <span style="margin-left: 8px;">{dayForHike.data.driving.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">m</span>
+                </>)}
+              </div>
+            </div>
+            {dayForHike.data.driving.notes && <p style="font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 0;">{dayForHike.data.driving.notes}</p>}
+          </div>
+        </section>
+      )}
+
+      {/* Where you sleep */}
+      {dayLodging && (
+        <section class="stagger" style="padding: 14px var(--page-x);">
+          <p class="eyebrow" style="margin: 0 0 10px;">Where You Sleep</p>
+          <a href="/lodgings" style="
+            display: block;
+            background: var(--bg-paper);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-md);
+            padding: 14px 16px;
+            box-shadow: var(--shadow-paper-sm);
+          ">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto;">
+                <path d="M3 11 L12 4 L21 11 V21 H3 Z" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" fill="none" />
+                <path d="M9 21 V14 H15 V21" stroke="var(--ink-soft)" stroke-width="1.25" stroke-linejoin="round" />
+              </svg>
+              <div style="flex: 1; min-width: 0;">
+                <div style="
+                  font-family: var(--font-display);
+                  font-weight: 600;
+                  font-size: 18px;
+                  line-height: 1.1;
+                  color: var(--ink);
+                ">{dayLodging.data.name}</div>
+                <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; letter-spacing: 0.03em;">{dayLodging.data.location}</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--ink-soft);">
+                <path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </a>
+        </section>
+      )}
+
+      {/* Day's bad-weather option (if different from the hike's own) */}
+      {dayForHike.data.badWeatherOption && dayForHike.data.badWeatherOption !== hike.data.badWeatherOption && (
+        <section class="stagger" style="padding: 14px var(--page-x);">
+          <p class="eyebrow signal" style="margin: 0 0 10px;">If The Day Goes Sideways</p>
+          <div style="background: var(--bg-paper); border: 1px solid var(--signal); border-left: 4px solid var(--signal); border-radius: var(--r-sm); padding: 12px 14px; font-size: 13.5px; color: var(--ink); transform: rotate(-0.5deg);">{dayForHike.data.badWeatherOption}</div>
+        </section>
+      )}
+
+      {/* Also today — other hikes scheduled the same day */}
+      {otherHikes.filter(Boolean).length > 0 && (
+        <section class="stagger" style="padding: 14px var(--page-x) 28px;">
+          <p class="eyebrow" style="margin: 0 0 12px;">Also Today</p>
+          <div style="display: grid; gap: 10px;">
+            {otherHikes.filter(Boolean).map((h: any) => (
+              <a href={`/hike/${h.slug}`} style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: var(--bg-paper);
+                border: 1px solid var(--hairline);
+                border-radius: var(--r-md);
+                padding: 12px 14px;
+                box-shadow: var(--shadow-paper-sm);
+              ">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto;">
+                  <path d="M2 19 L8 9 L12 14 L15 10 L22 19" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" fill="none" />
+                </svg>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-family: var(--font-display); font-weight: 600; font-size: 15.5px; line-height: 1.15; color: var(--ink);">{h.data.name}</div>
+                  <div class="mono tabular" style="font-size: 11px; color: var(--ink-soft); margin-top: 3px; letter-spacing: 0.04em;">
+                    {h.data.distanceKm} <span style="color: var(--gold);">km</span> · {h.data.elevationGainM} <span style="color: var(--gold);">m</span> · <span style="text-transform: capitalize;">{h.data.difficulty}</span>
+                  </div>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--ink-soft);">
+                  <path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Day-page link footer */}
+      <section style="padding: 8px var(--page-x) 28px; text-align: center;">
+        <a
+          href={`/day/${dayForHike.data.date}`}
+          class="mono-cap"
+          style="
+            font-size: 10.5px;
+            color: var(--ink-soft);
+            padding: 8px 14px;
+            border: 1px dashed var(--hairline);
+            border-radius: var(--r-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+          "
+        >
+          See Day {dayIndex + 1} On Its Own
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 6 L15 12 L9 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </section>
+    </>
   )}
 </BaseLayout>
