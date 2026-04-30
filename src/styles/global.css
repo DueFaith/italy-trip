@@ -19,6 +19,35 @@
 *, *::before, *::after { box-sizing: border-box; }
 * { -webkit-tap-highlight-color: transparent; }
 
+/* Keyboard focus — gold outline (3:1 against bg, decorative not text) */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+*:focus:not(:focus-visible) { outline: none; }
+
+/* Skip link — visible only when focused */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+.skip-link:focus-visible {
+  left: var(--page-x);
+  top: 8px;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  outline-color: var(--bg);
+}
+
 html { background: var(--bg); }
 
 html, body {
@@ -88,15 +117,18 @@ h1 { font-variation-settings: 'opsz' 144; }
 ::selection { background: var(--gold); color: var(--ink); }
 
 @layer components {
-  /* Eyebrow — small caps mono gold, used everywhere as section openers */
+  /* Eyebrow — small caps mono used everywhere as section openers.
+     Default colour is --ink-soft (gold for text fails contrast).
+     Add .accent for non-text decorative contexts (rule-adjacent). */
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 400;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--ink-soft);
   }
+  .eyebrow.accent { color: var(--gold); }
   .eyebrow.ink { color: var(--ink-soft); }
   .eyebrow.signal { color: var(--signal); }
 
@@ -112,6 +144,7 @@ h1 { font-variation-settings: 'opsz' 144; }
     text-transform: uppercase;
     color: var(--ink-soft);
   }
+  .mono-cap.accent { color: var(--gold); }
 
   /* Vintage stamp — tiny rotated badge with gold border (used for "6 DAYS") */
   .stamp {

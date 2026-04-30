@@ -4,14 +4,22 @@
  *
  * Type system:
  *   Display:  "Fraunces" 800–900 italic for hero, 500–600 for section heads.
- *             Variable font, font-variation-settings: 'opsz' 144 for hero text.
- *   Body/UI:  "Inter Tight" 300 / 700 only (extremes — no 400/600 default-feel).
+ *   Body/UI:  "Inter Tight" 300 / 700 only.
  *   Mono:     "JetBrains Mono" 400 with tabular-nums for stats, coords, time.
- *   Pairing:  high-contrast serif + technical mono. Size jumps >= 2.5x.
  *
- * Color: warm bone (#F1E9D2) + deep alpine teal (#0E3B43) signature.
- *        --gold used sparingly as primary accent.
- *        --signal only for genuine alerts (booking-window-open, weather).
+ * Color rules (post-2026-05-01 audit):
+ *   --gold (#D4A24C) is a NON-TEXT TOKEN ONLY. Allowed uses:
+ *     - decorative SVG accents
+ *     - dashed borders / underlines
+ *     - 1-pixel rules
+ *     - large display numbers (>= 24px, qualifies as WCAG large text)
+ *     - focus outlines (--gold on the ring is decorative, not text)
+ *   For small text that previously used gold (eyebrows, mono-cap captions,
+ *   ordinals, "View Checklist", "Day NN/NN") use --ink-soft instead — it
+ *   passes 4.5:1 contrast on warm-bone bg.
+ *
+ *   --signal (#A83232) IS approved for text — it passes 4.5:1.
+ *   --ink (#0E3B43) on --bg is the safe default; --ink-soft is the muted variant.
  */
 
 :root {
