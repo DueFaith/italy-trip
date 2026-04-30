@@ -1,22 +1,87 @@
+/*
+ * Dolomites Trip — Design Tokens
+ * Aesthetic: Vintage Italian Alpine Travel Poster (Cassandre / Broders / ENIT, 1920s–1950s)
+ *
+ * Type system:
+ *   Display:  "Fraunces" 800–900 italic for hero, 500–600 for section heads.
+ *             Variable font, font-variation-settings: 'opsz' 144 for hero text.
+ *   Body/UI:  "Inter Tight" 300 / 700 only (extremes — no 400/600 default-feel).
+ *   Mono:     "JetBrains Mono" 400 with tabular-nums for stats, coords, time.
+ *   Pairing:  high-contrast serif + technical mono. Size jumps >= 2.5x.
+ *
+ * Color: warm bone (#F1E9D2) + deep alpine teal (#0E3B43) signature.
+ *        --gold used sparingly as primary accent.
+ *        --signal only for genuine alerts (booking-window-open, weather).
+ */
+
 :root {
-  --bg: #fbfaf6;
-  --bg-2: #f0ede2;
-  --surface: #ffffff;
-  --ink: #1f2937;
-  --ink-muted: #6b6258;
-  --forest: #2d4a3e;
-  --sage: #5a6b4d;
-  --sage-2: #6b7e5c;
-  --border: #e6e1d2;
+  /* core palette */
+  --bg: #F1E9D2;            /* warm bone */
+  --bg-paper: #EBE2C7;      /* darker paper for cards */
+  --bg-paper-2: #E2D9B9;    /* deeper paper for nested surfaces */
+  --ink: #0E3B43;           /* deep alpine teal — primary text */
+  --ink-soft: #2C5359;      /* softer ink for secondary text */
+  --gold: #D4A24C;          /* weathered gold — primary accent */
+  --crevasse: #3E6680;      /* crevasse blue — secondary accent */
+  --signal: #A83232;        /* blood red — alerts */
+  --moss: #5C6E3E;          /* moss green — success */
+  --grain: rgba(14, 59, 67, 0.04);
+  --hairline: rgba(14, 59, 67, 0.12);
 
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 16px;
+  /* type families */
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "Inter Tight", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
+  /* radii — paper, not plastic */
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  /* shadows — paper drop, not generic SaaS */
+  --shadow-paper-sm: 0 1px 2px rgba(14, 59, 67, 0.08), 0 0 0 1px rgba(14, 59, 67, 0.06);
+  --shadow-paper-md: 0 4px 10px rgba(14, 59, 67, 0.12), 0 1px 0 rgba(14, 59, 67, 0.06);
+  --shadow-paper-lg: 0 14px 28px rgba(14, 59, 67, 0.18), 0 2px 0 rgba(14, 59, 67, 0.10);
+  --shadow-stamp: 1px 2px 0 rgba(14, 59, 67, 0.18);
+
+  /* page rhythm */
+  --page-x: clamp(16px, 4vw, 24px);
+  --max-content: 1280px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* legacy aliases — pages not yet migrated still reference these */
+  --bg-2: var(--bg-paper);
+  --surface: #FBF7E8;
+  --ink-muted: var(--ink-soft);
+  --forest: var(--ink);
+  --sage: var(--crevasse);
+  --sage-2: var(--ink-soft);
+  --border: var(--hairline);
+  --radius-sm: var(--r-sm);
+  --radius: var(--r-md);
+  --radius-lg: var(--r-lg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14282B;
+    --bg-paper: #1B3439;
+    --bg-paper-2: #234047;
+    --ink: #F1E9D2;
+    --ink-soft: #C4B997;
+    --gold: #E5B45C;
+    --crevasse: #6B91AB;
+    --signal: #D85959;
+    --moss: #8FA868;
+    --grain: rgba(241, 233, 210, 0.03);
+    --hairline: rgba(241, 233, 210, 0.16);
+    --shadow-paper-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(241, 233, 210, 0.06);
+    --shadow-paper-md: 0 4px 10px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(241, 233, 210, 0.05);
+    --shadow-paper-lg: 0 14px 28px rgba(0, 0, 0, 0.5), 0 2px 0 rgba(241, 233, 210, 0.07);
+    --shadow-stamp: 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --surface: #1B3439;
+  }
 }

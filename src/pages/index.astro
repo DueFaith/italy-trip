@@ -1,4 +1,11 @@
 ---
+/*
+ * Home — vintage Italian alpine travel poster.
+ * Type: Fraunces 900 italic for the trip name; Fraunces 800 for the countdown
+ * digits and the booking ring number; JetBrains Mono for everything else.
+ * Color: warm bone bg + deep alpine teal text + weathered gold accents,
+ * with crevasse blue / signal red / moss green for secondary roles.
+ */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getDays, getHikes, getTrip, getBookings } from '@/lib/content';
 
@@ -11,85 +18,312 @@ const today = new Date();
 const start = new Date(trip.startDate);
 const daysToGo = Math.max(0, Math.ceil((start.getTime() - today.getTime()) / 86400000));
 const bookedCount = bookings.filter(b => b.status === 'booked').length;
-const hikesCount = hikes.length;
+const totalBookings = bookings.length;
+const bookedPct = Math.round((bookedCount / totalBookings) * 100);
 
 // First upcoming day with a hike
 const firstHikeDay = days.find(d => d.data.hikeSlugs.length > 0);
 const firstHike = firstHikeDay ? hikes.find(h => h.slug === firstHikeDay.data.hikeSlugs[0]) : null;
 
-const fmtDate = (iso: string) => {
+// "Today" detection so we can show a pulsing signal-red dot if we're inside the trip window
+const todayISO = today.toISOString().slice(0, 10);
+
+const fmtShort = (iso: string) => {
   const d = new Date(iso + 'T00:00');
   return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 };
----
-<BaseLayout title={trip.name}>
-  <section class="px-4 pt-6 pb-4 bg-bg-2/60 border-b border-border">
-    <p class="eyebrow">A trip to</p>
-    <h1 class="text-3xl font-semibold tracking-tight mt-1">The {trip.name}</h1>
-    <p class="text-sm text-ink-muted mt-1">
-      {fmtDate(trip.startDate)} → {fmtDate(trip.endDate)} · {days.length} days
-    </p>
+const fmtDayMon = (iso: string) =>
+  new Date(iso + 'T00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }).toUpperCase();
+const fmtRange = (a: string, b: string) =>
+  `${fmtDayMon(a)} — ${fmtDayMon(b)} ${new Date(b + 'T00:00').getFullYear()}`;
 
-    <div class="grid grid-cols-3 gap-2 mt-4">
-      <div class="stat text-center">
-        <div class="text-xl font-bold text-forest">{daysToGo}</div>
-        <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">Days to go</div>
-      </div>
-      <div class="stat text-center">
-        <div class="text-xl font-bold text-forest">{hikesCount}/{hikesCount}</div>
-        <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">Hikes</div>
-      </div>
-      <div class="stat text-center">
-        <div class="text-xl font-bold text-forest">{bookedCount}/{bookings.length}</div>
-        <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">Booked</div>
-      </div>
+// Booking ring geometry (SVG)
+const ringSize = 168;
+const ringStroke = 14;
+const ringR = (ringSize - ringStroke) / 2;
+const ringC = 2 * Math.PI * ringR;
+const ringFilled = ringC * (bookedCount / totalBookings);
+---
+<BaseLayout title={`${trip.name} · Trip`} bodyClass="home-bg">
+
+  {/* ─────────────────────────────────────────────────────────────────────────
+      HERO — eyebrow / serif title / mono date range / vintage stamp badge
+     ───────────────────────────────────────────────────────────────────────── */}
+  <section class="stagger" style="padding: 28px var(--page-x) 8px;">
+    <p class="eyebrow" style="margin: 0;">A Trip To</p>
+
+    <h1
+      style="
+        font-family: var(--font-display);
+        font-style: italic;
+        font-weight: 900;
+        font-variation-settings: 'opsz' 144;
+        font-size: clamp(54px, 14vw, 88px);
+        line-height: 0.92;
+        letter-spacing: -0.025em;
+        color: var(--ink);
+        margin: 8px 0 12px;
+      "
+    >The {trip.name}</h1>
+
+    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+      <span class="mono-cap" style="font-size: 12px; color: var(--ink-soft);">
+        {fmtRange(trip.startDate, trip.endDate)}
+      </span>
+      <span class="stamp">{days.length} Days</span>
+    </div>
+
+    {/* Decorative gold rule with a tiny mountain glyph */}
+    <div style="display: flex; align-items: center; gap: 10px; margin: 22px 0 0;">
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.7;"></span>
+      <svg width="22" height="14" viewBox="0 0 22 14" fill="none" aria-hidden="true">
+        <path d="M1 13 L7 3 L11 9 L14 5 L21 13 Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" fill="none" />
+        <circle cx="7" cy="3" r="0.8" fill="var(--gold)" />
+      </svg>
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.7;"></span>
     </div>
   </section>
 
+  {/* ─────────────────────────────────────────────────────────────────────────
+      COUNTDOWN — the largest number on the page
+     ───────────────────────────────────────────────────────────────────────── */}
+  <section
+    class="stagger"
+    style="padding: 28px var(--page-x) 12px; text-align: center; position: relative;"
+  >
+    {/* soft gold sun behind the digits */}
+    <div
+      aria-hidden="true"
+      style="
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 40%, rgba(212, 162, 76, 0.18), transparent 60%);
+        pointer-events: none;
+      "
+    ></div>
+    <div
+      class="tabular"
+      style="
+        position: relative;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-variation-settings: 'opsz' 144;
+        font-size: clamp(96px, 26vw, 168px);
+        line-height: 0.85;
+        letter-spacing: -0.04em;
+        color: var(--ink);
+      "
+    >{daysToGo}</div>
+    <p class="mono-cap" style="position: relative; margin: 14px 0 0; font-size: 11px; color: var(--ink-soft);">
+      Days Until Departure
+    </p>
+  </section>
+
+  {/* ─────────────────────────────────────────────────────────────────────────
+      FIRST UP — postcard with -1deg rotation
+     ───────────────────────────────────────────────────────────────────────── */}
   {firstHike && firstHikeDay && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">First up</p>
-      <a href={`/hike/${firstHike.slug}`} class="card flex items-center gap-3">
-        <div class="w-10 h-10 rounded-md flex-shrink-0 bg-gradient-to-br from-sage-2 to-forest"></div>
-        <div>
-          <div class="font-semibold text-sm">{firstHike.data.name}</div>
-          <div class="text-[11px] text-ink-muted mt-0.5">
-            {fmtDate(firstHikeDay.data.date)} · {firstHike.data.distanceKm} km · {firstHike.data.elevationGainM} m
+    <section class="stagger" style="padding: 32px var(--page-x) 8px;">
+      <p class="eyebrow" style="margin: 0 0 12px 4px;">First Up</p>
+      <a href={`/hike/${firstHike.slug}`} class="postcard">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <div style="flex: 1;">
+            <span class="mono-cap" style="font-size: 10px; color: var(--gold);">
+              {fmtShort(firstHikeDay.data.date)}
+            </span>
+            <h2 style="
+              font-family: var(--font-display);
+              font-weight: 700;
+              font-variation-settings: 'opsz' 80;
+              font-size: 26px;
+              line-height: 1.05;
+              letter-spacing: -0.015em;
+              color: var(--ink);
+              margin: 6px 0 10px;
+            ">{firstHike.data.name}</h2>
+            <div class="mono" style="font-size: 12px; color: var(--ink-soft); letter-spacing: 0.04em;">
+              <span>{firstHike.data.distanceKm} <span style="color: var(--gold);">km</span></span>
+              <span style="margin: 0 8px; color: var(--gold);">·</span>
+              <span>{firstHike.data.elevationGainM} <span style="color: var(--gold);">m</span></span>
+              <span style="margin: 0 8px; color: var(--gold);">·</span>
+              <span>{firstHike.data.movingTimeHours.min}–{firstHike.data.movingTimeHours.max}h</span>
+            </div>
           </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto;">
+            <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          </svg>
         </div>
       </a>
     </section>
   )}
 
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Days</p>
-    <div class="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+  {/* ─────────────────────────────────────────────────────────────────────────
+      DAY PILLS + ITINERARY (torn ticket stubs)
+     ───────────────────────────────────────────────────────────────────────── */}
+  <section class="stagger" style="padding: 32px 0 8px;">
+    <p class="eyebrow" style="margin: 0 0 12px var(--page-x);">Itinerary</p>
+
+    <div
+      class="day-pill-scroll"
+      style="
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        padding: 4px var(--page-x) 12px;
+        margin: 0;
+        -webkit-overflow-scrolling: touch;
+      "
+    >
+      {days.map((d) => {
+        const isToday = d.data.date === todayISO;
+        return (
+          <a
+            href={`/day/${d.data.date}`}
+            class="day-pill"
+            style="scroll-snap-align: start;"
+            aria-current={isToday ? 'true' : undefined}
+          >
+            <span style="font-weight: 700;">{new Date(d.data.date + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric' })}</span>
+            <span style="opacity: 0.7;">{new Date(d.data.date + 'T00:00').toLocaleDateString('en-GB', { month: 'short' }).toUpperCase()}</span>
+            {isToday && (
+              <span
+                aria-label="today"
+                style="
+                  display: inline-block;
+                  width: 6px; height: 6px;
+                  border-radius: 50%;
+                  background: var(--signal);
+                  margin-left: 2px;
+                  animation: pulse-dot 1.6s ease-in-out infinite;
+                "
+              ></span>
+            )}
+          </a>
+        );
+      })}
+    </div>
+
+    <ol style="list-style: none; margin: 6px 0 0; padding: 0 var(--page-x); display: grid; gap: 10px;">
       {days.map((d, i) => (
-        <a href={`/day/${d.data.date}`} class:list={['pill', 'whitespace-nowrap', i === 0 ? 'pill-active' : '']}>
-          {fmtDate(d.data.date).replace(/^\w+,? /, '')}
-        </a>
+        <li>
+          <a href={`/day/${d.data.date}`} class="ticket">
+            <div class="ticket-rail">
+              <span class="ticket-num tabular">{String(i + 1).padStart(2, '0')}</span>
+              <span class="ticket-label">Day</span>
+            </div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+              <span class="mono-cap" style="font-size: 10px; color: var(--gold);">{fmtShort(d.data.date)}</span>
+              <span style="
+                font-family: var(--font-display);
+                font-weight: 600;
+                font-variation-settings: 'opsz' 36;
+                font-size: 17px;
+                line-height: 1.15;
+                letter-spacing: -0.01em;
+                color: var(--ink);
+                margin-top: 2px;
+              ">{d.data.theme}</span>
+              {d.data.hikeSlugs.length > 0 && (
+                <span class="mono" style="font-size: 11px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.04em;">
+                  {d.data.hikeSlugs.map((s, j) => (
+                    <>
+                      {j > 0 && <span style="color: var(--gold); margin: 0 6px;">·</span>}
+                      <span>{s}</span>
+                    </>
+                  ))}
+                </span>
+              )}
+            </div>
+          </a>
+        </li>
       ))}
-    </div>
-    <div class="mt-3 space-y-2">
-      {days.map((d) => (
-        <a href={`/day/${d.data.date}`} class="card block">
-          <div class="text-sm font-semibold">{fmtDate(d.data.date)}</div>
-          <div class="text-[11px] text-ink-muted mt-0.5">{d.data.theme}</div>
-        </a>
-      ))}
-    </div>
+    </ol>
   </section>
 
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Booking checklist</p>
-    <a href="/checklist" class="card block">
-      <div class="flex justify-between text-sm">
-        <span>{bookedCount} of {bookings.length} confirmed</span>
-        <span class="font-semibold">{Math.round(bookedCount / bookings.length * 100)}%</span>
+  {/* ─────────────────────────────────────────────────────────────────────────
+      BOOKING RING — circular SVG progress
+     ───────────────────────────────────────────────────────────────────────── */}
+  <section
+    class="stagger"
+    style="padding: 36px var(--page-x) 32px; display: flex; justify-content: center;"
+  >
+    <a
+      href="/checklist"
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 8px 16px;
+      "
+      aria-label={`Booking checklist: ${bookedCount} of ${totalBookings} confirmed`}
+    >
+      <div style={`position: relative; width: ${ringSize}px; height: ${ringSize}px;`}>
+        <svg width={ringSize} height={ringSize} viewBox={`0 0 ${ringSize} ${ringSize}`}>
+          <circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={ringR}
+            stroke="var(--ink)"
+            stroke-opacity="0.15"
+            stroke-width={ringStroke}
+            fill="none"
+          />
+          <circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={ringR}
+            stroke="var(--gold)"
+            stroke-width={ringStroke}
+            fill="none"
+            stroke-linecap="butt"
+            stroke-dasharray={`${ringFilled} ${ringC - ringFilled}`}
+            stroke-dashoffset={ringC / 4}
+            transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
+            style="transition: stroke-dasharray 800ms cubic-bezier(0.34, 1.56, 0.64, 1);"
+          />
+        </svg>
+        <div
+          style="
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          "
+        >
+          <span
+            class="tabular"
+            style="
+              font-family: var(--font-display);
+              font-weight: 800;
+              font-variation-settings: 'opsz' 80;
+              font-size: 38px;
+              line-height: 1;
+              letter-spacing: -0.02em;
+              color: var(--ink);
+            "
+          >{bookedCount}<span style="color: var(--ink-soft); font-weight: 500; opacity: 0.6;">/{totalBookings}</span></span>
+          <span class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">{bookedPct}% Booked</span>
+        </div>
       </div>
-      <div class="h-1.5 bg-bg-2 rounded-full mt-2 overflow-hidden">
-        <div class="h-full bg-forest" style={`width: ${bookedCount / bookings.length * 100}%`}></div>
-      </div>
+      <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft);">View Checklist →</span>
     </a>
   </section>
+
+  <style is:global>
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.45; transform: scale(0.7); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [aria-label="today"] { animation: none !important; }
+    }
+    /* hide the day-pill scrollbar without hiding overflow */
+    .day-pill-scroll::-webkit-scrollbar { display: none; }
+    .day-pill-scroll { scrollbar-width: none; }
+  </style>
 </BaseLayout>

@@ -4,19 +4,32 @@ import Header from '@/components/Header.astro';
 import BottomNav from '@/components/BottomNav.astro';
 import ReceiveShareLink from '@/components/ReceiveShareLink';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker.astro';
-const { title = 'Dolomites Trip', headerTitle } = Astro.props as { title?: string; headerTitle?: string };
+const { title = 'Dolomites Trip', headerTitle, bodyClass } = Astro.props as {
+  title?: string;
+  headerTitle?: string;
+  bodyClass?: string;
+};
 ---
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#fbfaf6" />
+    <meta name="theme-color" content="#F1E9D2" />
+    <meta name="theme-color" content="#14282B" media="(prefers-color-scheme: dark)" />
     <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..900;1,9..144,500..900&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
   </head>
-  <body>
+  <body class={bodyClass}>
     <Header title={headerTitle} />
-    <main class="max-w-screen-md mx-auto"><slot /></main>
+    <main class="mx-auto" style="max-width: var(--max-content);"><slot /></main>
     <BottomNav />
     <ReceiveShareLink client:load />
     <RegisterServiceWorker />

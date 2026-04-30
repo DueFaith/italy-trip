@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <style>path { fill: none; stroke: #0E3B43; stroke-width: 0.7; stroke-linecap: round; stroke-linejoin: round; }</style>
+  </defs>
+  <!-- Loose, organic concentric contour curves — simulating a topographic map -->
+  <g opacity="0.9">
+    <path d="M -50 220 C 110 180 230 280 360 220 S 600 200 880 250" />
+    <path d="M -50 260 C 130 220 240 320 380 260 S 620 240 880 290" />
+    <path d="M -50 300 C 150 260 250 360 400 300 S 640 280 880 330" />
+    <path d="M -50 340 C 170 310 270 400 420 340 S 660 320 880 370" />
+    <path d="M -50 380 C 190 350 290 440 440 380 S 680 360 880 410" />
+  </g>
+  <g opacity="0.9">
+    <path d="M -50 540 C 90 510 220 600 380 540 S 600 520 880 570" />
+    <path d="M -50 580 C 110 550 240 640 400 580 S 620 560 880 610" />
+    <path d="M -50 620 C 130 590 260 680 420 620 S 640 600 880 650" />
+  </g>
+  <!-- A few peak-like closed loops to suggest summits -->
+  <g opacity="0.9">
+    <path d="M 180 130 q 50 -50 110 0 q 30 30 -10 60 q -45 30 -90 5 q -40 -25 -10 -65 z" />
+    <path d="M 200 145 q 35 -35 80 0 q 22 22 -8 45 q -32 22 -65 4 q -29 -18 -7 -49 z" />
+    <path d="M 540 70 q 60 -45 130 0 q 35 30 -12 65 q -55 35 -110 5 q -45 -25 -8 -70 z" />
+    <path d="M 560 90 q 45 -32 100 0 q 26 22 -10 50 q -42 27 -85 5 q -34 -19 -5 -55 z" />
+  </g>
+  <!-- Faint dashed route line, decorative -->
+  <path d="M 0 700 C 200 660 380 760 560 700 S 800 680 900 720" stroke-dasharray="3 6" opacity="0.6" />
+</svg>
