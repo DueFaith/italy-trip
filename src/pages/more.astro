@@ -1,21 +1,51 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 const items = [
-  { href: '/lodgings', label: 'Lodgings' },
-  { href: '/restaurants', label: 'Restaurants' },
-  { href: '/checklist', label: 'Booking checklist' },
-  { href: '/contingencies', label: 'Contingencies' },
-  { href: '/photos', label: 'Photos' },
-  { href: '/customize', label: 'Customize' },
+  { href: '/lodgings',      label: 'Lodgings',         hint: 'Hotels, addresses, contacts' },
+  { href: '/restaurants',   label: 'Restaurants',      hint: 'By area · Cortina, Brixen, Ortisei' },
+  { href: '/checklist',     label: 'Booking Checklist',hint: 'Pre-trip status · 11 items' },
+  { href: '/contingencies', label: 'Contingencies',    hint: 'Weather rules · rainy-day backups' },
+  { href: '/photos',        label: 'Photos',           hint: 'Empty for now · post-trip drop' },
+  { href: '/customize',     label: 'Customize',        hint: 'Edit your local plan' },
 ];
 ---
 <BaseLayout title="More">
-  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
-    <h1 class="text-xl font-semibold">More</h1>
+  <section class="stagger" style="padding: 24px var(--page-x) 8px;">
+    <span class="mono-cap" style="font-size: 10px; color: var(--gold);">Index</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 6px;
+    ">More</h1>
   </section>
-  <section class="px-4 py-4 space-y-2">
+
+  <section class="stagger" style="padding: 14px var(--page-x) 28px; display: grid; gap: 10px;">
     {items.map((it) => (
-      <a href={it.href} class="card block text-sm font-semibold">{it.label}</a>
+      <a href={it.href} style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 16px;
+        background: var(--bg-paper);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-md);
+        box-shadow: var(--shadow-paper-sm);
+      ">
+        <div>
+          <div style="font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--ink); line-height: 1.1;">{it.label}</div>
+          <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.02em;">{it.hint}</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--gold);">
+          <path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
     ))}
   </section>
 </BaseLayout>

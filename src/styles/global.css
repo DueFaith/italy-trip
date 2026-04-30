@@ -152,6 +152,7 @@ h1 { font-variation-settings: 'opsz' 144; }
   }
   .postcard:active {
     transform: rotate(-1deg) scale(0.985);
+    box-shadow: var(--shadow-paper-md);
   }
   .postcard::before {
     content: '';
@@ -160,6 +161,15 @@ h1 { font-variation-settings: 'opsz' 144; }
     border: 0.5px dashed var(--hairline);
     border-radius: 4px;
     pointer-events: none;
+  }
+  /* Subtle ambient nudge on the arrow — tells you the card is tappable */
+  .postcard .arrow {
+    animation: arrow-nudge 2.6s ease-in-out infinite;
+    transform-origin: center;
+  }
+  @keyframes arrow-nudge {
+    0%, 100% { transform: translateX(0); opacity: 0.85; }
+    50%      { transform: translateX(3px); opacity: 1; }
   }
 
   /* Day pill — horizontal scrollable selector */
@@ -197,10 +207,10 @@ h1 { font-variation-settings: 'opsz' 144; }
     padding: 14px 16px;
     box-shadow: var(--shadow-paper-sm);
     position: relative;
-    transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+    transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), border-color 180ms var(--ease-out);
   }
   .ticket::before {
-    /* perforated top edge — dashed line + tiny offset that simulates a tear */
+    /* perforated top edge — dashed line that simulates a tear */
     content: '';
     position: absolute;
     top: -1px; left: 4px; right: 4px;
@@ -213,6 +223,14 @@ h1 { font-variation-settings: 'opsz' 144; }
   .ticket:active {
     transform: translateY(1px);
     box-shadow: var(--shadow-paper-sm);
+    border-color: var(--gold);
+  }
+  .ticket:active .ticket-chevron { transform: translateX(4px); color: var(--gold); }
+  .ticket-chevron {
+    align-self: center;
+    flex: 0 0 auto;
+    color: var(--ink-soft);
+    transition: transform 180ms var(--ease-out), color 180ms var(--ease-out);
   }
   .ticket-rail {
     flex: 0 0 auto;

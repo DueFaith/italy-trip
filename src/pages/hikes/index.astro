@@ -3,25 +3,64 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getHikes, getDays } from '@/lib/content';
 const hikes = await getHikes();
 const days = await getDays();
-const dayForSlug = (slug: string) => days.find(d => d.data.hikeSlugs.includes(slug))?.data.date;
+const dayForSlug = (slug: string) => days.find((d) => d.data.hikeSlugs.includes(slug))?.data.date;
 const fmt = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 ---
 <BaseLayout title="Hikes">
-  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
-    <h1 class="text-xl font-semibold">Hikes</h1>
+  <section class="stagger" style="padding: 24px var(--page-x) 8px;">
+    <span class="mono-cap" style="font-size: 10px; color: var(--gold);">All Routes · {hikes.length}</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 6px;
+    ">Hikes</h1>
   </section>
-  <section class="px-4 py-4 space-y-2">
+
+  <section class="stagger" style="padding: 14px var(--page-x) 28px; display: grid; gap: 12px;">
     {hikes.map((h: any) => {
       const date = dayForSlug(h.slug);
       return (
-        <a href={`/hike/${h.slug}`} class="card block">
-          <div class="text-sm font-semibold">{h.data.name}</div>
-          <div class="text-[11px] text-ink-muted mt-0.5">
-            {date && <span>{fmt(date)} · </span>}
-            {h.data.distanceKm} km · {h.data.elevationGainM} m · {h.data.difficulty}
+        <a href={`/hike/${h.slug}`} class="hike-card" style="
+          display: block;
+          background: var(--bg-paper);
+          border: 1px solid var(--hairline);
+          border-radius: var(--r-md);
+          padding: 14px 16px;
+          box-shadow: var(--shadow-paper-sm);
+          transition: transform 180ms var(--ease-out), border-color 180ms var(--ease-out);
+        ">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto;">
+              <path d="M2 19 L8 9 L12 14 L15 10 L22 19" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" fill="none" />
+              <path d="M3 21 H21" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="2 3" />
+            </svg>
+            <div style="flex: 1; min-width: 0;">
+              {date && <div class="mono-cap" style="font-size: 9.5px; color: var(--gold);">{fmt(date)}</div>}
+              <div style="font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--ink); line-height: 1.15; margin-top: 2px;">{h.data.name}</div>
+              <div class="mono tabular" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.04em;">
+                <span>{h.data.distanceKm}<span style="color: var(--gold); margin-left: 2px;">km</span></span>
+                <span style="color: var(--gold); margin: 0 6px;">·</span>
+                <span>{h.data.elevationGainM}<span style="color: var(--gold); margin-left: 2px;">m</span></span>
+                <span style="color: var(--gold); margin: 0 6px;">·</span>
+                <span style="text-transform: capitalize;">{h.data.difficulty}</span>
+              </div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--ink-soft);">
+              <path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </div>
         </a>
       );
     })}
   </section>
+
+  <style is:global>
+    .hike-card:active { transform: scale(0.99); border-color: var(--gold) !important; }
+  </style>
 </BaseLayout>

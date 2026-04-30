@@ -1,15 +1,36 @@
 ---
+/*
+ * Booking checklist — vintage poster aesthetic.
+ * The custom square checkboxes live inside <BookingChecklist /> (React island).
+ */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BookingChecklist from '@/components/BookingChecklist';
 import { getBookings } from '@/lib/content';
 const bookings = getBookings();
 ---
 <BaseLayout title="Booking checklist">
-  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
-    <h1 class="text-xl font-semibold">Booking checklist</h1>
-    <p class="text-[12px] text-ink-muted mt-1">Saved on this device only.</p>
+  <section class="stagger" style="padding: 24px var(--page-x) 14px;">
+    <span class="mono-cap" style="font-size: 10px; color: var(--gold);">Pre-Trip</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 10px;
+    ">Booking Checklist</h1>
+    <p class="mono" style="font-size: 12px; color: var(--ink-soft); letter-spacing: 0.02em;">Saved on this device only.</p>
+    <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
+      <span class="mono-cap" style="font-size: 9px; color: var(--gold);">Items</span>
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
+    </div>
   </section>
-  <section class="px-4 py-4">
+
+  <section class="stagger" style="padding: 6px var(--page-x) 28px;">
     <BookingChecklist bookings={bookings} client:load />
   </section>
 </BaseLayout>

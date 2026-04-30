@@ -2,12 +2,45 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Photos">
-  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
-    <h1 class="text-xl font-semibold">Photos</h1>
-    <p class="text-[12px] text-ink-muted mt-1">Empty for now — populated post-trip.</p>
+  <section class="stagger" style="padding: 24px var(--page-x) 8px;">
+    <span class="mono-cap" style="font-size: 10px; color: var(--gold);">After The Trip</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 6px;
+    ">Photographs</h1>
   </section>
-  <section class="px-4 py-8 text-center text-ink-muted text-sm">
-    <div class="w-24 h-24 mx-auto rounded-lg bg-gradient-to-br from-sage-2/30 to-forest/30 mb-4"></div>
-    <p>Drop photos in <code class="bg-bg-2 px-1 rounded">public/photos/&lt;day&gt;/</code> after the trip.</p>
+
+  <section class="stagger" style="padding: 32px var(--page-x); text-align: center;">
+    {/* Empty-state postcard */}
+    <div style="
+      display: inline-block;
+      transform: rotate(-2deg);
+      padding: 28px 36px;
+      background: var(--bg-paper);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow-paper-lg);
+      max-width: 320px;
+    ">
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true" style="display: block; margin: 0 auto 14px;">
+        <rect x="6" y="14" width="44" height="32" rx="2" stroke="var(--gold)" stroke-width="1.5" fill="none" />
+        <path d="M16 14 L20 8 H36 L40 14" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round" fill="none" />
+        <circle cx="28" cy="30" r="7" stroke="var(--ink-soft)" stroke-width="1.5" fill="none" />
+        <circle cx="28" cy="30" r="2" fill="var(--gold)" />
+      </svg>
+      <div style="font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--ink); line-height: 1.2;">
+        Nothing yet — we haven't gone.
+      </div>
+      <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 8px; letter-spacing: 0.04em; line-height: 1.5;">
+        Drop photos in <code style="font-family: var(--font-mono); background: var(--bg); padding: 1px 6px; border-radius: 3px; border: 1px solid var(--hairline);">public/photos/&lt;day&gt;/</code> after the trip.
+      </div>
+    </div>
   </section>
 </BaseLayout>

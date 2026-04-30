@@ -4,25 +4,64 @@ import { getRestaurants } from '@/lib/content';
 const groups = await getRestaurants();
 ---
 <BaseLayout title="Restaurants">
-  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
-    <h1 class="text-xl font-semibold">Restaurants</h1>
+  <section class="stagger" style="padding: 24px var(--page-x) 8px;">
+    <span class="mono-cap" style="font-size: 10px; color: var(--gold);">Where We Eat</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 6px;
+    ">Restaurants</h1>
   </section>
+
   {groups.map((g: any) => (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">{g.data.area}</p>
-      <div class="space-y-2">
-        {g.data.items.map((r: any) => (
-          <div class="card">
-            <div class="flex justify-between items-start gap-2">
-              <div class="font-semibold text-sm">{r.name}</div>
-              <div class="text-[11px] text-ink-muted">{r.priceRange ?? ''}{r.needsReservation ? ' · book' : ''}</div>
-            </div>
-            <div class="text-[11px] text-ink-muted">{r.type}</div>
-            {r.notes && <p class="text-[11px] text-ink-muted mt-1">{r.notes}</p>}
-            {r.phone && <a href={`tel:${r.phone}`} class="text-[11px] text-forest underline decoration-dotted">{r.phone}</a>}
-          </div>
-        ))}
+    <section class="stagger" style="padding: 18px var(--page-x);">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="mono-cap" style="font-size: 11px; color: var(--ink); font-weight: 700;">{g.data.area}</span>
+        <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.5;"></span>
       </div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 10px;">
+        {g.data.items.map((r: any) => (
+          <li style="
+            background: var(--bg-paper);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-md);
+            padding: 12px 14px;
+            box-shadow: var(--shadow-paper-sm);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+          ">
+            {/* Vintage map-marker bullet — small filled circle with gold ring */}
+            <span style="
+              flex: 0 0 14px;
+              width: 14px;
+              height: 14px;
+              border-radius: 50%;
+              border: 1.5px solid var(--gold);
+              background: var(--bg-paper);
+              position: relative;
+              margin-top: 5px;
+            ">
+              <span style="position: absolute; inset: 3px; border-radius: 50%; background: var(--ink);"></span>
+            </span>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink); line-height: 1.2;">{r.name}</span>
+                <span class="mono-cap" style="font-size: 10px; color: var(--gold);">{r.priceRange ?? ''}{r.needsReservation ? ' · Book' : ''}</span>
+              </div>
+              <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; letter-spacing: 0.02em;">{r.type}</div>
+              {r.notes && <p style="font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 0; line-height: 1.45; font-style: italic;">{r.notes}</p>}
+              {r.phone && <a href={`tel:${r.phone}`} class="mono-cap" style="font-size: 10px; color: var(--gold); margin-top: 6px; display: inline-block; border-bottom: 1px dashed var(--gold); padding-bottom: 1px;">{r.phone}</a>}
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   ))}
 </BaseLayout>

@@ -11,14 +11,29 @@ const canonicalDays = days.map((d) => d.data);
 const canonicalHikes = hikes.map((h) => ({ ...h.data, slug: h.slug }));
 ---
 <BaseLayout title="Customize">
-  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
-    <h1 class="text-xl font-semibold">Customize</h1>
-    <p class="text-[12px] text-ink-muted mt-1">Edits stay on this device. Use share-link to send to others.</p>
+  <section class="stagger" style="padding: 24px var(--page-x) 12px;">
+    <span class="mono-cap" style="font-size: 10px; color: var(--gold);">Your Local Plan</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 8px;
+    ">Customize</h1>
+    <p style="font-size: 12.5px; color: var(--ink-soft); line-height: 1.5;">
+      Edits stay on this device. Use the <strong style="color: var(--gold); font-weight: 700;">share link</strong> to send your version to companions.
+    </p>
   </section>
-  <section class="px-4 py-4">
+
+  <section class="stagger" style="padding: 6px var(--page-x) 12px;">
     <CustomizePanel canonicalDays={canonicalDays} canonicalHikes={canonicalHikes} client:load />
-    <div class="mt-6">
-      <ShareLinkButton client:load />
-    </div>
+  </section>
+
+  <section class="stagger" style="padding: 18px var(--page-x) 28px;">
+    <ShareLinkButton client:load />
   </section>
 </BaseLayout>

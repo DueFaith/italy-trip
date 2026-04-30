@@ -31,5 +31,45 @@ for (const l of lodgings) {
 }
 ---
 <BaseLayout title="Map">
+  {/* Floating caption at the top of the map for context */}
+  <div style="
+    position: absolute;
+    top: 70px;
+    left: var(--page-x);
+    right: var(--page-x);
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  ">
+    <span class="mono-cap" style="
+      font-size: 10px;
+      color: var(--ink);
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      padding: 6px 10px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-sm);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-paper-sm);
+    ">{hikes.length} Trailheads · {lodgings.length} Lodgings</span>
+  </div>
   <MapView pins={pins} client:only="react" />
+
+  {/* Sepia-tone overlay on the map canvas — gives the OSM tiles a vintage feel */}
+  <style is:global>
+    .maplibregl-canvas {
+      filter: sepia(0.35) saturate(0.85) hue-rotate(-10deg) contrast(0.95) brightness(1.02);
+    }
+    .maplibregl-popup-content {
+      background: var(--bg-paper) !important;
+      border: 1px solid var(--hairline) !important;
+      box-shadow: var(--shadow-paper-md) !important;
+      font-family: var(--font-body) !important;
+      color: var(--ink) !important;
+      border-radius: var(--r-sm) !important;
+    }
+    .maplibregl-popup-tip { display: none !important; }
+    .maplibregl-ctrl button { background: var(--bg-paper) !important; }
+  </style>
 </BaseLayout>

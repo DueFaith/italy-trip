@@ -1,7 +1,13 @@
 ---
+/*
+ * Hike detail — vintage poster aesthetic.
+ * Hero with name + AllTrails star rating; 2x2 stat block; numbered route
+ * highlights with vintage circle stamps; hazards in signal red rotated -1deg;
+ * food-on-trail with refuge-house glyphs.
+ */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getHikes, getDays } from '@/lib/content';
 import EditHikeButton from '@/components/customize/EditHikeButton';
+import { getHikes, getDays } from '@/lib/content';
 
 export async function getStaticPaths() {
   const hikes = await getHikes();
@@ -12,109 +18,239 @@ const { hike } = Astro.props;
 const days = await getDays();
 const dayForHike = days.find((d) => d.data.hikeSlugs.includes(hike.slug));
 const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+// Render star rating as 5 SVG stars filled to the rating
+const stars = hike.data.rating?.stars ?? null;
+const fullStars = stars ? Math.floor(stars) : 0;
+const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
 ---
 <BaseLayout title={hike.data.name}>
-  <section class="px-4 pt-5 pb-3 bg-bg-2/60 border-b border-border">
-    <p class="eyebrow">{hike.data.region} · {hike.data.type.replace('-', ' ')}</p>
-    <h1 class="text-xl font-semibold tracking-tight mt-1">{hike.data.name}</h1>
-    {dayForHike && (
-      <p class="text-sm text-ink-muted mt-1">
-        <a class="underline decoration-dotted" href={`/day/${dayForHike.data.date}`}>{fmtDate(dayForHike.data.date)}</a>
-      </p>
-    )}
-    <div class="mt-3">
-      <EditHikeButton canonical={{ ...hike.data, slug: hike.slug }} client:load />
-    </div>
-  </section>
 
-  <section class="px-4 py-4 grid grid-cols-3 gap-2">
-    <div class="stat text-center">
-      <div class="text-base font-bold text-forest">{hike.data.distanceKm}</div>
-      <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">km</div>
+  {/* Hero */}
+  <section class="stagger" style="padding: 24px var(--page-x) 12px;">
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <span class="mono-cap" style="font-size: 10px; color: var(--gold);">{hike.data.region}</span>
+      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">·</span>
+      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">{hike.data.type.replace('-', ' ')}</span>
+      {dayForHike && (<>
+        <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">·</span>
+        <a class="mono-cap" href={`/day/${dayForHike.data.date}`} style="font-size: 10px; color: var(--ink-soft); border-bottom: 1px dashed var(--gold); padding-bottom: 1px;">{fmtDate(dayForHike.data.date)}</a>
+      </>)}
     </div>
-    <div class="stat text-center">
-      <div class="text-base font-bold text-forest">{hike.data.elevationGainM}</div>
-      <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">m gain</div>
-    </div>
-    <div class="stat text-center">
-      <div class="text-base font-bold text-forest">{hike.data.movingTimeHours.min}–{hike.data.movingTimeHours.max}h</div>
-      <div class="text-[10px] uppercase tracking-wide text-ink-muted mt-0.5">moving</div>
-    </div>
-  </section>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 12px 0 14px;
+    ">{hike.data.name}</h1>
 
-  {hike.data.alltrailsUrl && (
-    <section class="px-4 pb-2">
-      <a href={hike.data.alltrailsUrl} class="card block text-sm">
-        AllTrails — {hike.data.alltrailsUrl.replace(/^https?:\/\//, '')}
-        {hike.data.rating && <span class="text-ink-muted text-xs"> · {hike.data.rating.stars}★ ({hike.data.rating.reviews})</span>}
-      </a>
-    </section>
-  )}
-
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Trailhead</p>
-    <div class="card text-sm">
-      <div class="font-semibold">{hike.data.trailhead.name}</div>
-      <div class="text-[11px] text-ink-muted mt-0.5">
-        <a href={`https://www.google.com/maps?q=${hike.data.trailhead.lat},${hike.data.trailhead.lon}`} class="underline decoration-dotted">
-          {hike.data.trailhead.lat}, {hike.data.trailhead.lon}
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Parking</p>
-    <div class="card text-sm">
-      <div>
-        {hike.data.parking.name}
-        {hike.data.parking.costEur > 0 && <span class="text-ink-muted"> · €{hike.data.parking.costEur}</span>}
-      </div>
-      {hike.data.parking.mustBook && (
-        <div class="text-xs text-forest mt-1">
-          ⚠ Booking required.
-          {hike.data.parking.bookingUrl && <a href={hike.data.parking.bookingUrl} class="underline decoration-dotted ml-1">Book here</a>}
+    {stars && (
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; gap: 2px;" aria-label={`${stars} out of 5`}>
+          {Array.from({ length: 5 }, (_, i) => {
+            const filled = i < fullStars;
+            const half = i === fullStars && halfStar === 1;
+            return (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <defs>{half && (<linearGradient id={`half-${hike.slug}-${i}`} x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="50%" stop-color="var(--gold)" />
+                  <stop offset="50%" stop-color="transparent" />
+                </linearGradient>)}</defs>
+                <path d="M12 2 L14.6 8.6 L21.6 9.2 L16.3 13.9 L17.9 20.8 L12 17.2 L6.1 20.8 L7.7 13.9 L2.4 9.2 L9.4 8.6 Z"
+                  fill={filled ? 'var(--gold)' : (half ? `url(#half-${hike.slug}-${i})` : 'transparent')}
+                  stroke="var(--gold)"
+                  stroke-width="1.2"
+                  stroke-linejoin="round" />
+              </svg>
+            );
+          })}
         </div>
+        <span class="mono tabular" style="font-size: 12px; color: var(--ink-soft); letter-spacing: 0.04em;">{stars.toFixed(1)} <span style="opacity: 0.7;">({hike.data.rating?.reviews?.toLocaleString() ?? 0})</span></span>
+      </div>
+    )}
+
+    <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <EditHikeButton canonical={{ ...hike.data, slug: hike.slug }} client:load />
+      {hike.data.alltrailsUrl && (
+        <a href={hike.data.alltrailsUrl} style="
+          font-family: var(--font-mono);
+          font-size: 11px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--gold);
+          padding: 8px 12px;
+          border: 1px solid var(--gold);
+          border-radius: var(--r-sm);
+        ">View on AllTrails →</a>
       )}
     </div>
   </section>
 
+  {/* 2x2 stat block */}
+  <section class="stagger" style="padding: 14px var(--page-x);">
+    <div style="
+      background: var(--bg-paper);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-md);
+      padding: 18px 4px;
+      box-shadow: var(--shadow-paper-md);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    ">
+      <div style="text-align: center; padding: 8px 4px; border-right: 1px dashed var(--hairline); border-bottom: 1px dashed var(--hairline);">
+        <div class="mono tabular" style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 36px; color: var(--ink); line-height: 1;">{hike.data.distanceKm}</div>
+        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Distance · km</div>
+      </div>
+      <div style="text-align: center; padding: 8px 4px; border-bottom: 1px dashed var(--hairline);">
+        <div class="mono tabular" style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 36px; color: var(--ink); line-height: 1;">{hike.data.elevationGainM}</div>
+        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Gain · metres</div>
+      </div>
+      <div style="text-align: center; padding: 8px 4px; border-right: 1px dashed var(--hairline);">
+        <div class="mono tabular" style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 36px; color: var(--ink); line-height: 1;">{hike.data.movingTimeHours.min}–{hike.data.movingTimeHours.max}</div>
+        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Moving · hours</div>
+      </div>
+      <div style="text-align: center; padding: 8px 4px;">
+        <div style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 28px; color: var(--ink); line-height: 1; text-transform: capitalize; letter-spacing: -0.01em;">{hike.data.difficulty}</div>
+        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Grade</div>
+      </div>
+    </div>
+  </section>
+
+  {/* Trailhead */}
+  <section class="stagger" style="padding: 18px var(--page-x);">
+    <p class="eyebrow" style="margin: 0 0 10px;">Trailhead</p>
+    <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; box-shadow: var(--shadow-paper-sm);">
+      <div style="display: flex; align-items: flex-start; gap: 12px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto; margin-top: 2px;">
+          <path d="M2 19 L9 7 L13.5 14 L16 10 L22 19 Z" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round" fill="none" />
+          <circle cx="9" cy="7" r="0.9" fill="var(--gold)" />
+        </svg>
+        <div style="flex: 1;">
+          <div style="font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--ink); line-height: 1.15;">{hike.data.trailhead.name}</div>
+          <a href={`https://www.google.com/maps?q=${hike.data.trailhead.lat},${hike.data.trailhead.lon}`} class="mono tabular" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; display: inline-block; border-bottom: 1px dashed var(--gold); padding-bottom: 1px; letter-spacing: 0.03em;">
+            {hike.data.trailhead.lat}, {hike.data.trailhead.lon}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Parking */}
+  <section class="stagger" style="padding: 18px var(--page-x);">
+    <p class="eyebrow" style="margin: 0 0 10px;">Parking</p>
+    <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; box-shadow: var(--shadow-paper-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+        <span style="font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink);">{hike.data.parking.name}</span>
+        {hike.data.parking.costEur > 0 && (
+          <span class="mono tabular" style="font-size: 14px; font-weight: 700; color: var(--gold);">€{hike.data.parking.costEur}</span>
+        )}
+      </div>
+      {hike.data.parking.mustBook && (
+        <div class="mono-cap" style="
+          margin-top: 10px;
+          padding: 8px 10px;
+          font-size: 10px;
+          color: var(--signal);
+          background: rgba(168, 50, 50, 0.06);
+          border: 1px dashed var(--signal);
+          border-radius: var(--r-sm);
+          display: inline-block;
+        ">⚠ Booking required {hike.data.parking.bookingUrl && (<>· <a href={hike.data.parking.bookingUrl} style="border-bottom: 1px solid var(--signal); padding-bottom: 1px;">Reserve</a></>)}</div>
+      )}
+    </div>
+  </section>
+
+  {/* Route highlights ─ numbered with vintage circle stamps */}
   {hike.data.routeHighlights.length > 0 && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">Route highlights</p>
-      <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
-        {hike.data.routeHighlights.map((h: string) => <li>{h}</li>)}
+    <section class="stagger" style="padding: 18px var(--page-x);">
+      <p class="eyebrow" style="margin: 0 0 12px;">Route Highlights</p>
+      <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 12px;">
+        {hike.data.routeHighlights.map((h: string, i: number) => (
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <span style="
+              flex: 0 0 32px;
+              width: 32px;
+              height: 32px;
+              border: 1.5px solid var(--gold);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-family: var(--font-mono);
+              font-size: 12px;
+              font-weight: 700;
+              color: var(--gold);
+              background: var(--bg);
+              transform: rotate(-2deg);
+              box-shadow: var(--shadow-stamp);
+              position: relative;
+            ">
+              <span style="position: absolute; inset: 2px; border: 0.5px dashed var(--gold); border-radius: 50%; opacity: 0.6;"></span>
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <span style="font-size: 14.5px; line-height: 1.45; color: var(--ink); padding-top: 4px;">{h}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
+
+  {/* Food on trail ─ refuge house glyph */}
+  {hike.data.foodOnTrail.length > 0 && (
+    <section class="stagger" style="padding: 18px var(--page-x);">
+      <p class="eyebrow" style="margin: 0 0 12px;">Food on the Trail</p>
+      <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 10px;">
+        {hike.data.foodOnTrail.map((f: { name: string; notes: string }) => (
+          <li style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto; margin-top: 2px;">
+              <path d="M3 11 L12 4 L21 11 V21 H3 Z" stroke="var(--gold)" stroke-width="1.4" stroke-linejoin="round" fill="none" />
+              <path d="M10 21 V15 H14 V21" stroke="var(--ink-soft)" stroke-width="1.2" />
+            </svg>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--ink);">{f.name}</div>
+              <div style="font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4;">{f.notes}</div>
+            </div>
+          </li>
+        ))}
       </ul>
     </section>
   )}
 
-  {hike.data.foodOnTrail.length > 0 && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">Food on the trail</p>
-      <div class="space-y-2">
-        {hike.data.foodOnTrail.map((f: { name: string; notes: string }) => (
-          <div class="card text-sm">
-            <div class="font-semibold">{f.name}</div>
-            <div class="text-[11px] text-ink-muted mt-0.5">{f.notes}</div>
-          </div>
-        ))}
+  {/* Hazards ─ signal red label */}
+  {hike.data.hazards.length > 0 && (
+    <section class="stagger" style="padding: 18px var(--page-x);">
+      <p class="eyebrow signal" style="margin: 0 0 12px;">Hazards & Tips</p>
+      <div style="
+        background: var(--bg-paper);
+        border: 1.5px solid var(--signal);
+        border-radius: var(--r-sm);
+        padding: 12px 14px 12px 16px;
+        box-shadow: var(--shadow-paper-sm);
+        position: relative;
+      ">
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 8px;">
+          {hike.data.hazards.map((h: string) => (
+            <li style="display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.45; color: var(--ink);">
+              <span style="flex: 0 0 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--signal); margin-top: 7px;"></span>
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )}
 
-  {hike.data.hazards.length > 0 && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">Hazards & tips</p>
-      <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
-        {hike.data.hazards.map((h: string) => <li>{h}</li>)}
-      </ul>
-    </section>
-  )}
-
+  {/* Bad weather option */}
   {hike.data.badWeatherOption && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">Bad weather option</p>
-      <div class="card text-sm">{hike.data.badWeatherOption}</div>
+    <section class="stagger" style="padding: 18px var(--page-x) 28px;">
+      <p class="eyebrow signal" style="margin: 0 0 12px;">If The Weather Turns</p>
+      <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 12px 14px; font-size: 13.5px; color: var(--ink);">{hike.data.badWeatherOption}</div>
     </section>
   )}
 </BaseLayout>

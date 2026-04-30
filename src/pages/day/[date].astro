@@ -1,8 +1,13 @@
 ---
+/*
+ * Day detail — vintage poster aesthetic.
+ * Sticky date header in Fraunces; schedule with mono left rail; hike block
+ * as a stat-block grid; driving as a "route slip"; lodging as a paper card.
+ */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getDays, getHike, getLodgings } from '@/lib/content';
-import WeatherWidget from '@/components/WeatherWidget';
 import EditDayButton from '@/components/customize/EditDayButton';
+import WeatherWidget from '@/components/WeatherWidget';
+import { getDays, getHike, getLodgings } from '@/lib/content';
 
 export async function getStaticPaths() {
   const days = await getDays();
@@ -19,44 +24,117 @@ const hikes = await Promise.all(day.data.hikeSlugs.map((slug: string) => getHike
 const lodgings = await getLodgings();
 const lodging = lodgings.find((l) => l.id === day.data.lodgingSlug);
 
-const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+const fmtFull = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 ---
 <BaseLayout title={`Day ${dayIndex + 1} — ${day.data.theme}`}>
-  <section class="px-4 pt-5 pb-3 bg-bg-2/60 border-b border-border">
-    <p class="eyebrow">Day {dayIndex + 1}</p>
-    <h1 class="text-xl font-semibold tracking-tight mt-1">{day.data.theme}</h1>
-    <p class="text-sm text-ink-muted mt-1">{fmtDate(day.data.date)}</p>
-    <div class="mt-2">
+
+  {/* Hero ─ Day stamp + date + theme */}
+  <section class="stagger" style="padding: 24px var(--page-x) 14px;">
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <span class="stamp">Day {String(dayIndex + 1).padStart(2, '0')} / {String(days.length).padStart(2, '0')}</span>
+      <span class="mono-cap" style="font-size: 10.5px; color: var(--gold);">{fmtFull(day.data.date)}</span>
+    </div>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 14px 0 12px;
+    ">{day.data.theme}</h1>
+    <div style="margin-top: 4px;">
       <EditDayButton canonical={day.data} client:load />
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
+      <span class="mono-cap" style="font-size: 9px; color: var(--gold);">Itinerary</span>
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
     </div>
   </section>
 
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Schedule</p>
-    <ol class="space-y-1.5">
-      {day.data.schedule.map((s: { time: string; action: string }) => (
-        <li class="flex gap-3 text-sm">
-          <span class="text-ink-muted tabular-nums w-12 flex-shrink-0">{s.time}</span>
-          <span>{s.action}</span>
-        </li>
-      ))}
-    </ol>
-  </section>
+  {/* Schedule */}
+  {day.data.schedule.length > 0 && (
+    <section class="stagger" style="padding: 6px var(--page-x) 18px;">
+      <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 0;">
+        {day.data.schedule.map((s: { time: string; action: string }) => (
+          <li style="display: flex; gap: 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px dashed var(--hairline);">
+            <span class="mono tabular" style="
+              flex: 0 0 56px;
+              font-size: 13px;
+              color: var(--gold);
+              letter-spacing: 0.04em;
+              font-weight: 700;
+            ">{s.time}</span>
+            <span style="font-size: 14.5px; line-height: 1.4; color: var(--ink); font-weight: 400;">{s.action}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
 
-  <section class="px-4 pb-2">
-    <p class="eyebrow mb-2">Weather</p>
+  {/* Weather */}
+  <section class="stagger" style="padding: 8px var(--page-x);">
+    <p class="eyebrow" style="margin: 0 0 10px;">Weather</p>
     <WeatherWidget lat={day.data.weatherFor.lat} lon={day.data.weatherFor.lon} label={day.data.weatherFor.label} date={day.data.date} client:visible />
   </section>
 
+  {/* Hikes */}
   {hikes.length > 0 && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">Hikes</p>
-      <div class="space-y-2">
+    <section class="stagger" style="padding: 22px var(--page-x) 8px;">
+      <p class="eyebrow" style="margin: 0 0 12px;">{hikes.length === 1 ? 'Hike' : 'Hikes'}</p>
+      <div style="display: grid; gap: 14px;">
         {hikes.filter(Boolean).map((h: any) => (
-          <a href={`/hike/${h.slug}`} class="card block">
-            <div class="text-sm font-semibold">{h.data.name}</div>
-            <div class="text-[11px] text-ink-muted mt-0.5">
-              {h.data.distanceKm} km · {h.data.elevationGainM} m · {h.data.movingTimeHours.min}–{h.data.movingTimeHours.max}h · {h.data.difficulty}
+          <a
+            href={`/hike/${h.slug}`}
+            class="hike-card"
+            style="
+              display: block;
+              background: var(--bg-paper);
+              border: 1px solid var(--hairline);
+              border-radius: var(--r-md);
+              padding: 16px 16px 14px;
+              box-shadow: var(--shadow-paper-md);
+              position: relative;
+              transition: transform 180ms var(--ease-out), border-color 180ms var(--ease-out);
+            "
+          >
+            <span class="mono-cap" style="font-size: 9px; color: var(--gold);">{h.data.region}</span>
+            <h3 style="
+              font-family: var(--font-display);
+              font-weight: 700;
+              font-variation-settings: 'opsz' 80;
+              font-size: 22px;
+              line-height: 1.1;
+              letter-spacing: -0.015em;
+              margin: 4px 0 12px;
+            ">{h.data.name}</h3>
+            <div style="
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 8px;
+              padding: 10px 0 4px;
+              border-top: 1px dashed var(--hairline);
+            ">
+              <div style="text-align: center;">
+                <div class="mono tabular" style="font-size: 17px; font-weight: 700; color: var(--ink);">{h.data.distanceKm}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">km</div>
+              </div>
+              <div style="text-align: center;">
+                <div class="mono tabular" style="font-size: 17px; font-weight: 700; color: var(--ink);">{h.data.elevationGainM}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">m gain</div>
+              </div>
+              <div style="text-align: center;">
+                <div class="mono tabular" style="font-size: 17px; font-weight: 700; color: var(--ink);">{h.data.movingTimeHours.min}–{h.data.movingTimeHours.max}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">hours</div>
+              </div>
+              <div style="text-align: center;">
+                <div class="mono" style="font-size: 12px; font-weight: 700; color: var(--ink); padding-top: 2px; text-transform: uppercase; letter-spacing: 0.06em;">{h.data.difficulty.slice(0, 4)}</div>
+                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold);">grade</div>
+              </div>
             </div>
           </a>
         ))}
@@ -64,29 +142,116 @@ const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en
     </section>
   )}
 
+  {/* Driving */}
   {day.data.driving.distanceKm > 0 && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">Driving</p>
-      <div class="card text-sm">
-        <span class="font-semibold">{day.data.driving.distanceKm} km</span>
-        <span class="text-ink-muted"> · {Math.floor(day.data.driving.durationMin / 60)}h {day.data.driving.durationMin % 60}m</span>
-        {day.data.driving.notes && <p class="text-xs text-ink-muted mt-1">{day.data.driving.notes}</p>}
+    <section class="stagger" style="padding: 22px var(--page-x);">
+      <p class="eyebrow" style="margin: 0 0 12px;">Driving</p>
+      <div style="
+        background: var(--bg-paper);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-md);
+        padding: 14px 16px;
+        box-shadow: var(--shadow-paper-sm);
+      ">
+        <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
+          <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
+            {day.data.driving.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">km</span>
+          </div>
+          <div style="flex: 1; min-width: 60px; display: flex; align-items: center; gap: 8px;">
+            <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
+          </div>
+          <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
+            {Math.floor(day.data.driving.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">h</span>
+            {day.data.driving.durationMin % 60 > 0 && (<>
+              <span style="margin-left: 8px;">{day.data.driving.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">m</span>
+            </>)}
+          </div>
+        </div>
+        {day.data.driving.notes && <p style="font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 0;">{day.data.driving.notes}</p>}
       </div>
     </section>
   )}
 
+  {/* Lodging */}
   {lodging && (
-    <section class="px-4 py-4">
-      <p class="eyebrow mb-2">Lodging</p>
-      <a href="/lodgings" class="card block">
-        <div class="text-sm font-semibold">{lodging.data.name}</div>
-        <div class="text-[11px] text-ink-muted">{lodging.data.location}</div>
+    <section class="stagger" style="padding: 22px var(--page-x);">
+      <p class="eyebrow" style="margin: 0 0 12px;">Lodging</p>
+      <a href="/lodgings" style="
+        display: block;
+        background: var(--bg-paper);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-md);
+        padding: 14px 16px;
+        box-shadow: var(--shadow-paper-sm);
+      ">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto;">
+            <path d="M3 11 L12 4 L21 11 V21 H3 Z" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" fill="none" />
+            <path d="M9 21 V14 H15 V21" stroke="var(--ink-soft)" stroke-width="1.25" stroke-linejoin="round" />
+          </svg>
+          <div style="flex: 1;">
+            <div style="
+              font-family: var(--font-display);
+              font-weight: 600;
+              font-size: 18px;
+              line-height: 1.1;
+              color: var(--ink);
+            ">{lodging.data.name}</div>
+            <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; letter-spacing: 0.03em;">{lodging.data.location}</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--ink-soft);">
+            <path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
       </a>
     </section>
   )}
 
-  <nav class="px-4 py-4 flex justify-between text-sm">
-    {prev ? <a href={`/day/${prev.data.date}`} class="text-sage">← {fmtDate(prev.data.date)}</a> : <span></span>}
-    {next ? <a href={`/day/${next.data.date}`} class="text-sage">{fmtDate(next.data.date)} →</a> : <span></span>}
+  {/* Bad weather option */}
+  {day.data.badWeatherOption && (
+    <section class="stagger" style="padding: 22px var(--page-x);">
+      <p class="eyebrow signal" style="margin: 0 0 12px;">If The Weather Turns</p>
+      <div style="
+        background: var(--bg-paper);
+        border: 1px solid var(--signal);
+        border-left: 4px solid var(--signal);
+        border-radius: var(--r-sm);
+        padding: 12px 14px;
+        font-size: 13.5px;
+        color: var(--ink);
+        transform: rotate(-0.5deg);
+      ">{day.data.badWeatherOption}</div>
+    </section>
+  )}
+
+  {/* Prev / next */}
+  <nav style="
+    padding: 28px var(--page-x);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px dashed var(--hairline);
+    margin-top: 12px;
+  ">
+    {prev ? (
+      <a href={`/day/${prev.data.date}`} style="display: flex; align-items: center; gap: 6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6 L9 12 L15 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="mono-cap" style="font-size: 10.5px; color: var(--ink-soft);">{fmtShort(prev.data.date)}</span>
+      </a>
+    ) : <span></span>}
+    {next ? (
+      <a href={`/day/${next.data.date}`} style="display: flex; align-items: center; gap: 6px;">
+        <span class="mono-cap" style="font-size: 10.5px; color: var(--ink-soft);">{fmtShort(next.data.date)}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6 L15 12 L9 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    ) : <span></span>}
   </nav>
+
+  <style is:global>
+    .hike-card:active { transform: scale(0.99); border-color: var(--gold) !important; }
+  </style>
 </BaseLayout>

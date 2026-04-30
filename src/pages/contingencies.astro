@@ -2,42 +2,96 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Contingencies">
-  <section class="px-4 pt-5 pb-3 border-b border-border bg-bg-2/60">
-    <h1 class="text-xl font-semibold">Weather & Contingencies</h1>
+  <section class="stagger" style="padding: 24px var(--page-x) 8px;">
+    <span class="mono-cap signal" style="font-size: 10px;">When Things Don't Go To Plan</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 6px;
+    ">Contingencies</h1>
   </section>
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Forecast sources</p>
-    <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
-      <li><a class="underline decoration-dotted" href="https://www.meteo.bz.it">meteo.bz.it</a> — South Tyrol official</li>
-      <li><a class="underline decoration-dotted" href="https://www.meteotrentino.it">meteotrentino.it</a> — Trentino official</li>
-      <li><a class="underline decoration-dotted" href="https://www.mountain-forecast.com">mountain-forecast.com</a> — peak-specific</li>
+
+  <section class="stagger" style="padding: 18px var(--page-x);">
+    <p class="eyebrow" style="margin: 0 0 10px;">Forecast Sources</p>
+    <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 8px;">
+      <li style="display: flex; gap: 10px; padding: 10px 12px; background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md);">
+        <span class="mono-cap" style="flex: 0 0 80px; font-size: 9px; color: var(--gold); padding-top: 2px;">South Tyrol</span>
+        <a href="https://www.meteo.bz.it" class="mono" style="font-size: 12px; color: var(--ink); border-bottom: 1px dashed var(--gold); padding-bottom: 1px;">meteo.bz.it</a>
+      </li>
+      <li style="display: flex; gap: 10px; padding: 10px 12px; background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md);">
+        <span class="mono-cap" style="flex: 0 0 80px; font-size: 9px; color: var(--gold); padding-top: 2px;">Trentino</span>
+        <a href="https://www.meteotrentino.it" class="mono" style="font-size: 12px; color: var(--ink); border-bottom: 1px dashed var(--gold); padding-bottom: 1px;">meteotrentino.it</a>
+      </li>
+      <li style="display: flex; gap: 10px; padding: 10px 12px; background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md);">
+        <span class="mono-cap" style="flex: 0 0 80px; font-size: 9px; color: var(--gold); padding-top: 2px;">Per Peak</span>
+        <a href="https://www.mountain-forecast.com" class="mono" style="font-size: 12px; color: var(--ink); border-bottom: 1px dashed var(--gold); padding-bottom: 1px;">mountain-forecast.com</a>
+      </li>
     </ul>
   </section>
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Decision rules</p>
-    <ul class="text-sm space-y-1.5 list-disc list-inside marker:text-sage">
-      <li>Storms above 2,500 m by 14:00 → start by 06:30, off ridges by 13:00.</li>
-      <li>Full-day rain → swap to indoor day (Bolzano Ötzi museum, Brixen old town, Klausen).</li>
-      <li>Sorapis cables become dangerous when wet — swap to a different day if storms forecast.</li>
-    </ul>
+
+  <section class="stagger" style="padding: 18px var(--page-x);">
+    <p class="eyebrow" style="margin: 0 0 10px;">Decision Rules</p>
+    <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 12px;">
+      {[
+        'Storms above 2,500 m by 14:00 → start by 06:30, off ridges by 13:00.',
+        'Full-day rain → swap to indoor day (Bolzano Ötzi museum, Brixen old town, Klausen).',
+        'Sorapis cables become dangerous when wet — swap to a different day if storms forecast.',
+      ].map((rule, i) => (
+        <li style="display: flex; gap: 12px; align-items: flex-start;">
+          <span style="
+            flex: 0 0 28px;
+            width: 28px;
+            height: 28px;
+            border: 1.5px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gold);
+            background: var(--bg);
+            transform: rotate(-2deg);
+            box-shadow: var(--shadow-stamp);
+          ">{String(i + 1).padStart(2, '0')}</span>
+          <span style="font-size: 13.5px; line-height: 1.45; color: var(--ink); padding-top: 4px;">{rule}</span>
+        </li>
+      ))}
+    </ol>
   </section>
-  <section class="px-4 py-4">
-    <p class="eyebrow mb-2">Backup activities</p>
-    <div class="card text-sm">
-      <div class="font-semibold">Cortina area</div>
-      <ul class="text-[12px] mt-1 space-y-1 list-disc list-inside marker:text-sage">
-        <li>5 Torri WWI open-air museum (Bai de Dones cable car)</li>
-        <li>Lagazuoi cable car + WWI tunnels</li>
-        <li>Drive the Falzarego pass</li>
-      </ul>
-    </div>
-    <div class="card text-sm mt-2">
-      <div class="font-semibold">Eisacktal area</div>
-      <ul class="text-[12px] mt-1 space-y-1 list-disc list-inside marker:text-sage">
-        <li>Brixen old town + Hofburg cathedral</li>
-        <li>Bolzano Ötzi museum</li>
-        <li>Lago di Carezza (always nice, even in light rain)</li>
-      </ul>
+
+  <section class="stagger" style="padding: 18px var(--page-x) 28px;">
+    <p class="eyebrow" style="margin: 0 0 12px;">Rainy-Day Backups</p>
+    <div style="display: grid; gap: 12px;">
+      <article style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; box-shadow: var(--shadow-paper-sm);">
+        <div class="mono-cap" style="font-size: 10px; color: var(--gold); margin-bottom: 6px;">Cortina Area</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 6px;">
+          {['5 Torri WWI open-air museum (Bai de Dones cable car)', 'Lagazuoi cable car + WWI tunnels', 'Drive the Falzarego pass'].map((item) => (
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span style="flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--gold); margin-top: 6px;"></span>
+              <span style="font-size: 13px; line-height: 1.45; color: var(--ink);">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </article>
+      <article style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; box-shadow: var(--shadow-paper-sm);">
+        <div class="mono-cap" style="font-size: 10px; color: var(--gold); margin-bottom: 6px;">Eisacktal Area</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 6px;">
+          {['Brixen old town + Hofburg cathedral', 'Bolzano Ötzi museum', 'Lago di Carezza (always nice, even in light rain)'].map((item) => (
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span style="flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--gold); margin-top: 6px;"></span>
+              <span style="font-size: 13px; line-height: 1.45; color: var(--ink);">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </article>
     </div>
   </section>
 </BaseLayout>
