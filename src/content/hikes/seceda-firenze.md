@@ -17,9 +17,9 @@ rating:
   reviews: 354
 type: loop
 trailhead: 
-  name: Unknown
-  lat: 0
-  lon: 0
+  name: Seceda summit cable car station
+  lat: 46.5764
+  lon: 11.6749
 parking: 
   name: Trailhead parking
   costEur: 0

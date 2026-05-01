@@ -465,7 +465,7 @@ If the schedule above feels too much:
 - **Elevation gain:** 212 m (695 ft)
 - **Time:** 2–2.5h
 - **Difficulty:** Easy (4.7★, 691 reviews)
-- **Start/end:** Compatsch / Mont Sëuc cable car top station area
+- **Start/end:** Compatsch / Mont Sëuc cable car top station, 46.5419, 11.6253
 - **Note:** Trail starts from Compatsch — accessible from either Mont Sëuc cable car (from Ortisei) OR Seiser Alm Bahn (from Siusi/Seis am Schlern)
 
 #### Cable car — Mont Sëuc (from Ortisei)

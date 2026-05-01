@@ -198,11 +198,16 @@ export function parseHikes(md) {
     const slug = normaliseHikeName(nameLine);
     if (hikes.find(h => h.slug === slug)) continue; // dedupe
 
-    const distanceMatch = block.match(/\*\*Distance:\*\*\s*([\d.]+)\s*km/i);
+    // Distance: accept optional "~" prefix (e.g. "~4 km" for Cadini)
+    const distanceMatch = block.match(/\*\*Distance:\*\*\s*~?\s*([\d.]+)\s*km/i);
     const gainMatch = block.match(/\*\*Elevation gain:\*\*\s*~?(\d+)\s*m/i);
     const timeMatch = block.match(/\*\*Time:\*\*\s*(\d+(?:\.\d+)?)[–-](\d+(?:\.\d+)?)h/i);
     const ratingMatch = block.match(/\*\*Difficulty:\*\*\s*(\w+)[^(]*\(([\d.]+)★(?:,\s*([\d,]+))?/i);
-    const trailheadMatch = block.match(/\*\*Trailhead:\*\*\s*([^,\n]+),\s*([\d.]+),\s*([\d.]+)/);
+    // Trailhead: some hikes use "**Trailhead:**" (Tre Cime, Sorapis, Braies, Cadini),
+    // others use "**Start/end:**" (Seceda, Alpe di Siusi). Try both.
+    const trailheadMatch =
+      block.match(/\*\*Trailhead:\*\*\s*([^,\n]+),\s*([\d.]+),\s*([\d.]+)/) ||
+      block.match(/\*\*Start\/end:\*\*\s*([^,\n]+),\s*([\d.]+),\s*([\d.]+)/);
     const alltrailsMatch = block.match(/\*\*AllTrails:\*\*\s*`(https?:\/\/[^\s`]+)`/i);
     const typeMatch = block.match(/\|\s*(Loop|Out & back|Out-and-back|Point-to-point)\s*\|/i)
                    || block.match(/\b(Loop|Out & back|Out-and-back|Point-to-point)\b/i);

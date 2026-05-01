@@ -3,7 +3,7 @@ slug: cadini
 name: Cadini di Misurina viewpoint
 region: Veneto
 alltrailsUrl: https://www.alltrails.com/trail/italy/veneto/rifugio-auronzo-cadini-di-misurina
-distanceKm: 0
+distanceKm: 4
 elevationGainM: 200
 movingTimeHours: 
   min: 1.5

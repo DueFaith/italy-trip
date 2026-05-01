@@ -17,9 +17,9 @@ rating:
   reviews: 691
 type: loop
 trailhead: 
-  name: Unknown
-  lat: 0
-  lon: 0
+  name: Compatsch / Mont Sëuc cable car top station
+  lat: 46.5419
+  lon: 11.6253
 parking: 
   name: Trailhead parking
   costEur: 0
