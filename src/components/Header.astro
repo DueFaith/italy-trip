@@ -3,7 +3,7 @@ import CustomizedPill from '@/components/CustomizedPill';
 const { title } = Astro.props as { title?: string };
 const wordmark = (title ?? 'Dolomites').toUpperCase();
 ---
-<header class="sticky top-0 z-30">
+<header class="sticky top-0 z-30" transition:persist="header">
   <div
     class="flex items-center justify-between"
     style="
