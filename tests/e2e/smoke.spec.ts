@@ -61,3 +61,16 @@ test('bottom nav has 4 items: home, map, checklist, more', async ({ page }) => {
   await expect(nav.getByText('Day', { exact: true })).toHaveCount(0);
   await expect(nav.getByText('Hikes', { exact: true })).toHaveCount(0);
 });
+
+test('persistent day-pill scroller appears on day and hike pages', async ({ page }) => {
+  await page.goto('/day/2026-07-16');
+  await expect(page.getByRole('complementary', { name: /day navigation/i })).toBeVisible();
+
+  await page.goto('/hike/tre-cime');
+  await expect(page.getByRole('complementary', { name: /day navigation/i })).toBeVisible();
+});
+
+test('day-pill scroller is absent from home page', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('complementary', { name: /day navigation/i })).toHaveCount(0);
+});

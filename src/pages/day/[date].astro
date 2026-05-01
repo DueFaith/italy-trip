@@ -27,7 +27,7 @@ const lodging = lodgings.find((l) => l.id === day.data.lodgingSlug);
 const fmtFull = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 ---
-<BaseLayout title={`Day ${dayIndex + 1} — ${day.data.theme}`}>
+<BaseLayout title={`Day ${dayIndex + 1} — ${day.data.theme}`} activeDayDate={day.data.date}>
 
   {/* Hero ─ Day stamp + date + theme */}
   <section class="stagger" style="padding: 24px var(--page-x) 14px;">

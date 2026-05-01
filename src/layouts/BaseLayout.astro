@@ -2,12 +2,14 @@
 import '@/styles/global.css';
 import Header from '@/components/Header.astro';
 import BottomNav from '@/components/BottomNav.astro';
+import DayPillScroller from '@/components/DayPillScroller.astro';
 import ReceiveShareLink from '@/components/ReceiveShareLink';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker.astro';
-const { title = 'Dolomites Trip', headerTitle, bodyClass } = Astro.props as {
+const { title = 'Dolomites Trip', headerTitle, bodyClass, activeDayDate } = Astro.props as {
   title?: string;
   headerTitle?: string;
   bodyClass?: string;
+  activeDayDate?: string;
 };
 ---
 <!DOCTYPE html>
@@ -30,6 +32,7 @@ const { title = 'Dolomites Trip', headerTitle, bodyClass } = Astro.props as {
   <body class={bodyClass}>
     <a href="#main" class="skip-link">Skip to main content</a>
     <Header title={headerTitle} />
+    {activeDayDate && <DayPillScroller activeDate={activeDayDate} />}
     <main id="main" class="mx-auto" style="max-width: var(--max-content);"><slot /></main>
     <BottomNav />
     <ReceiveShareLink client:load />

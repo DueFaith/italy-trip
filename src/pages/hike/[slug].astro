@@ -44,7 +44,7 @@ const stars = hike.data.rating?.stars ?? null;
 const fullStars = stars ? Math.floor(stars) : 0;
 const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
 ---
-<BaseLayout title={hike.data.name}>
+<BaseLayout title={hike.data.name} activeDayDate={dayForHike?.data.date}>
 
   {/* ════════ PART I — THE ROUTE ════════ */}
 
