@@ -1,0 +1,15 @@
+{
+  "name": "Dolomites Trip · Jul 2026",
+  "short_name": "Dolomites",
+  "description": "Trip planning for the Dolomites, July 15–20, 2026.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F1E9D2",
+  "theme_color": "#F1E9D2",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-mask-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
