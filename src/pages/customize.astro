@@ -33,7 +33,20 @@ const canonicalHikes = hikes.map((h) => ({ ...h.data, slug: h.slug }));
     <CustomizePanel canonicalDays={canonicalDays} canonicalHikes={canonicalHikes} client:load />
   </section>
 
-  <section class="stagger" style="padding: 18px var(--page-x) 28px;">
+  {/* Sticky share bar — always visible while you're on /customize */}
+  <div
+    style="
+      position: sticky;
+      bottom: calc(64px + env(safe-area-inset-bottom));
+      z-index: 15;
+      padding: 12px var(--page-x);
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(12px) saturate(140%);
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      border-top: 1px solid var(--hairline);
+      margin-top: 32px;
+    "
+  >
     <ShareLinkButton client:load />
-  </section>
+  </div>
 </BaseLayout>

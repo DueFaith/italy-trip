@@ -47,10 +47,32 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
   const [newDayDate, setNewDayDate] = useState('');
   const [newDayTheme, setNewDayTheme] = useState('');
 
+  const hasNoEdits =
+    Object.keys(state.hikeEdits).length === 0 &&
+    Object.keys(state.dayEdits).length === 0 &&
+    Object.keys(state.customHikes).length === 0 &&
+    Object.keys(state.customDays).length === 0;
+
   const fmt = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 
   return (
     <div className="space-y-6">
+      {hasNoEdits && (
+        <div style={{
+          background: 'var(--bg-paper)',
+          border: '1px dashed var(--gold)',
+          borderRadius: 'var(--r-md)',
+          padding: '14px 16px',
+          marginBottom: 20,
+        }}>
+          <div className="mono-cap" style={{ fontSize: 11, color: 'var(--ink-soft)', marginBottom: 6 }}>
+            How To Customize
+          </div>
+          <div style={{ fontSize: 13.5, color: 'var(--ink)', lineHeight: 1.5 }}>
+            Drag a hike between days to rearrange. Tap any hike or day to edit details. Add new hikes or days with the <strong style={{ color: 'var(--gold)' }}>+ New</strong> buttons.
+          </div>
+        </div>
+      )}
       <section>
         <div className="flex items-center justify-between mb-2">
           <h2 className="eyebrow" style={{ margin: 0 }}>Hikes</h2>
