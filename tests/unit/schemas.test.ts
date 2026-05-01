@@ -52,12 +52,39 @@ describe('content schemas', () => {
   it('day requires hikeSlugs as string array', () => {
     const day = {
       date: '2026-07-16', theme: 'Test',
-      driving: { distanceKm: 50, durationMin: 90 },
+      driving: { legs: [{ from: 'A', to: 'B', distanceKm: 50, durationMin: 90 }] },
       schedule: [{ time: '07:00', action: 'Wake' }],
       hikeSlugs: ['tre-cime'],
       lodgingSlug: 'baita-fraina',
       weatherFor: { lat: 46.6, lon: 12.3, label: 'Cortina' },
     };
     expect(DaySchema.parse(day)).toEqual(day);
+  });
+
+  it('day accepts a driving.legs array', () => {
+    const day = {
+      date: '2026-07-18', theme: 'Test',
+      driving: {
+        legs: [
+          { from: 'Cortina', to: 'Braies', distanceKm: 50, durationMin: 55 },
+          { from: 'Braies', to: 'Cadini', distanceKm: 42, durationMin: 60, notes: 'Toll road' },
+        ],
+      },
+      schedule: [],
+      hikeSlugs: ['lago-di-braies', 'cadini'],
+      lodgingSlug: 'pension-kircher-sepp',
+      weatherFor: { lat: 46.6, lon: 12.3, label: 'Cortina' },
+    };
+    expect(DaySchema.parse(day)).toEqual(day);
+  });
+
+  it('day rejects the legacy single-leg driving shape', () => {
+    const day = {
+      date: '2026-07-16', theme: 'Test',
+      driving: { distanceKm: 50, durationMin: 90 },
+      schedule: [], hikeSlugs: [], lodgingSlug: 'baita-fraina',
+      weatherFor: { lat: 46.5, lon: 12.1, label: 'Cortina' },
+    };
+    expect(() => DaySchema.parse(day)).toThrow();
   });
 });

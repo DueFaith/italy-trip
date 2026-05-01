@@ -36,10 +36,20 @@ export const TripSchema = z.object({
   }),
 });
 
+const DriveLeg = z.object({
+  from: z.string(),
+  to: z.string(),
+  distanceKm: z.number(),
+  durationMin: z.number(),
+  notes: z.string().optional(),
+});
+
 export const DaySchema = z.object({
   date: ISODate,
   theme: z.string(),
-  driving: z.object({ distanceKm: z.number(), durationMin: z.number(), notes: z.string().optional() }),
+  driving: z.object({
+    legs: z.array(DriveLeg),
+  }),
   schedule: z.array(z.object({ time: HHMM, action: z.string() })),
   hikeSlugs: z.array(z.string()),
   lodgingSlug: z.string(),
