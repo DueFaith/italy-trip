@@ -33,21 +33,25 @@
   category: parking
   status: pending-window
   notes: Open Jun 16
+  relatedHikeSlug: tre-cime
 - id: b-8
   label: "Cadini parking (Jul 18, 11:00)"
   category: parking
   status: pending-window
   notes: Open Jun 18
+  relatedHikeSlug: cadini
 - id: b-9
   label: "Seceda cable car (Jul 19, 08:30)"
   category: cable-car
   status: pending-window
   notes: Open ~Jun 19
+  relatedHikeSlug: seceda-firenze
 - id: b-10
   label: Lago di Braies parking
   category: parking
   status: not-needed
   notes: Not needed (arrive before 09:30)
+  relatedHikeSlug: lago-di-braies
 - id: b-11
   label: Baita Fraina dinner
   category: lodging

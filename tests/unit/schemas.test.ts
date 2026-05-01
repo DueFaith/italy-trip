@@ -1,6 +1,24 @@
 import { describe, it, expect } from 'vitest';
 import { TripSchema, DaySchema, HikeSchema, LodgingSchema, BookingSchema } from '@/content/config';
 
+describe('BookingSchema relatedHikeSlug', () => {
+  it('accepts a booking with a relatedHikeSlug', () => {
+    const b = {
+      id: 'b-7',
+      label: 'Tre Cime parking',
+      category: 'parking',
+      status: 'pending-window',
+      relatedHikeSlug: 'tre-cime',
+    };
+    expect(BookingSchema.parse(b)).toEqual(b);
+  });
+
+  it('makes relatedHikeSlug optional', () => {
+    const b = { id: 'b-1', label: 'Flight', category: 'flight', status: 'booked' };
+    expect(() => BookingSchema.parse(b)).not.toThrow();
+  });
+});
+
 describe('content schemas', () => {
   it('accepts a valid trip', () => {
     const trip = {

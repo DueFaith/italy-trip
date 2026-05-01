@@ -117,6 +117,7 @@ export const BookingSchema = z.object({
   costEur: z.number().optional(),
   confirmationNumber: z.string().optional(),
   notes: z.string().optional(),
+  relatedHikeSlug: z.string().optional(),
 });
 
 export const collections = {

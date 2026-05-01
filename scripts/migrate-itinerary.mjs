@@ -287,12 +287,14 @@ export function parseBookings(md) {
     const label = row[1].trim();
     const status = row[2].trim();
     if (!label || label.startsWith('---') || label.toLowerCase() === 'item') continue;
+    const slug = inferRelatedHike(label);
     items.push({
       id: `b-${id++}`,
       label: label.replace(/\*\*/g, ''),
       category: inferCategory(label),
       status: status.includes('✅') ? 'booked' : status.includes('❌') ? 'not-needed' : 'pending-window',
       notes: status.replace(/[✅⏳❌]/g, '').trim() || undefined,
+      relatedHikeSlug: slug,
     });
   }
   return items;
@@ -307,6 +309,17 @@ function inferCategory(label) {
   if (l.includes('hotel') || l.includes('baita') || l.includes('kircher') || l.includes('airbnb')) return 'lodging';
   if (l.includes('dinner') || l.includes('restaurant')) return 'restaurant';
   return 'other';
+}
+
+function inferRelatedHike(label) {
+  const l = label.toLowerCase();
+  if (l.includes('tre cime')) return 'tre-cime';
+  if (l.includes('cadini')) return 'cadini';
+  if (l.includes('seceda')) return 'seceda-firenze';
+  if (l.includes('lago di braies') || l.includes('braies')) return 'lago-di-braies';
+  if (l.includes('sorapis')) return 'sorapis';
+  if (l.includes('alpe di siusi') || l.includes('mont sëuc') || l.includes('siusi')) return 'alpe-di-siusi-family';
+  return undefined;
 }
 
 function writeFile(rel, content) {
