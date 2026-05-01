@@ -47,3 +47,14 @@ test('customize page renders', async ({ page }) => {
   await page.goto('/customize');
   await expect(page.getByRole('heading', { name: /Customize/i })).toBeVisible();
 });
+
+test('bottom nav has 4 items: home, map, checklist, more', async ({ page }) => {
+  await page.goto('/');
+  const nav = page.getByRole('navigation', { name: /primary/i });
+  await expect(nav.getByText('Home', { exact: true })).toBeVisible();
+  await expect(nav.getByText('Map', { exact: true })).toBeVisible();
+  await expect(nav.getByText('Checklist', { exact: true })).toBeVisible();
+  await expect(nav.getByText('More', { exact: true })).toBeVisible();
+  await expect(nav.getByText('Day', { exact: true })).toHaveCount(0);
+  await expect(nav.getByText('Hikes', { exact: true })).toHaveCount(0);
+});
