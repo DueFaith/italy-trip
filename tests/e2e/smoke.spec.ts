@@ -82,3 +82,9 @@ test('hike page prev/next walks trip order across day boundaries', async ({ page
   await expect(page.getByText('Lake Sorapis via Passo Tre Croci', { exact: false })).toBeVisible();
   await expect(page.getByText('Cadini di Misurina viewpoint', { exact: false }).first()).toBeVisible();
 });
+
+test('today banner is absent outside trip dates (May 2026)', async ({ page }) => {
+  await page.goto('/');
+  // Today banner should not render today (May 2026, before Jul 15 trip start)
+  await expect(page.getByText(/Today · Day/)).toHaveCount(0);
+});
