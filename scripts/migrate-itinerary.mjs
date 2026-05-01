@@ -87,6 +87,51 @@ const HIKE_SLUG_MAP = {
 };
 
 /**
+ * Parse a "Xh Ym" or "Xh" or "Y min" duration string into total minutes.
+ *   "55 min" → 55
+ *   "1h"     → 60
+ *   "1h 0m"  → 60
+ *   "2h 15m" → 135
+ */
+function parseDurationToMinutes(s) {
+  const hMatch = s.match(/(\d+)\s*h(?:\s*(\d+)\s*m)?/i);
+  if (hMatch) {
+    return parseInt(hMatch[1], 10) * 60 + (hMatch[2] ? parseInt(hMatch[2], 10) : 0);
+  }
+  const mMatch = s.match(/(\d+)\s*min/i);
+  if (mMatch) return parseInt(mMatch[1], 10);
+  return 0;
+}
+
+/**
+ * Parse a "**Drive legs:**" block from a day's markdown section.
+ * Format expected, one line per leg:
+ *   - {from} → {to} — {km} km / {duration}
+ * Returns an array of { from, to, distanceKm, durationMin } objects.
+ */
+export function parseDriveLegs(block) {
+  // Find the "**Drive legs:**" line and read subsequent "- ..." lines until a blank
+  // line, a heading, or another bold label appears.
+  const m = block.match(/\*\*Drive legs:\*\*\s*\n([\s\S]+?)(?=\n\*\*|\n#{1,6} |\n---|\n\n)/);
+  if (!m) return [];
+  const body = m[1];
+  const legs = [];
+  for (const line of body.split('\n')) {
+    // " - From → To — 25 km / 45 min "  (em dash before km)
+    const lm = line.match(/^\s*-\s+(.+?)\s*→\s*(.+?)\s*—\s*([\d.]+)\s*km\s*\/\s*(.+?)\s*$/);
+    if (lm) {
+      legs.push({
+        from: lm[1].trim(),
+        to: lm[2].trim(),
+        distanceKm: parseFloat(lm[3]),
+        durationMin: parseDurationToMinutes(lm[4]),
+      });
+    }
+  }
+  return legs;
+}
+
+/**
  * Normalise a hike name string to a canonical slug.
  * Strips parenthetical suffixes like "(RECOMMENDED)" and trailing
  * qualifiers like "loop", "via …", "lake …", "viewpoint" before
@@ -133,15 +178,10 @@ export function parseDays(md) {
       }
     }
 
-    // Driving line near top: "**Driving:** ~50 km return (~1h 30m)"
-    const drivingMatch = block.match(/\*\*Driving:\*\*\s*~?(\d+)\s*km[^(]*(?:\(~?(\d+)h(?:\s*(\d+)m)?\)|\(~?(\d+)\s*min\))/i);
-    let driving = { distanceKm: 0, durationMin: 0 };
-    if (drivingMatch) {
-      const km = parseInt(drivingMatch[1], 10);
-      const h = drivingMatch[2] ? parseInt(drivingMatch[2], 10) : 0;
-      const m = drivingMatch[3] ? parseInt(drivingMatch[3], 10) : drivingMatch[4] ? parseInt(drivingMatch[4], 10) : 0;
-      driving = { distanceKm: km, durationMin: h * 60 + m };
-    }
+    // Drive legs are defined in a "**Drive legs:**" block per day.
+    // The legacy "**Driving:** Xkm (Yh Zm)" prose summary is no longer parsed.
+    const legs = parseDriveLegs(block);
+    const driving = { legs };
 
     // Hike refs: look for "#### Hike:" / "#### Hike A:" / "#### Hike B:" headings
     const hikeSlugs = [];
@@ -335,6 +375,8 @@ function writeFile(rel, content) {
 }
 
 function emitDay(day) {
+  // day.driving is now { legs: [{ from, to, distanceKm, durationMin, notes? }] }
+  // (changed from { distanceKm, durationMin } in 2026-05-01 audit pass).
   const slug = `${day.date}-${slugify(day.theme.split('→').pop().split(',')[0])}`;
   const fm = {
     date: day.date,
