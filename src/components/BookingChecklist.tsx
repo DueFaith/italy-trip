@@ -1,4 +1,5 @@
 import { useLocalState } from '@/stores/localState';
+import { useState } from 'react';
 
 type Booking = {
   id: string;
@@ -10,6 +11,7 @@ type Booking = {
   costEur?: number;
   confirmationNumber?: string;
   notes?: string;
+  relatedHikeSlug?: string;
 };
 
 const categoryOrder = ['flight', 'car', 'lodging', 'parking', 'cable-car', 'restaurant', 'other'];
@@ -26,6 +28,7 @@ const categoryLabel: Record<string, string> = {
 export default function BookingChecklist({ bookings }: { bookings: Booking[] }) {
   const local = useLocalState((s) => s.bookings);
   const setBooking = useLocalState((s) => s.setBooking);
+  const [expandedConfId, setExpandedConfId] = useState<string | null>(null);
 
   const isChecked = (b: Booking) => {
     const ls = local[b.id];
@@ -49,15 +52,15 @@ export default function BookingChecklist({ bookings }: { bookings: Booking[] }) 
     <div style={{ display: 'grid', gap: 24 }}>
       {groups.map((g) => (
         <section key={g.cat}>
-          <h2
-            className="eyebrow"
-            style={{ margin: '0 0 10px' }}
-          >{categoryLabel[g.cat] ?? g.cat}</h2>
+          <h2 className="eyebrow" style={{ margin: '0 0 10px' }}>
+            {categoryLabel[g.cat] ?? g.cat}
+          </h2>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 8 }}>
             {g.items.map((b) => {
               const checked = isChecked(b);
               const conf = local[b.id]?.confirmation ?? b.confirmationNumber ?? '';
               const soon = opensSoon(b);
+              const expanded = expandedConfId === b.id;
               return (
                 <li
                   key={b.id}
@@ -128,7 +131,7 @@ export default function BookingChecklist({ bookings }: { bookings: Booking[] }) 
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div
                         style={{
-                          fontSize: 14,
+                          fontSize: 14.5,
                           fontWeight: checked ? 400 : 700,
                           color: 'var(--ink)',
                           textDecoration: checked ? 'line-through' : 'none',
@@ -158,7 +161,7 @@ export default function BookingChecklist({ bookings }: { bookings: Booking[] }) 
                       {b.bookingOpens && !checked && (
                         <div
                           className="mono-cap"
-                          style={{ fontSize: 10, color: soon ? 'var(--signal)' : 'var(--gold)', marginTop: 4 }}
+                          style={{ fontSize: 11, color: soon ? 'var(--signal)' : 'var(--ink-soft)', marginTop: 4 }}
                         >
                           Opens {b.bookingOpens}
                         </div>
@@ -180,31 +183,81 @@ export default function BookingChecklist({ bookings }: { bookings: Booking[] }) 
                           {b.bookingUrl.replace(/^https?:\/\//, '').slice(0, 38)}
                         </a>
                       )}
-                      <input
-                        type="text"
-                        placeholder="Confirmation #"
-                        value={conf}
-                        onChange={(e) =>
-                          setBooking(b.id, {
-                            checked,
-                            confirmation: e.target.value,
-                            bookedAt: local[b.id]?.bookedAt,
-                          })
-                        }
-                        className="mono"
-                        style={{
-                          marginTop: 10,
-                          width: '100%',
-                          fontSize: 11,
-                          letterSpacing: '0.04em',
-                          color: 'var(--ink)',
-                          background: 'var(--bg)',
-                          border: '1px solid var(--hairline)',
-                          borderRadius: 'var(--r-sm)',
-                          padding: '6px 10px',
-                          boxSizing: 'border-box',
-                        }}
-                      />
+                      {b.relatedHikeSlug && (
+                        <a
+                          href={`/hike/${b.relatedHikeSlug}`}
+                          className="mono-cap"
+                          style={{
+                            fontSize: 10.5,
+                            color: 'var(--ink-soft)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            marginTop: 6,
+                            marginLeft: b.bookingUrl && !checked ? 12 : 0,
+                            borderBottom: '1px dashed var(--gold)',
+                            paddingBottom: 1,
+                          }}
+                        >
+                          View Hike
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M9 6 L15 12 L9 18" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </a>
+                      )}
+                      {/* Collapsible confirmation field */}
+                      {!expanded && !conf && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.preventDefault(); setExpandedConfId(b.id); }}
+                          aria-label={`Add confirmation number for ${b.label}`}
+                          className="mono-cap"
+                          style={{
+                            fontSize: 10.5,
+                            color: 'var(--ink-soft)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            marginTop: 8,
+                            padding: '8px 0',
+                            minHeight: 32,
+                            border: 'none',
+                            background: 'none',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          + Add Confirmation #
+                        </button>
+                      )}
+                      {(expanded || conf) && (
+                        <input
+                          type="text"
+                          placeholder="Confirmation #"
+                          value={conf}
+                          onChange={(e) =>
+                            setBooking(b.id, {
+                              checked,
+                              confirmation: e.target.value,
+                              bookedAt: local[b.id]?.bookedAt,
+                            })
+                          }
+                          aria-label={`Confirmation number for ${b.label}`}
+                          className="mono"
+                          style={{
+                            marginTop: 10,
+                            width: '100%',
+                            fontSize: 11,
+                            letterSpacing: '0.04em',
+                            color: 'var(--ink)',
+                            background: 'var(--bg)',
+                            border: '1px solid var(--hairline)',
+                            borderRadius: 'var(--r-sm)',
+                            padding: '8px 10px',
+                            minHeight: 38,
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                      )}
                     </div>
                   </label>
                 </li>

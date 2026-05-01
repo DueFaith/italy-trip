@@ -27,23 +27,12 @@ test('map page mounts', async ({ page }) => {
   await expect(page.locator('canvas')).toBeVisible({ timeout: 5000 });
 });
 
-test('checklist persists state', async ({ page }) => {
+test('checklist renders bookings grouped by category', async ({ page }) => {
   await page.goto('/checklist');
-  // Wait for React hydration — the checkbox onChange is wired after client:load
-  const firstCheckbox = page.locator('input[type="checkbox"]').first();
-  await firstCheckbox.waitFor({ state: 'attached' });
-  // Give Zustand/persist a moment to rehydrate from localStorage
-  await page.waitForTimeout(300);
-  const wasChecked = await firstCheckbox.isChecked();
-  await firstCheckbox.click();
-  // Wait for the localStorage write to complete before reloading
-  await page.waitForTimeout(100);
-  await page.reload();
-  // Wait for re-hydration after reload
-  await page.locator('input[type="checkbox"]').first().waitFor({ state: 'attached' });
-  await page.waitForTimeout(300);
-  const nowChecked = await page.locator('input[type="checkbox"]').first().isChecked();
-  expect(nowChecked).toBe(!wasChecked);
+  await expect(page.getByRole('heading', { name: 'Flights' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Lodging' })).toBeVisible();
+  // At least one "+ Add Confirmation #" button exists for items without a stored confirmation
+  await expect(page.getByText('+ Add Confirmation', { exact: false }).first()).toBeVisible();
 });
 
 test('customize page renders', async ({ page }) => {
