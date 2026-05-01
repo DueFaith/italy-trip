@@ -148,7 +148,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
 
   {/* Trailhead */}
   <section class="stagger" style="padding: 18px var(--page-x);">
-    <p class="eyebrow" style="margin: 0 0 10px;">Trailhead</p>
+    <h2 class="eyebrow" style="margin: 0 0 10px;">Trailhead</h2>
     <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; box-shadow: var(--shadow-paper-sm);">
       <div style="display: flex; align-items: flex-start; gap: 12px;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto; margin-top: 2px;">
@@ -167,7 +167,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
 
   {/* Parking */}
   <section class="stagger" style="padding: 18px var(--page-x);">
-    <p class="eyebrow" style="margin: 0 0 10px;">Parking</p>
+    <h2 class="eyebrow" style="margin: 0 0 10px;">Parking</h2>
     <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; box-shadow: var(--shadow-paper-sm);">
       <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
         <span style="font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink);">{hike.data.parking.name}</span>
@@ -193,7 +193,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
   {/* Route highlights */}
   {hike.data.routeHighlights.length > 0 && (
     <section class="stagger" style="padding: 18px var(--page-x);">
-      <p class="eyebrow" style="margin: 0 0 12px;">Route Highlights</p>
+      <h2 class="eyebrow" style="margin: 0 0 12px;">Route Highlights</h2>
       <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 12px;">
         {hike.data.routeHighlights.map((h: string, i: number) => (
           <li style="display: flex; gap: 12px; align-items: flex-start;">
@@ -228,7 +228,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
   {/* Food on trail */}
   {hike.data.foodOnTrail.length > 0 && (
     <section class="stagger" style="padding: 18px var(--page-x);">
-      <p class="eyebrow" style="margin: 0 0 12px;">Food on the Trail</p>
+      <h2 class="eyebrow" style="margin: 0 0 12px;">Food on the Trail</h2>
       <ul style="list-style: none; margin: 0; padding: 0; display: grid; gap: 10px;">
         {hike.data.foodOnTrail.map((f: { name: string; notes: string }) => (
           <li style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md);">
@@ -249,7 +249,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
   {/* Hazards */}
   {hike.data.hazards.length > 0 && (
     <section class="stagger" style="padding: 18px var(--page-x);">
-      <p class="eyebrow signal" style="margin: 0 0 12px;">Hazards & Tips</p>
+      <h2 class="eyebrow signal" style="margin: 0 0 12px;">Hazards & Tips</h2>
       <div style="
         background: var(--bg-paper);
         border: 1.5px solid var(--signal);
@@ -273,7 +273,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
   {/* Bad weather option (for the hike itself) */}
   {hike.data.badWeatherOption && (
     <section class="stagger" style="padding: 18px var(--page-x);">
-      <p class="eyebrow signal" style="margin: 0 0 12px;">If The Weather Turns</p>
+      <h2 class="eyebrow signal" style="margin: 0 0 12px;">If The Weather Turns</h2>
       <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 12px 14px; font-size: 13.5px; color: var(--ink);">{hike.data.badWeatherOption}</div>
     </section>
   )}
@@ -317,7 +317,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
       {/* Schedule timeline */}
       {dayForHike.data.schedule.length > 0 && (
         <section class="stagger" style="padding: 24px var(--page-x) 8px;">
-          <p class="eyebrow" style="margin: 0 0 12px;">Schedule</p>
+          <h3 class="eyebrow" style="margin: 0 0 12px;">Schedule</h3>
           <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 0;">
             {dayForHike.data.schedule.map((s: { time: string; action: string }) => (
               <li style="display: flex; gap: 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px dashed var(--hairline);">
@@ -337,14 +337,14 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
 
       {/* Weather */}
       <section class="stagger" style="padding: 14px var(--page-x);">
-        <p class="eyebrow" style="margin: 0 0 10px;">Weather</p>
+        <h3 class="eyebrow" style="margin: 0 0 10px;">Weather</h3>
         <WeatherWidget lat={dayForHike.data.weatherFor.lat} lon={dayForHike.data.weatherFor.lon} label={dayForHike.data.weatherFor.label} date={dayForHike.data.date} client:visible />
       </section>
 
       {/* Driving */}
       {dayForHike.data.driving.distanceKm > 0 && (
         <section class="stagger" style="padding: 14px var(--page-x);">
-          <p class="eyebrow" style="margin: 0 0 10px;">Driving</p>
+          <h3 class="eyebrow" style="margin: 0 0 10px;">Driving</h3>
           <div style="
             background: var(--bg-paper);
             border: 1px solid var(--hairline);
@@ -378,7 +378,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
       {/* Where you sleep */}
       {dayLodging && (
         <section class="stagger" style="padding: 14px var(--page-x);">
-          <p class="eyebrow" style="margin: 0 0 10px;">Where You Sleep</p>
+          <h3 class="eyebrow" style="margin: 0 0 10px;">Where You Sleep</h3>
           <a href="/lodgings" style="
             display: block;
             background: var(--bg-paper);
@@ -413,7 +413,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
       {/* Day's bad-weather option (if different from the hike's own) */}
       {dayForHike.data.badWeatherOption && dayForHike.data.badWeatherOption !== hike.data.badWeatherOption && (
         <section class="stagger" style="padding: 14px var(--page-x);">
-          <p class="eyebrow signal" style="margin: 0 0 10px;">If The Day Goes Sideways</p>
+          <h3 class="eyebrow signal" style="margin: 0 0 10px;">If The Day Goes Sideways</h3>
           <div style="background: var(--bg-paper); border: 1px solid var(--signal); border-left: 4px solid var(--signal); border-radius: var(--r-sm); padding: 12px 14px; font-size: 13.5px; color: var(--ink); transform: rotate(-0.5deg);">{dayForHike.data.badWeatherOption}</div>
         </section>
       )}
@@ -421,7 +421,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
       {/* Also today — other hikes scheduled the same day */}
       {otherHikes.filter(Boolean).length > 0 && (
         <section class="stagger" style="padding: 14px var(--page-x) 28px;">
-          <p class="eyebrow" style="margin: 0 0 12px;">Also Today</p>
+          <h3 class="eyebrow" style="margin: 0 0 12px;">Also Today</h3>
           <div style="display: grid; gap: 10px;">
             {otherHikes.filter(Boolean).map((h: any) => (
               <a href={`/hike/${h.slug}`} style="

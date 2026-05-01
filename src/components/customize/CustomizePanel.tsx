@@ -53,7 +53,7 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
     <div className="space-y-6">
       <section>
         <div className="flex items-center justify-between mb-2">
-          <p className="eyebrow">Hikes</p>
+          <h2 className="eyebrow" style={{ margin: 0 }}>Hikes</h2>
           <button onClick={() => setShowHikeForm(true)} className="text-xs text-forest font-semibold">+ New</button>
         </div>
         {showHikeForm && (
@@ -85,7 +85,7 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
 
       <section>
         <div className="flex items-center justify-between mb-2">
-          <p className="eyebrow">Days (drag a hike to move it)</p>
+          <h2 className="eyebrow" style={{ margin: 0 }}>Days (drag a hike to move it)</h2>
           <button onClick={() => setShowDayForm(true)} className="text-xs text-forest font-semibold">+ New</button>
         </div>
         {showDayForm && (

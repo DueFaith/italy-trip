@@ -78,14 +78,14 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
 
   {/* Weather */}
   <section class="stagger" style="padding: 8px var(--page-x);">
-    <p class="eyebrow" style="margin: 0 0 10px;">Weather</p>
+    <h2 class="eyebrow" style="margin: 0 0 10px;">Weather</h2>
     <WeatherWidget lat={day.data.weatherFor.lat} lon={day.data.weatherFor.lon} label={day.data.weatherFor.label} date={day.data.date} client:visible />
   </section>
 
   {/* Hikes — uniform .hike-poster cards (same shape as the home page) */}
   {hikes.length > 0 && (
     <section class="stagger" style="padding: 22px var(--page-x) 8px;">
-      <p class="eyebrow" style="margin: 0 0 12px;">{hikes.length === 1 ? 'Hike' : 'Hikes'}</p>
+      <h2 class="eyebrow" style="margin: 0 0 12px;">{hikes.length === 1 ? 'Hike' : 'Hikes'}</h2>
       <div style="display: grid; gap: 14px;">
         {hikes.filter(Boolean).map((h: any) => (
           <a href={`/hike/${h.slug}`} class="hike-poster">
@@ -133,7 +133,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
   {/* Driving */}
   {day.data.driving.distanceKm > 0 && (
     <section class="stagger" style="padding: 22px var(--page-x);">
-      <p class="eyebrow" style="margin: 0 0 12px;">Driving</p>
+      <h2 class="eyebrow" style="margin: 0 0 12px;">Driving</h2>
       <div style="
         background: var(--bg-paper);
         border: 1px solid var(--hairline);
@@ -167,7 +167,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
   {/* Lodging */}
   {lodging && (
     <section class="stagger" style="padding: 22px var(--page-x);">
-      <p class="eyebrow" style="margin: 0 0 12px;">Lodging</p>
+      <h2 class="eyebrow" style="margin: 0 0 12px;">Lodging</h2>
       <a href="/lodgings" style="
         display: block;
         background: var(--bg-paper);
@@ -202,7 +202,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
   {/* Bad weather option */}
   {day.data.badWeatherOption && (
     <section class="stagger" style="padding: 22px var(--page-x);">
-      <p class="eyebrow signal" style="margin: 0 0 12px;">If The Weather Turns</p>
+      <h2 class="eyebrow signal" style="margin: 0 0 12px;">If The Weather Turns</h2>
       <div style="
         background: var(--bg-paper);
         border: 1px solid var(--signal);

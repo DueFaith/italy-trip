@@ -49,10 +49,10 @@ export default function BookingChecklist({ bookings }: { bookings: Booking[] }) 
     <div style={{ display: 'grid', gap: 24 }}>
       {groups.map((g) => (
         <section key={g.cat}>
-          <p
+          <h2
             className="eyebrow"
             style={{ margin: '0 0 10px' }}
-          >{categoryLabel[g.cat] ?? g.cat}</p>
+          >{categoryLabel[g.cat] ?? g.cat}</h2>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 8 }}>
             {g.items.map((b) => {
               const checked = isChecked(b);

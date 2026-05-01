@@ -132,6 +132,17 @@ h1 { font-variation-settings: 'opsz' 144; }
   .eyebrow.ink { color: var(--ink-soft); }
   .eyebrow.signal { color: var(--signal); }
 
+  /* Allow .eyebrow on actual heading elements (h2/h3) without breaking the look */
+  h2.eyebrow, h3.eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
   /* Mono label — the workhorse for stats, dates, captions */
   .mono {
     font-family: var(--font-mono);
