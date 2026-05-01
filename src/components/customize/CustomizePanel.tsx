@@ -76,7 +76,12 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
       <section>
         <div className="flex items-center justify-between mb-2">
           <h2 className="eyebrow" style={{ margin: 0 }}>Hikes</h2>
-          <button onClick={() => setShowHikeForm(true)} className="text-xs text-forest font-semibold">+ New</button>
+          <button
+            onClick={() => setShowHikeForm(true)}
+            aria-label="Add new hike"
+            className="text-xs text-forest font-semibold"
+            style={{ minHeight: 44, padding: '10px 6px' }}
+          >+ New</button>
         </div>
         {showHikeForm && (
           <div className="card mb-2">
@@ -97,7 +102,12 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
                 </div>
                 <a href={`/hike/${h.slug}`} className="text-[11px] text-sage">Edit →</a>
                 {isCustom && (
-                  <button onClick={() => state.removeCustomHike(h.slug)} className="ml-2 text-[11px] text-red-700">Delete</button>
+                  <button
+                    onClick={() => state.removeCustomHike(h.slug)}
+                    aria-label={`Delete ${h.name}`}
+                    className="ml-2 text-[11px] text-red-700"
+                    style={{ minHeight: 44, padding: '10px 4px' }}
+                  >Delete</button>
                 )}
               </div>
             );
@@ -108,7 +118,12 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
       <section>
         <div className="flex items-center justify-between mb-2">
           <h2 className="eyebrow" style={{ margin: 0 }}>Days (drag a hike to move it)</h2>
-          <button onClick={() => setShowDayForm(true)} className="text-xs text-forest font-semibold">+ New</button>
+          <button
+            onClick={() => setShowDayForm(true)}
+            aria-label="Add new day"
+            className="text-xs text-forest font-semibold"
+            style={{ minHeight: 44, padding: '10px 6px' }}
+          >+ New</button>
         </div>
         {showDayForm && (
           <div className="card mb-2 space-y-2 text-sm">
