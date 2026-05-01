@@ -56,26 +56,6 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
     </div>
   </section>
 
-  {/* Schedule */}
-  {day.data.schedule.length > 0 && (
-    <section class="stagger" style="padding: 6px var(--page-x) 18px;">
-      <ol style="list-style: none; margin: 0; padding: 0; display: grid; gap: 0;">
-        {day.data.schedule.map((s: { time: string; action: string }) => (
-          <li style="display: flex; gap: 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px dashed var(--hairline);">
-            <span class="mono tabular" style="
-              flex: 0 0 56px;
-              font-size: 13px;
-              color: var(--ink-soft);
-              letter-spacing: 0.04em;
-              font-weight: 700;
-            ">{s.time}</span>
-            <span style="font-size: 14.5px; line-height: 1.4; color: var(--ink); font-weight: 400;">{s.action}</span>
-          </li>
-        ))}
-      </ol>
-    </section>
-  )}
-
   {/* Weather */}
   <section class="stagger" style="padding: 8px var(--page-x);">
     <h2 class="eyebrow" style="margin: 0 0 10px;">Weather</h2>
@@ -123,6 +103,12 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
                 <div class="stat-num" style="text-transform: capitalize; font-size: 16px; padding-top: 4px;">{h.data.difficulty}</div>
                 <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">grade</div>
               </div>
+            </div>
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--hairline); display: flex; align-items: center; gap: 6px; color: var(--ink-soft);">
+              <span class="mono-cap" style="font-size: 11px;">View Full Schedule</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+              </svg>
             </div>
           </a>
         ))}

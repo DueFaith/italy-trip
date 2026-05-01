@@ -7,10 +7,13 @@ test('home page renders core elements', async ({ page }) => {
   await expect(page.getByText('Booked')).toBeVisible();
 });
 
-test('day page renders schedule and weather', async ({ page }) => {
+test('day page renders hikes and driving (schedule lives on hike page now)', async ({ page }) => {
   await page.goto('/day/2026-07-16');
-  await expect(page.getByText(/Schedule/i)).toBeVisible();
-  await expect(page.getByRole('main').getByText('Hikes', { exact: true })).toBeVisible();
+  await expect(page.getByRole('main').getByText(/Hike/i)).toBeVisible();
+  // Schedule section was moved to the hike page in spec §4 — ensure it's NOT here
+  await expect(page.locator('main').getByText('Wake, breakfast', { exact: false })).toHaveCount(0);
+  // The "View Full Schedule" callout inside hike cards stays
+  await expect(page.locator('main').getByText('View Full Schedule', { exact: true })).toBeVisible();
 });
 
 test('hike page renders stats', async ({ page }) => {
