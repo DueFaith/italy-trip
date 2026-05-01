@@ -2,8 +2,19 @@
 date: "2026-07-18"
 theme: Lago di Braies + Cadini di Misurina + Transfer
 driving: 
-  distanceKm: 210
-  durationMin: 270
+  legs: 
+    - from: Cortina (Baita Fraina)
+      to: Lago di Braies P3
+      distanceKm: 50
+      durationMin: 55
+    - from: Lago di Braies
+      to: Rifugio Auronzo (Cadini parking)
+      distanceKm: 42
+      durationMin: 60
+    - from: Rifugio Auronzo
+      to: Pension Kircher Sepp (Barbiano)
+      distanceKm: 111
+      durationMin: 135
 schedule: 
   - time: 05:30
     action: "Wake, light breakfast (coffee + pastry from hotel; eat fully later)"

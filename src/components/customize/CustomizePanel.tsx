@@ -141,7 +141,7 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
                   if (!newDayDate || !newDayTheme) return;
                   state.addDay({
                     date: newDayDate, theme: newDayTheme,
-                    driving: { distanceKm: 0, durationMin: 0 },
+                    driving: { legs: [] },
                     schedule: [], hikeSlugs: [],
                     lodgingSlug: 'baita-fraina',
                     weatherFor: { lat: 46.5237, lon: 12.1528, label: 'Cortina' },

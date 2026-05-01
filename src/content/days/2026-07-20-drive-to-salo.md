@@ -2,8 +2,15 @@
 date: "2026-07-20"
 theme: Alpe di Siusi short hike → Drive to Salò
 driving: 
-  distanceKm: 280
-  durationMin: 210
+  legs: 
+    - from: Pension Kircher Sepp (Barbiano)
+      to: Ortisei (Mont Sëuc valley station)
+      distanceKm: 19
+      durationMin: 25
+    - from: Ortisei
+      to: Salò (Lake Garda)
+      distanceKm: 207
+      durationMin: 170
 schedule: 
   - time: 06:30
     action: "Wake, breakfast"

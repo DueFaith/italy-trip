@@ -117,7 +117,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
   )}
 
   {/* Driving */}
-  {day.data.driving.distanceKm > 0 && (
+  {day.data.driving.legs.length > 0 && (
     <section class="stagger" style="padding: 22px var(--page-x);">
       <h2 class="eyebrow" style="margin: 0 0 12px;">Driving</h2>
       <div style="
@@ -127,25 +127,28 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
         padding: 14px 16px;
         box-shadow: var(--shadow-paper-sm);
       ">
-        <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
-          <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
-            {day.data.driving.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">km</span>
+        {day.data.driving.legs.map((leg: { from: string; to: string; distanceKm: number; durationMin: number; notes?: string }) => (
+          <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 10px;">
+            <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
+              {leg.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">km</span>
+            </div>
+            <div style="flex: 1; min-width: 60px; display: flex; align-items: center; gap: 8px;">
+              <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
+            </div>
+            <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
+              {Math.floor(leg.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">h</span>
+              {leg.durationMin % 60 > 0 && (<>
+                <span style="margin-left: 8px;">{leg.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">m</span>
+              </>)}
+            </div>
+            <div style="flex-basis: 100%; font-size: 12px; color: var(--ink-soft);">{leg.from} → {leg.to}</div>
+            {leg.notes && <p style="font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 0;">{leg.notes}</p>}
           </div>
-          <div style="flex: 1; min-width: 60px; display: flex; align-items: center; gap: 8px;">
-            <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
-          </div>
-          <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
-            {Math.floor(day.data.driving.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">h</span>
-            {day.data.driving.durationMin % 60 > 0 && (<>
-              <span style="margin-left: 8px;">{day.data.driving.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">m</span>
-            </>)}
-          </div>
-        </div>
-        {day.data.driving.notes && <p style="font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 0;">{day.data.driving.notes}</p>}
+        ))}
       </div>
     </section>
   )}

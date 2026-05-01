@@ -4,7 +4,7 @@ import type { DayShape, HikeShape, LocalState } from '@/stores/types';
 
 const baseDay: DayShape = {
   date: '2026-07-16', theme: 'Tre Cime',
-  driving: { distanceKm: 50, durationMin: 90 },
+  driving: { legs: [{ from: 'Baita Fraina', to: 'Rifugio Auronzo', distanceKm: 50, durationMin: 90 }] },
   schedule: [], hikeSlugs: ['tre-cime'], lodgingSlug: 'baita-fraina',
   weatherFor: { lat: 0, lon: 0, label: '' },
 };

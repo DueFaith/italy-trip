@@ -2,8 +2,11 @@
 date: "2026-07-16"
 theme: Tre Cime di Lavaredo
 driving: 
-  distanceKm: 50
-  durationMin: 90
+  legs: 
+    - from: Baita Fraina (Cortina)
+      to: Rifugio Auronzo (Tre Cime parking)
+      distanceKm: 25
+      durationMin: 45
 schedule: 
   - time: 06:00
     action: "Wake, breakfast at hotel (open 07:00 — eat the moment it opens)"

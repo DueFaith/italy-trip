@@ -1,9 +1,17 @@
 export type ScheduleItem = { time: string; action: string };
 
+export type DriveLeg = {
+  from: string;
+  to: string;
+  distanceKm: number;
+  durationMin: number;
+  notes?: string;
+};
+
 export type DayShape = {
   date: string;
   theme: string;
-  driving: { distanceKm: number; durationMin: number; notes?: string };
+  driving: { legs: DriveLeg[] };
   schedule: ScheduleItem[];
   hikeSlugs: string[];
   lodgingSlug: string;

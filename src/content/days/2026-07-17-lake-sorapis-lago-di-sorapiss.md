@@ -2,8 +2,11 @@
 date: "2026-07-17"
 theme: Lake Sorapis (Lago di Sorapiss)
 driving: 
-  distanceKm: 0
-  durationMin: 0
+  legs: 
+    - from: Baita Fraina (Cortina)
+      to: Passo Tre Croci (Sorapis trailhead)
+      distanceKm: 11
+      durationMin: 15
 schedule: 
   - time: 07:00
     action: "Wake, breakfast"

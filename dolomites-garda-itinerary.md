@@ -26,7 +26,7 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 | Hotel | Location | Check-in | Check-out | Nights | Notes |
 |---|---|---|---|---|---|
 | **Baita Fraina** | Località Fraina 1, Cortina d'Ampezzo, BL | Wed Jul 15, 20:00 | Sat Jul 18, 11:00 | 3 | One-lane access road, restaurant on site (book ahead), great breakfast. +39 0436 3634. baitafraina.it |
-| **Garni / Pension Kircher Sepp** | Via Rosengarten 30, Barbiano (Barbian), BZ 39040 | Sat Jul 18, 15:00 | Mon Jul 20, 11:00 | 2 | Family-run, ask for balcony room facing Dolomites. +39 0471 650008 |
+| **Garni / Pension Kircher Sepp** | Via Rosengarten 27, Barbiano (Barbian), BZ 39040 | Sat Jul 18, 15:00 | Mon Jul 20, 11:00 | 2 | Family-run, ask for balcony room facing Dolomites. +39 0471 650008 |
 | **Salò AirBnB** | Salò, Lake Garda | Mon Jul 20, 15:00 | — | — | Out of scope for this doc |
 
 ### 1.4 Coordinates reference
@@ -51,8 +51,8 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 ### 2.2 Optional pre-bookings
 | Task | URL | Notes |
 |---|---|---|
-| Lago di Braies parking P3 | `https://www.pragsparking.com/en` | Skip if arriving before 09:30. Required if arriving 09:30–16:00 between Jul 1–Sep 15. ~€12. |
-| Mont Sëuc cable car (Alpe di Siusi from Ortisei) | `https://www.funiviaortisei.eu` | No pre-booking needed; just buy at counter. Round-trip ~€30. |
+| Lago di Braies parking P3 | `https://www.pragsparking.com/en` | Skip if arriving before 09:00. Required if arriving 09:00–16:00 between Jul 1–Sep 15. ~€12. |
+| Mont Sëuc cable car (Alpe di Siusi from Ortisei) | `https://www.funiviaortisei.eu` | No pre-booking needed; just buy at counter. Round-trip €39 (2026 confirmed). |
 | Rifugio dinner reservations on hike days | Various | Tre Cime: Rifugio Locatelli or Auronzo lunch is walk-in. Sorapis: Rifugio Vandelli. Seceda: Rifugio Firenze. |
 | Restaurant at Baita Fraina (your hotel) | +39 0436 3634 | Book on arrival for at least one dinner. |
 
@@ -91,6 +91,9 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 **Driving:** ~165 km / 2h 30m (VCE → Cortina)
 **Lodging:** Baita Fraina (check-in 20:00)
 
+**Drive legs:**
+- Venice Marco Polo Airport → Cortina (Baita Fraina) — 146 km / 2h 30m
+
 #### Schedule
 | Time | Action |
 |---|---|
@@ -124,6 +127,9 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 **Hike:** Tre Cime di Lavaredo loop
 **Difficulty:** Moderate
 **Lodging:** Baita Fraina (night 2)
+
+**Drive legs:**
+- Baita Fraina (Cortina) → Rifugio Auronzo (Tre Cime parking) — 25 km / 45 min
 
 #### Schedule
 | Time | Action |
@@ -195,6 +201,9 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 **Difficulty:** Moderate (with exposure caveat)
 **Lodging:** Baita Fraina (night 3)
 
+**Drive legs:**
+- Baita Fraina (Cortina) → Passo Tre Croci (Sorapis trailhead) — 11 km / 15 min
+
 #### Schedule
 | Time | Action |
 |---|---|
@@ -263,6 +272,11 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 **Difficulty:** Easy + Easy
 **Lodging:** Pension Kircher Sepp (Barbiano)
 
+**Drive legs:**
+- Cortina (Baita Fraina) → Lago di Braies P3 — 50 km / 55 min
+- Lago di Braies → Rifugio Auronzo (Cadini parking) — 42 km / 1h 0m
+- Rifugio Auronzo → Pension Kircher Sepp (Barbiano) — 111 km / 2h 15m
+
 ⚠️ **This is the busiest day of the trip.** Pre-pack the car the night before. Read the schedule carefully.
 
 #### Why it's structured this way
@@ -303,8 +317,8 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 - **Trailhead:** Pragser Wildsee P3, 46.6943, 12.0854
 
 ##### Parking — P3 (Lago di Braies)
-- **Cost:** €12 (no booking before 09:30 in summer)
-- **Important:** From Jul 1 to Sep 15, you cannot drive in 09:30–16:00 without a pre-booked slot via `https://www.pragsparking.com/en`
+- **Cost:** €12 (no booking before 09:00 in summer)
+- **Important:** From Jul 1 to Sep 15, you cannot drive in 09:00–16:00 without a pre-booked slot via `https://www.pragsparking.com/en`
 - **Drive from Cortina:** 1h, 50 km via SR48 → SS51 → SS49
 
 ##### Route notes
@@ -359,6 +373,9 @@ If the schedule above feels too much:
 **Hike:** Seceda → Rifugio Firenze → Col Raiser loop
 **Difficulty:** Moderate
 **Lodging:** Pension Kircher Sepp (night 2)
+
+**Drive legs:**
+- Pension Kircher Sepp (Barbiano) → Ortisei (Mont Sëuc valley station) — 19 km / 25 min
 
 #### Schedule
 | Time | Action |
@@ -438,6 +455,10 @@ If the schedule above feels too much:
 **Difficulty:** Easy
 **Lodging:** Salò AirBnB (out of scope — but check-in 15:00)
 
+**Drive legs:**
+- Pension Kircher Sepp (Barbiano) → Ortisei (Mont Sëuc valley station) — 19 km / 25 min
+- Ortisei → Salò (Lake Garda) — 207 km / 2h 50m
+
 ⚠️ **Recommended swap on the AllTrails link**: The user-linked `alpe-di-siusi-ortisei` is a one-way descent from cable car to Ortisei, mostly downhill, slippery, and skips the iconic plateau views. I'm recommending the **Alpe di Siusi Family Tour** loop instead — same total time, way better views, easier on the knees.
 
 #### Schedule
@@ -472,7 +493,7 @@ If the schedule above feels too much:
 - **Website:** `https://www.funiviaortisei.eu`
 - **Address:** Via Setil 9, Ortisei BZ
 - **Hours:** 08:30–17:30 summer
-- **Round-trip:** ~€30 / adult (2026 estimate)
+- **Round-trip:** €39 / adult (2026 confirmed via funiviaortisei.eu)
 - **Parking:** 240-space garage at valley station, paid (~€2.80/h)
 - **No advance booking** required, but expect queues by 10:00 in peak summer
 
