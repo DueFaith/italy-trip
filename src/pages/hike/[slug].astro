@@ -36,6 +36,22 @@ const otherHikeRefs = dayForHike
   : [];
 const otherHikes = await Promise.all(otherHikeRefs.map((slug: string) => getHike(slug)));
 
+// Trip-order list of all hikes; used for prev/next that walks across day boundaries
+const allHikesInTripOrder: Array<{ slug: string; name: string; date: string; dayIndex: number }> = [];
+for (let di = 0; di < days.length; di++) {
+  const d = days[di];
+  for (const slug of d.data.hikeSlugs) {
+    const h = await getHike(slug);
+    if (!h) continue;
+    allHikesInTripOrder.push({ slug, name: h.data.name, date: d.data.date, dayIndex: di });
+  }
+}
+const currentTripIdx = allHikesInTripOrder.findIndex((h) => h.slug === hike.slug);
+const prevHike = currentTripIdx > 0 ? allHikesInTripOrder[currentTripIdx - 1] : null;
+const nextHike = currentTripIdx >= 0 && currentTripIdx < allHikesInTripOrder.length - 1
+  ? allHikesInTripOrder[currentTripIdx + 1]
+  : null;
+
 const fmtDate = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 const fmtFull = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -50,16 +66,25 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
 
   {/* Hero */}
   <section class="stagger" style="padding: 24px var(--page-x) 12px;">
-    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-      {dayForHike && (
-        <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft); font-weight: 700;">
-          Day {String(dayIndex + 1).padStart(2, '0')} / {String(totalDays).padStart(2, '0')}
+    {/* Breadcrumb back to the day overview */}
+    {dayForHike && (
+      <a
+        href={`/day/${dayForHike.data.date}`}
+        style="display: inline-flex; align-items: center; gap: 6px; color: var(--ink-soft); padding: 8px 0; min-height: 44px;"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 6 L9 12 L15 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="mono-cap" style="font-size: 11px;">
+          Day {String(dayIndex + 1).padStart(2, '0')} · {new Date(dayForHike.data.date + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase()}
         </span>
-      )}
-      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">·</span>
-      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">{hike.data.region}</span>
-      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">·</span>
-      <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">{hike.data.type.replace('-', ' ')}</span>
+      </a>
+    )}
+    {/* Region · type meta */}
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
+      <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft);">{hike.data.region}</span>
+      <span style="color: var(--gold); opacity: 0.6;">·</span>
+      <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft);">{hike.data.type.replace('-', ' ')}</span>
     </div>
     <h1 style="
       font-family: var(--font-display);
@@ -452,28 +477,63 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
         </section>
       )}
 
-      {/* Day-page link footer */}
-      <section style="padding: 8px var(--page-x) 28px; text-align: center;">
-        <a
-          href={`/day/${dayForHike.data.date}`}
-          class="mono-cap"
-          style="
-            font-size: 10.5px;
-            color: var(--ink-soft);
-            padding: 8px 14px;
-            border: 1px dashed var(--hairline);
-            border-radius: var(--r-sm);
-            display: inline-flex;
+      {/* Trip-order prev/next — walks all 6 hikes regardless of day boundaries */}
+      <nav aria-label="Hike navigation" style="
+        padding: 28px var(--page-x);
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+        gap: 12px;
+        border-top: 1px dashed var(--hairline);
+        margin-top: 12px;
+      ">
+        {prevHike ? (
+          <a href={`/hike/${prevHike.slug}`} style="
+            flex: 1;
+            display: flex;
             align-items: center;
-            gap: 6px;
-          "
-        >
-          See Day {dayIndex + 1} On Its Own
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 6 L15 12 L9 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </a>
-      </section>
+            gap: 8px;
+            padding: 14px 12px;
+            min-height: 44px;
+            color: var(--ink-soft);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-sm);
+            background: var(--bg-paper);
+          ">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto;">
+              <path d="M15 6 L9 12 L15 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span style="display: flex; flex-direction: column; min-width: 0;">
+              <span class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft);">Previous Hike</span>
+              <span style="font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--ink); line-height: 1.15; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{prevHike.name}</span>
+            </span>
+          </a>
+        ) : <span style="flex: 1;"></span>}
+        {nextHike ? (
+          <a href={`/hike/${nextHike.slug}`} style="
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 12px;
+            min-height: 44px;
+            color: var(--ink-soft);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-sm);
+            background: var(--bg-paper);
+            justify-content: flex-end;
+            text-align: right;
+          ">
+            <span style="display: flex; flex-direction: column; align-items: flex-end; min-width: 0;">
+              <span class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft);">Next Hike</span>
+              <span style="font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--ink); line-height: 1.15; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{nextHike.name}</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto;">
+              <path d="M9 6 L15 12 L9 18" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+        ) : <span style="flex: 1;"></span>}
+      </nav>
     </>
   )}
 </BaseLayout>

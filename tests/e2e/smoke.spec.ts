@@ -74,3 +74,11 @@ test('day-pill scroller is absent from home page', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('complementary', { name: /day navigation/i })).toHaveCount(0);
 });
+
+test('hike page prev/next walks trip order across day boundaries', async ({ page }) => {
+  // From Lago di Braies (Day 4, hike #3 in trip order):
+  // prev should be Sorapis (Day 3), next should be Cadini (Day 4 same day)
+  await page.goto('/hike/lago-di-braies');
+  await expect(page.getByText('Lake Sorapis via Passo Tre Croci', { exact: false })).toBeVisible();
+  await expect(page.getByText('Cadini di Misurina viewpoint', { exact: false }).first()).toBeVisible();
+});
