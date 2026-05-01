@@ -4,10 +4,12 @@ items:
     type: Mid-range reliable
     priceRange: $$
     needsReservation: false
-  - name: Bar Anna
-    type: Quick panini and coffee
+  - name: Caffè Val d'Anna
+    type: Café · quick panini and coffee
     priceRange: $
     needsReservation: false
+    address: "Streda Annatal 39, Ortisei"
+    notes: "Casual stop for coffee, panini, light bites."
   - name: Restaurant Concordia
     type: Traditional Ladin
     priceRange: $$

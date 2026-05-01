@@ -17,13 +17,13 @@ items:
     type: Old stagecoach inn
     priceRange: $$
     needsReservation: true
-    notes: 8 km north of Cortina.
+    notes: ~7 km north on the SS51.
   - name: Enoteca Baita Fraina
     type: Wine bar / aperitivo
     priceRange: $
     needsReservation: false
     notes: Sister wine bar in town centre.
-  - name: Panificio Alvera
+  - name: Panificio Alverà
     type: Bakery
     priceRange: $
     needsReservation: false
