@@ -33,7 +33,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
   <section class="stagger" style="padding: 24px var(--page-x) 14px;">
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
       <span class="stamp">Day {String(dayIndex + 1).padStart(2, '0')} / {String(days.length).padStart(2, '0')}</span>
-      <span class="mono-cap" style="font-size: 10.5px; color: var(--gold);">{fmtFull(day.data.date)}</span>
+      <span class="mono-cap" style="font-size: 10.5px; color: var(--ink-soft);">{fmtFull(day.data.date)}</span>
     </div>
     <h1 style="
       font-family: var(--font-display);
@@ -51,7 +51,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
     </div>
     <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
       <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
-      <span class="mono-cap" style="font-size: 9px; color: var(--gold);">Itinerary</span>
+      <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft);">Itinerary</span>
       <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
     </div>
   </section>
@@ -65,7 +65,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
             <span class="mono tabular" style="
               flex: 0 0 56px;
               font-size: 13px;
-              color: var(--gold);
+              color: var(--ink-soft);
               letter-spacing: 0.04em;
               font-weight: 700;
             ">{s.time}</span>
@@ -90,7 +90,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
         {hikes.filter(Boolean).map((h: any) => (
           <a href={`/hike/${h.slug}`} class="hike-poster">
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <span class="mono-cap" style="font-size: 9.5px; color: var(--gold); letter-spacing: 0.18em; font-weight: 700;">Tap For Full Detail →</span>
+              <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); letter-spacing: 0.18em; font-weight: 700;">Tap For Full Detail →</span>
               <span style="color: var(--gold); opacity: 0.6;">·</span>
               <span class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft);">{h.data.region}</span>
             </div>
@@ -109,19 +109,19 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
             <div class="poster-stats">
               <div style="text-align: center;">
                 <div class="stat-num tabular">{h.data.distanceKm}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">km</div>
+                <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">km</div>
               </div>
               <div style="text-align: center; border-left: 1px dashed var(--hairline);">
                 <div class="stat-num tabular">{h.data.elevationGainM}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">m gain</div>
+                <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">m gain</div>
               </div>
               <div style="text-align: center; border-left: 1px dashed var(--hairline);">
                 <div class="stat-num tabular">{h.data.movingTimeHours.min}–{h.data.movingTimeHours.max}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">hours</div>
+                <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">hours</div>
               </div>
               <div style="text-align: center; border-left: 1px dashed var(--hairline);">
                 <div class="stat-num" style="text-transform: capitalize; font-size: 16px; padding-top: 4px;">{h.data.difficulty}</div>
-                <div class="mono-cap" style="font-size: 8.5px; color: var(--gold); margin-top: 4px;">grade</div>
+                <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">grade</div>
               </div>
             </div>
           </a>
@@ -143,7 +143,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
       ">
         <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
           <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
-            {day.data.driving.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">km</span>
+            {day.data.driving.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">km</span>
           </div>
           <div style="flex: 1; min-width: 60px; display: flex; align-items: center; gap: 8px;">
             <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
@@ -153,9 +153,9 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
             <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
           </div>
           <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
-            {Math.floor(day.data.driving.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">h</span>
+            {Math.floor(day.data.driving.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">h</span>
             {day.data.driving.durationMin % 60 > 0 && (<>
-              <span style="margin-left: 8px;">{day.data.driving.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">m</span>
+              <span style="margin-left: 8px;">{day.data.driving.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">m</span>
             </>)}
           </div>
         </div>

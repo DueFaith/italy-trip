@@ -8,7 +8,7 @@ const fmt = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB'
 ---
 <BaseLayout title="Hikes">
   <section class="stagger" style="padding: 24px var(--page-x) 8px;">
-    <span class="mono-cap" style="font-size: 10px; color: var(--gold);">All Routes · {hikes.length}</span>
+    <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">All Routes · {hikes.length}</span>
     <h1 style="
       font-family: var(--font-display);
       font-style: italic;
@@ -41,12 +41,12 @@ const fmt = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB'
               <path d="M3 21 H21" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="2 3" />
             </svg>
             <div style="flex: 1; min-width: 0;">
-              {date && <div class="mono-cap" style="font-size: 9.5px; color: var(--gold);">{fmt(date)}</div>}
+              {date && <div class="mono-cap" style="font-size: 11px; color: var(--ink-soft);">{fmt(date)}</div>}
               <div style="font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--ink); line-height: 1.15; margin-top: 2px;">{h.data.name}</div>
               <div class="mono tabular" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.04em;">
-                <span>{h.data.distanceKm}<span style="color: var(--gold); margin-left: 2px;">km</span></span>
+                <span>{h.data.distanceKm}<span style="color: var(--ink-soft); margin-left: 2px;">km</span></span>
                 <span style="color: var(--gold); margin: 0 6px;">·</span>
-                <span>{h.data.elevationGainM}<span style="color: var(--gold); margin-left: 2px;">m</span></span>
+                <span>{h.data.elevationGainM}<span style="color: var(--ink-soft); margin-left: 2px;">m</span></span>
                 <span style="color: var(--gold); margin: 0 6px;">·</span>
                 <span style="text-transform: capitalize;">{h.data.difficulty}</span>
               </div>

@@ -52,7 +52,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
   <section class="stagger" style="padding: 24px var(--page-x) 12px;">
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
       {dayForHike && (
-        <span class="mono-cap" style="font-size: 10px; color: var(--gold); font-weight: 700;">
+        <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft); font-weight: 700;">
           Day {String(dayIndex + 1).padStart(2, '0')} / {String(totalDays).padStart(2, '0')}
         </span>
       )}
@@ -106,7 +106,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
           font-size: 11px;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: var(--gold);
+          color: var(--ink-soft);
           padding: 8px 12px;
           border: 1px solid var(--gold);
           border-radius: var(--r-sm);
@@ -129,19 +129,19 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
     ">
       <div style="text-align: center; padding: 8px 4px; border-right: 1px dashed var(--hairline); border-bottom: 1px dashed var(--hairline);">
         <div class="mono tabular" style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 36px; color: var(--ink); line-height: 1;">{hike.data.distanceKm}</div>
-        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Distance · km</div>
+        <div class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-top: 6px;">Distance · km</div>
       </div>
       <div style="text-align: center; padding: 8px 4px; border-bottom: 1px dashed var(--hairline);">
         <div class="mono tabular" style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 36px; color: var(--ink); line-height: 1;">{hike.data.elevationGainM}</div>
-        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Gain · metres</div>
+        <div class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-top: 6px;">Gain · metres</div>
       </div>
       <div style="text-align: center; padding: 8px 4px; border-right: 1px dashed var(--hairline);">
         <div class="mono tabular" style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 36px; color: var(--ink); line-height: 1;">{hike.data.movingTimeHours.min}–{hike.data.movingTimeHours.max}</div>
-        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Moving · hours</div>
+        <div class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-top: 6px;">Moving · hours</div>
       </div>
       <div style="text-align: center; padding: 8px 4px;">
         <div style="font-family: var(--font-display); font-weight: 800; font-variation-settings: 'opsz' 80; font-size: 28px; color: var(--ink); line-height: 1; text-transform: capitalize; letter-spacing: -0.01em;">{hike.data.difficulty}</div>
-        <div class="mono-cap" style="font-size: 9.5px; color: var(--gold); margin-top: 6px;">Grade</div>
+        <div class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-top: 6px;">Grade</div>
       </div>
     </div>
   </section>
@@ -172,7 +172,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
       <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
         <span style="font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink);">{hike.data.parking.name}</span>
         {hike.data.parking.costEur > 0 && (
-          <span class="mono tabular" style="font-size: 14px; font-weight: 700; color: var(--gold);">€{hike.data.parking.costEur}</span>
+          <span class="mono tabular" style="font-size: 14px; font-weight: 700; color: var(--ink-soft);">€{hike.data.parking.costEur}</span>
         )}
       </div>
       {hike.data.parking.mustBook && (
@@ -292,7 +292,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
           <span style="flex: 1; height: 1px; background: var(--gold); transform: translateY(-3px);"></span>
         </div>
         <div style="text-align: center; margin-top: 14px;">
-          <span class="mono-cap" style="font-size: 11px; color: var(--gold); letter-spacing: 0.32em; font-weight: 700;">Part II · The Day</span>
+          <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); letter-spacing: 0.32em; font-weight: 700;">Part II · The Day</span>
           <h2 style="
             font-family: var(--font-display);
             font-style: italic;
@@ -324,7 +324,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
                 <span class="mono tabular" style="
                   flex: 0 0 56px;
                   font-size: 13px;
-                  color: var(--gold);
+                  color: var(--ink-soft);
                   letter-spacing: 0.04em;
                   font-weight: 700;
                 ">{s.time}</span>
@@ -354,7 +354,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
           ">
             <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
               <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
-                {dayForHike.data.driving.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">km</span>
+                {dayForHike.data.driving.distanceKm}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">km</span>
               </div>
               <div style="flex: 1; min-width: 60px; display: flex; align-items: center; gap: 8px;">
                 <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
@@ -364,9 +364,9 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
                 <span style="height: 1px; flex: 1; background: var(--ink-soft); opacity: 0.4;"></span>
               </div>
               <div class="mono tabular" style="font-size: 22px; font-weight: 700; color: var(--ink);">
-                {Math.floor(dayForHike.data.driving.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">h</span>
+                {Math.floor(dayForHike.data.driving.durationMin / 60)}<span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">h</span>
                 {dayForHike.data.driving.durationMin % 60 > 0 && (<>
-                  <span style="margin-left: 8px;">{dayForHike.data.driving.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--gold); margin-left: 4px;">m</span>
+                  <span style="margin-left: 8px;">{dayForHike.data.driving.durationMin % 60}</span><span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin-left: 4px;">m</span>
                 </>)}
               </div>
             </div>
@@ -440,7 +440,7 @@ const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
                 <div style="flex: 1; min-width: 0;">
                   <div style="font-family: var(--font-display); font-weight: 600; font-size: 15.5px; line-height: 1.15; color: var(--ink);">{h.data.name}</div>
                   <div class="mono tabular" style="font-size: 11px; color: var(--ink-soft); margin-top: 3px; letter-spacing: 0.04em;">
-                    {h.data.distanceKm} <span style="color: var(--gold);">km</span> · {h.data.elevationGainM} <span style="color: var(--gold);">m</span> · <span style="text-transform: capitalize;">{h.data.difficulty}</span>
+                    {h.data.distanceKm} <span style="color: var(--ink-soft);">km</span> · {h.data.elevationGainM} <span style="color: var(--ink-soft);">m</span> · <span style="text-transform: capitalize;">{h.data.difficulty}</span>
                   </div>
                 </div>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--ink-soft);">
