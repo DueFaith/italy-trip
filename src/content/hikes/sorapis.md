@@ -11,10 +11,10 @@ movingTimeHours:
 totalTimeHours: 
   min: 4
   max: 6
-difficulty: moderate
+difficulty: hard
 rating: 
   stars: 4.7
-  reviews: 4585
+  reviews: 4569
 type: out-and-back
 trailhead: 
   name: Passo Tre Croci

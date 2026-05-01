@@ -3,14 +3,14 @@ slug: tre-cime
 name: Tre Cime di Lavaredo loop
 region: Veneto
 alltrailsUrl: https://www.alltrails.com/trail/italy/veneto/tre-cime-di-lavaredo-drei-zinnen
-distanceKm: 10.3
-elevationGainM: 425
+distanceKm: 10.1
+elevationGainM: 493
 movingTimeHours: 
-  min: 4
-  max: 5
+  min: 3.5
+  max: 4
 totalTimeHours: 
-  min: 4
-  max: 6
+  min: 3.5
+  max: 5
 difficulty: moderate
 rating: 
   stars: 4.7

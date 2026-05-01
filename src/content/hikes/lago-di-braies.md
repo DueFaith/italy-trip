@@ -4,7 +4,7 @@ name: Lago di Braies lake loop
 region: Veneto
 alltrailsUrl: https://www.alltrails.com/trail/italy/south-tyrol/lago-di-braies-pragser-wildsee
 distanceKm: 3.8
-elevationGainM: 30
+elevationGainM: 189
 movingTimeHours: 
   min: 1
   max: 1.5
@@ -12,7 +12,9 @@ totalTimeHours:
   min: 1
   max: 2.5
 difficulty: moderate
-rating: null
+rating: 
+  stars: 4.7
+  reviews: 2913
 type: loop
 trailhead: 
   name: Pragser Wildsee P3

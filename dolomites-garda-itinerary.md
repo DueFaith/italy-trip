@@ -148,9 +148,9 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 
 #### Hike: Tre Cime di Lavaredo loop
 - **AllTrails:** `https://www.alltrails.com/trail/italy/veneto/tre-cime-di-lavaredo-drei-zinnen`
-- **Distance:** 10.3 km (6.3 mi) loop
-- **Elevation gain:** 425 m (1,617 ft)
-- **Time:** 4–5h moving (allow 5–6h with breaks)
+- **Distance:** 10.1 km (6.3 mi) loop
+- **Elevation gain:** 493 m (1,617 ft)
+- **Time:** 3.5–4h moving (allow 4.5–5h with breaks)
 - **Difficulty:** Moderate (4.7★, 6,244 reviews)
 - **Trailhead:** Rifugio Auronzo, 46.6122, 12.2962
 - **Direction:** Counter-clockwise (101 → 104 → 102 → 105 → 101) is the standard. Clockwise has steeper ascent at the end but escapes crowds at trailhead.
@@ -221,7 +221,7 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 - **Distance:** 12.7 km (7.9 mi) out-and-back
 - **Elevation gain:** 600 m (1,961 ft) — note: undulating, not all in one climb
 - **Time:** 4–5h moving; allow 5–6h with lake time
-- **Difficulty:** Moderate (4.7★, 4,585 reviews) — but reviewers consistently warn this is *not* easy
+- **Difficulty:** Hard (4.7★, 4,569 reviews) — AllTrails grades this Hard; cable-assisted ledges, polished rock, exposure
 - **Trailhead:** Passo Tre Croci, 46.5578, 12.2036
 
 #### Trailhead parking — Passo Tre Croci
@@ -297,9 +297,9 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 #### Hike A: Lago di Braies lake loop
 - **AllTrails:** `https://www.alltrails.com/trail/italy/south-tyrol/lago-di-braies-pragser-wildsee`
 - **Distance:** 3.8 km loop
-- **Elevation gain:** ~30 m (essentially flat)
+- **Elevation gain:** 189 m (rocky shoreline path has real undulation; not as flat as it looks)
 - **Time:** 1–1.5h
-- **Difficulty:** Easy (more a walk than a hike)
+- **Difficulty:** Moderate (4.7★, 2,913 reviews) — AllTrails grades it moderate due to undulating shoreline
 - **Trailhead:** Pragser Wildsee P3, 46.6943, 12.0854
 
 ##### Parking — P3 (Lago di Braies)
@@ -316,10 +316,10 @@ This document is the source of truth for the Dolomites portion of the trip. It c
 
 #### Hike B: Cadini di Misurina viewpoint
 - **AllTrails:** `https://www.alltrails.com/trail/italy/veneto/rifugio-auronzo-cadini-di-misurina`
-- **Distance:** ~4 km (2.5 mi) out-and-back
-- **Elevation gain:** ~200 m (650 ft)
+- **Distance:** 3.4 km (2.1 mi) out-and-back
+- **Elevation gain:** 211 m (692 ft)
 - **Time:** 1.5–2h
-- **Difficulty:** Moderate (4.9★ — extremely high rating for the views)
+- **Difficulty:** Moderate (4.8★, 2,867 reviews — extremely high rating for the views)
 - **Trailhead:** Rifugio Auronzo (same lot as Tre Cime), 46.6122, 12.2962
 
 ##### Parking — Rifugio Auronzo (Cadini variant)
