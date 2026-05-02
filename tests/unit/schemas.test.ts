@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TripSchema, DaySchema, HikeSchema, LodgingSchema, BookingSchema } from '@/content/config';
+import { TripSchema, DaySchema, HikeSchema, LodgingSchema, BookingSchema, ActivitySchema } from '@/content/config';
 
 describe('BookingSchema relatedHikeSlug', () => {
   it('accepts a booking with a relatedHikeSlug', () => {
@@ -86,5 +86,55 @@ describe('content schemas', () => {
       weatherFor: { lat: 46.5, lon: 12.1, label: 'Cortina' },
     };
     expect(() => DaySchema.parse(day)).toThrow();
+  });
+});
+
+describe('ActivitySchema', () => {
+  const validBase = {
+    slug: 'demo',
+    name: 'Demo Activity',
+    category: 'culture-history' as const,
+    description: 'A test activity for schema validation.',
+    location: { label: 'Salò', lat: 45.6063, lon: 10.5237 },
+    cost: { display: '€10' },
+    bookingRequired: false,
+  };
+
+  it('accepts a minimal valid activity', () => {
+    expect(() => ActivitySchema.parse(validBase)).not.toThrow();
+  });
+
+  it('accepts a featured activity with bookingNote and url', () => {
+    const a = {
+      ...validBase,
+      slug: 'featured-demo',
+      featured: true,
+      bookingRequired: true,
+      bookingNote: 'Reserve 2 days ahead',
+      url: 'https://example.com/booking',
+      durationHours: 2,
+      driveFromSaloMin: 25,
+    };
+    expect(() => ActivitySchema.parse(a)).not.toThrow();
+  });
+
+  it('defaults featured to false when omitted', () => {
+    const parsed = ActivitySchema.parse(validBase);
+    expect(parsed.featured).toBe(false);
+  });
+
+  it('rejects a missing required field (name)', () => {
+    const { name, ...withoutName } = validBase;
+    expect(() => ActivitySchema.parse(withoutName)).toThrow();
+  });
+
+  it('rejects an invalid category enum value', () => {
+    const a = { ...validBase, category: 'made-up-category' };
+    expect(() => ActivitySchema.parse(a)).toThrow();
+  });
+
+  it('rejects a malformed url', () => {
+    const a = { ...validBase, url: 'not-a-url' };
+    expect(() => ActivitySchema.parse(a)).toThrow();
   });
 });
