@@ -9,13 +9,14 @@
  *                The matching pill gets aria-current="true" and the gold border.
  */
 import { getDays, getTrip } from '@/lib/content';
+import { phaseBoundary } from '@/lib/phase';
 
 const { activeDate } = Astro.props as { activeDate: string };
 const days = await getDays();
 const trip = getTrip();
 // Phase II starts on Garda phase start; insert a divider between the last
 // Phase I pill (the transition day, Jul 20) and the first Phase II pill (Jul 21)
-const phaseBoundary = trip.phases?.find((p) => p.id === 'garda')?.start ?? trip.endDate;
+const boundary = phaseBoundary(trip);
 
 const fmtDay = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric' });
 const fmtMon = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
@@ -50,7 +51,7 @@ const fmtMon = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-
       // day to a post-boundary day. The boundary is Jul 20 (Garda start) — divider
       // sits between Jul 20 and Jul 21.
       const prev = days[i - 1];
-      const isPhaseTransition = prev && prev.data.date < phaseBoundary && d.data.date >= phaseBoundary;
+      const isPhaseTransition = prev && prev.data.date < boundary && d.data.date >= boundary;
       return (
         <>
           {isPhaseTransition && (

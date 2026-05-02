@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import MapView from '@/components/MapView';
-import { getHikes, getLodgings, getActivities, getDays } from '@/lib/content';
+import { getHikes, getLodgings, getActivities, getDays, getTrip } from '@/lib/content';
+import { phaseBoundary } from '@/lib/phase';
 
 const hikes = await getHikes();
 const lodgings = await getLodgings();
@@ -92,7 +93,7 @@ const dayDate = url.searchParams.get('day') ?? undefined;
       box-shadow: var(--shadow-paper-sm);
     ">{hikes.length} Trailheads · {lodgings.length} Lodgings · {activities.length} Activities</span>
   </div>
-  <MapView pins={pins} focusId={focusId} dayDate={dayDate} client:only="react" />
+  <MapView pins={pins} focusId={focusId} dayDate={dayDate} phaseBoundary={phaseBoundary(getTrip())} client:only="react" />
 
   {/* Sepia-tone overlay on the map canvas — gives the OSM tiles a vintage feel */}
   <style is:global>

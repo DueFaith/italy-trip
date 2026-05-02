@@ -29,9 +29,10 @@ const lodging = lodgings.find((l) => l.id === day.data.lodgingSlug);
 import MapRibbon from '@/components/MapRibbon.astro';
 import type { Pin } from '@/lib/tile-math';
 import { getTrip } from '@/lib/content';
+import { phaseBoundary } from '@/lib/phase';
 const trip = getTrip();
-const phaseBoundary = trip.phases?.find((p) => p.id === 'garda')?.start ?? trip.endDate;
-const isGardaFreeForm = day.data.hikeSlugs.length === 0 && day.data.date >= phaseBoundary;
+const boundary = phaseBoundary(trip);
+const isGardaFreeForm = day.data.hikeSlugs.length === 0 && day.data.date >= boundary;
 
 // 4 nearest activities to Salò (anchor: lodging coords, NOT weatherFor) — same
 // computation as the home page TodayBanner. Only relevant on free-form days.

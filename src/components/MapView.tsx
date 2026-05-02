@@ -16,6 +16,7 @@ type Props = {
   pins: Pin[];
   focusId?: string;
   dayDate?: string;
+  phaseBoundary?: string;
 };
 
 const colors = {
@@ -26,7 +27,7 @@ const colors = {
   activity: '#3a5f8a',
 };
 
-export default function MapView({ pins, focusId: focusIdProp, dayDate: dayDateProp }: Props) {
+export default function MapView({ pins, focusId: focusIdProp, dayDate: dayDateProp, phaseBoundary: phaseBoundaryProp = '2026-07-20' }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
@@ -45,7 +46,7 @@ export default function MapView({ pins, focusId: focusIdProp, dayDate: dayDatePr
   // Default Phase I/II layer state: if the SSR prop signaled a Phase I day,
   // default to Phase I only. (Toggles are hidden when filters are active, so
   // this only meaningfully affects the no-filter global view.)
-  const phaseIOnly = dayDateProp !== undefined && !focusIdProp && dayDateProp < '2026-07-20';
+  const phaseIOnly = dayDateProp !== undefined && !focusIdProp && dayDateProp < phaseBoundaryProp;
   const [showHikes, setShowHikes] = useState(true);
   const [showActivities, setShowActivities] = useState(!phaseIOnly);
 

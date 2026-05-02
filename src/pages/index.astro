@@ -6,6 +6,7 @@ import BookingRingOrBadge from '@/components/BookingRingOrBadge.astro';
 import PastPhaseSummary from '@/components/PastPhaseSummary.astro';
 import { getDays, getHikes, getTrip, getBookings, getLodgings, getActivities } from '@/lib/content';
 import { haversineKm } from '@/lib/geo';
+import { phaseBoundary, isInPhaseII } from '@/lib/phase';
 
 const trip = getTrip();
 const days = await getDays();
@@ -20,8 +21,8 @@ const inTrip = todayISO >= trip.startDate && todayISO <= trip.endDate;
 
 // Phase boundary: derived from trip.phases (Garda start), with safe fallback
 // to trip.endDate (i.e. "Phase II never starts") if phases is removed.
-const phaseBoundary = trip.phases?.find((p) => p.id === 'garda')?.start ?? trip.endDate;
-const inPhaseII = todayISO >= phaseBoundary;
+const boundary = phaseBoundary(trip);
+const inPhaseII = isInPhaseII(trip, todayISO);
 
 const bookedCount = bookings.filter((b) => b.status === 'booked').length;
 const totalBookings = bookings.length;
@@ -61,7 +62,7 @@ for (const day of days) {
 }
 
 // For PastPhaseSummary stat block
-const dolomiteDays = days.filter((d) => d.data.date < phaseBoundary);
+const dolomiteDays = days.filter((d) => d.data.date < boundary);
 const dolomiteNights = dolomiteDays.length;
 
 const fmtShort = (iso: string) => {
@@ -192,7 +193,7 @@ const fmtRange = (a: string, b: string) =>
       <BookingRingOrBadge bookedCount={bookedCount} totalBookings={totalBookings} collapse={collapseRing} />
 
       {/* PAST PHASE — Dolomites summary card */}
-      <PastPhaseSummary hikes={hikes} startDate={trip.startDate} endDate={phaseBoundary} nights={dolomiteNights} />
+      <PastPhaseSummary hikes={hikes} startDate={trip.startDate} endDate={boundary} nights={dolomiteNights} />
     </>
   ) : (
     <>
