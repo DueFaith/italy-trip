@@ -1,45 +1,72 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import MapView from '@/components/MapView';
-import { getHikes, getLodgings, getActivities } from '@/lib/content';
+import { getHikes, getLodgings, getActivities, getDays } from '@/lib/content';
 
 const hikes = await getHikes();
 const lodgings = await getLodgings();
 const activities = await getActivities();
+const days = await getDays();
 
-type Pin = { lat: number; lon: number; label: string; href?: string; category: 'trailhead' | 'lodging' | 'parking' | 'restaurant' | 'activity' };
+type Pin = {
+  id: string;
+  lat: number;
+  lon: number;
+  label: string;
+  href?: string;
+  category: 'trailhead' | 'lodging' | 'parking' | 'restaurant' | 'activity';
+  dayDates: string[];
+};
 
 const pins: Pin[] = [];
 
 for (const h of hikes) {
+  // Find every day that schedules this hike.
+  const dayDates = days.filter((d) => d.data.hikeSlugs.includes(h.slug)).map((d) => d.data.date);
   pins.push({
+    id: `hike-${h.slug}`,
     lat: h.data.trailhead.lat,
     lon: h.data.trailhead.lon,
     label: `${h.data.name} (trailhead)`,
     href: `/hike/${h.slug}`,
     category: 'trailhead',
+    dayDates,
   });
 }
 
 for (const l of lodgings) {
+  // A lodging belongs to every day whose lodgingSlug points at it.
+  const dayDates = days.filter((d) => d.data.lodgingSlug === l.id).map((d) => d.data.date);
   pins.push({
+    id: `lodging-${l.id}`,
     lat: l.data.lat,
     lon: l.data.lon,
     label: l.data.name,
-    href: '/lodgings',
+    href: `/lodgings/${l.id}`,
     category: 'lodging',
+    dayDates,
   });
 }
 
 for (const a of activities) {
+  // Activities aren't scheduled to specific days yet — leave dayDates empty.
   pins.push({
+    id: `activity-${a.id}`,
     lat: a.data.location.lat,
     lon: a.data.location.lon,
     label: a.data.name,
     href: `/activities/${a.id}`,
     category: 'activity',
+    dayDates: [],
   });
 }
+
+// Read URL params at SSR time. They'll be available again client-side
+// via window.location for the React island; we also pass them as props
+// so the island sees them on first render.
+const url = new URL(Astro.request.url);
+const focusId = url.searchParams.get('focus') ?? undefined;
+const dayDate = url.searchParams.get('day') ?? undefined;
 ---
 <BaseLayout title="Map">
   {/* Floating caption at the top of the map for context */}
@@ -65,7 +92,7 @@ for (const a of activities) {
       box-shadow: var(--shadow-paper-sm);
     ">{hikes.length} Trailheads · {lodgings.length} Lodgings · {activities.length} Activities</span>
   </div>
-  <MapView pins={pins} client:only="react" />
+  <MapView pins={pins} focusId={focusId} dayDate={dayDate} client:only="react" />
 
   {/* Sepia-tone overlay on the map canvas — gives the OSM tiles a vintage feel */}
   <style is:global>
