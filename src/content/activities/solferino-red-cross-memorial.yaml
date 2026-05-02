@@ -1,0 +1,16 @@
+slug: solferino-red-cross-memorial
+name: Solferino Red Cross Memorial Complex
+category: culture-history
+description: "Birthplace of the Red Cross. The 1859 battle between Franco-Sardinian and Austrian armies left 40,000 wounded; Henri Dunant's witness here led directly to the founding of the International Red Cross. Visit the Memorial chapel, the Ossuary, and the Tower commemorating the battle."
+location: 
+  label: Solferino
+  lat: 45.3733
+  lon: 10.5664
+cost: 
+  display: €5 per site · €10 combined ticket
+durationHours: 3
+driveFromSaloMin: 35
+bookingRequired: false
+bookingNote: Guided tours bookable in advance — recommended for English narration.
+url: https://www.solferinoesanmartino.it/
+featured: true

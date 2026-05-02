@@ -1,0 +1,14 @@
+slug: rocca-di-manerba
+name: Rocca di Manerba
+category: hiking
+description: Short hike (~30 min up) to a 13th-century rock fortress jutting over the lake. Easy walk on a marked path. Great late-afternoon light over the south basin.
+location: 
+  label: Manerba del Garda
+  lat: 45.5489
+  lon: 10.5631
+cost: 
+  display: Free
+durationHours: 1.5
+driveFromSaloMin: 15
+bookingRequired: false
+featured: false

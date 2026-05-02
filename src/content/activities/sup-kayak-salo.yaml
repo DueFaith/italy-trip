@@ -1,0 +1,14 @@
+slug: sup-kayak-salo
+name: SUP / Kayak Rental — Salò Waterfront
+category: water-sports
+description: "Stand-up paddleboard and kayak rentals on the Salò lakefront promenade. Calm morning water; the bay is sheltered. Walk-in friendly, lifejackets included."
+location: 
+  label: Salò
+  lat: 45.6063
+  lon: 10.5237
+cost: 
+  display: €15 per hour
+durationHours: 2
+driveFromSaloMin: 0
+bookingRequired: false
+featured: false

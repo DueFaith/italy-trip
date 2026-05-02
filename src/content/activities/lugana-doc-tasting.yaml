@@ -1,0 +1,15 @@
+slug: lugana-doc-tasting
+name: Lugana DOC Tasting
+category: wine
+description: "The white-wine appellation just south of the lake (Sirmione/Desenzano peninsula). Trebbiano di Lugana grape; mineral, citrus, age-worthy whites. Visit a producer like Cà dei Frati or Ottella for cellar tour + tasting."
+location: 
+  label: Sirmione · Desenzano
+  lat: 45.4708
+  lon: 10.5378
+cost: 
+  display: €20–40 per tasting
+durationHours: 2
+driveFromSaloMin: 25
+bookingRequired: true
+bookingNote: Book direct with the producer 2–3 days ahead.
+featured: false

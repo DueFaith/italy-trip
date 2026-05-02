@@ -1,0 +1,16 @@
+slug: garda-rent-boat-rental
+name: Garda Rent Boat — Boat Rental (No Licence)
+category: water-sports
+description: "Self-drive boat rental from Sirmione for sub-40 hp craft that don't require a licence. 4–6 person capacity, perfect for cruising the south basin and the Sirmione peninsula."
+location: 
+  label: Sirmione
+  lat: 45.4951
+  lon: 10.6065
+cost: 
+  display: €100–180 per half-day
+durationHours: 4
+driveFromSaloMin: 25
+bookingRequired: true
+bookingNote: Reserve 2–3 days ahead.
+url: https://www.gardarentboat.it/
+featured: false

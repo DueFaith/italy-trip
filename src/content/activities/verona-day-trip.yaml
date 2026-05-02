@@ -1,0 +1,15 @@
+slug: verona-day-trip
+name: Verona Day Trip
+category: day-trip
+description: "Roman Arena (still hosts opera in summer), Juliet's balcony at Casa di Giulietta, Castelvecchio museum, Piazza delle Erbe. ~1h drive from Salò; park outside the ZTL and walk the historic centre."
+location: 
+  label: Verona
+  lat: 45.4384
+  lon: 10.9916
+cost: 
+  display: €12 Arena · museums €5–8 each
+durationHours: 8
+driveFromSaloMin: 60
+bookingRequired: false
+bookingNote: "If opera is on at the Arena, book months ahead."
+featured: false

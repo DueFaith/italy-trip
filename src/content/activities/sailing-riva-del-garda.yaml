@@ -1,0 +1,15 @@
+slug: sailing-riva-del-garda
+name: Sailing Lessons — Riva del Garda
+category: water-sports
+description: "The north end of the lake (Riva / Torbole) gets reliable thermal winds — Ora in the afternoon, Pelér in the morning — making it Italy's best inland sailing school spot. Half-day intro courses available."
+location: 
+  label: Riva del Garda
+  lat: 45.8854
+  lon: 10.84
+cost: 
+  display: €60–120 per half-day course
+durationHours: 4
+driveFromSaloMin: 75
+bookingRequired: true
+bookingNote: Book 3–5 days ahead in summer.
+featured: false

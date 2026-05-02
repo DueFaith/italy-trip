@@ -1,0 +1,16 @@
+slug: vittoriale-degli-italiani
+name: Vittoriale degli Italiani
+category: culture-history
+description: "D'Annunzio's eccentric villa-museum complex on the hillside above Gardone Riviera. Includes the writer's house (Prioria), an open-air theatre, an actual warship (Puglia) embedded in the gardens, and a mausoleum. One of the strangest and most memorable cultural visits on the lake."
+location: 
+  label: Gardone Riviera
+  lat: 45.6175
+  lon: 10.5575
+cost: 
+  display: €18 grounds · €25 grounds + house
+durationHours: 3
+driveFromSaloMin: 10
+bookingRequired: true
+bookingNote: Timed entry for the house — book online to avoid sold-out slots.
+url: https://www.vittoriale.it/
+featured: true

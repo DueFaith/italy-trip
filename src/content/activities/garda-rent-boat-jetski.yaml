@@ -1,0 +1,16 @@
+slug: garda-rent-boat-jetski
+name: Garda Rent Boat — Jet Ski Rental
+category: water-sports
+description: "Jet ski rental from Sirmione (peninsula at the south end of the lake). Yamaha craft, hourly rates, no licence required for the standard models with operator briefing. Helmets and life-vests included."
+location: 
+  label: Sirmione
+  lat: 45.4951
+  lon: 10.6065
+cost: 
+  display: €80–120 per hour
+durationHours: 1
+driveFromSaloMin: 25
+bookingRequired: true
+bookingNote: Book 1–2 days ahead in peak season.
+url: https://www.gardarentboat.it/
+featured: true

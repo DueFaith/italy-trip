@@ -1,0 +1,16 @@
+slug: monte-baldo-cable-car
+name: Monte Baldo Cable Car (Funivia)
+category: mountain-cable-car
+description: "Rotating panoramic cable car from Malcesine (lake level) to Monte Baldo (1,760 m). Two stages, ~10-minute ride, 360° views over Lake Garda and the Adamello-Brenta range. Ridge walks, paragliding launches, and a refuge at the top station."
+location: 
+  label: Malcesine
+  lat: 45.7681
+  lon: 10.8108
+cost: 
+  display: €30 round-trip adult
+durationHours: 4
+driveFromSaloMin: 70
+bookingRequired: true
+bookingNote: Sells out on clear summer days — book online for a morning slot.
+url: https://www.funiviedelbaldo.it/
+featured: true

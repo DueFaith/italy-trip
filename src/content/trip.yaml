@@ -1,9 +1,18 @@
 name: Dolomites
 startDate: "2026-07-15"
-endDate: "2026-07-20"
+endDate: "2026-07-27"
 travelers: 
   - Kevin
   - + party
+phases: 
+  - id: dolomites
+    label: Dolomites
+    start: "2026-07-15"
+    end: "2026-07-20"
+  - id: garda
+    label: Lake Garda
+    start: "2026-07-20"
+    end: "2026-07-27"
 flights: 
   outbound: 
     - flightNumber: LX1267

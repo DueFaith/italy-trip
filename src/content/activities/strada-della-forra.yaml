@@ -1,0 +1,14 @@
+slug: strada-della-forra
+name: Strada della Forra — Tremosine Gorge Road
+category: scenic
+description: "A vertiginous 6 km road carved into a limestone gorge, climbing from the lakeshore at Riva di Tremosine to the village of Pieve. James Bond *Quantum of Solace* opening sequence. Drive it, stop at the gallery viewpoints."
+location: 
+  label: Tremosine sul Garda
+  lat: 45.7833
+  lon: 10.7167
+cost: 
+  display: Free
+durationHours: 1
+driveFromSaloMin: 60
+bookingRequired: false
+featured: false

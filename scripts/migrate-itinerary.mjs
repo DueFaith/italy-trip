@@ -17,6 +17,8 @@ function toYAML(obj, indent = 0) {
   if (typeof obj === 'string') {
     // Quote strings that contain characters YAML would misinterpret
     // Also quote ISO date (YYYY-MM-DD) and ISO datetime strings so YAML parses them as strings
+    // Empty strings must be quoted so YAML doesn't parse them as null
+    if (obj === '') return '""';
     if (obj.includes('\n') || obj.includes(': ') || obj.startsWith('- ')
         || obj.includes('*') || obj.includes('#') || obj.includes('{') || obj.includes('}')
         || obj.includes('[') || obj.includes(']') || obj.includes(',') || obj.includes('|')
@@ -410,8 +412,12 @@ function emitTrip() {
   const trip = {
     name: 'Dolomites',
     startDate: '2026-07-15',
-    endDate: '2026-07-20',
+    endDate: '2026-07-27',
     travelers: ['Kevin', '+ party'],
+    phases: [
+      { id: 'dolomites', label: 'Dolomites', start: '2026-07-15', end: '2026-07-20' },
+      { id: 'garda',     label: 'Lake Garda', start: '2026-07-20', end: '2026-07-27' },
+    ],
     flights: {
       outbound: [
         { flightNumber: 'LX1267', airline: 'Swiss', from: 'CPH', to: 'ZRH', depart: '2026-07-15T09:40', arrive: '2026-07-15T11:35' },
@@ -465,6 +471,18 @@ function emitLodgings() {
       bookingUrl: 'https://www.booking.com/hotel/it/gasthof-albergo-kircher-sepp.html',
       notes: 'Family-run. Ask for balcony room facing Dolomites.',
     },
+    {
+      slug: 'salo-airbnb',
+      name: 'Salò AirBnB',
+      location: 'Salò, Lake Garda',
+      checkIn: '2026-07-20T16:00',
+      checkOut: '2026-07-27T10:00',
+      nights: 7,
+      address: '',
+      lat: 45.6063,
+      lon: 10.5237,
+      notes: 'AirBnB — address & booking URL to fill in later.',
+    },
   ];
   for (const l of lodgings) {
     writeFile(`src/content/lodgings/${l.slug}.yaml`, toYAML(l).trim() + '\n');
@@ -506,6 +524,314 @@ function emitRestaurants() {
   }
 }
 
+function emitActivities() {
+  const activities = [
+    // ── FEATURED (4) ───────────────────────────────────────────────────
+    {
+      slug: 'solferino-red-cross-memorial',
+      name: 'Solferino Red Cross Memorial Complex',
+      category: 'culture-history',
+      description: 'Birthplace of the Red Cross. The 1859 battle between Franco-Sardinian and Austrian armies left 40,000 wounded; Henri Dunant\'s witness here led directly to the founding of the International Red Cross. Visit the Memorial chapel, the Ossuary, and the Tower commemorating the battle.',
+      location: { label: 'Solferino', lat: 45.3733, lon: 10.5664 },
+      cost: { display: '€5 per site · €10 combined ticket' },
+      durationHours: 3,
+      driveFromSaloMin: 35,
+      bookingRequired: false,
+      bookingNote: 'Guided tours bookable in advance — recommended for English narration.',
+      url: 'https://www.solferinoesanmartino.it/',
+      featured: true,
+    },
+    {
+      slug: 'garda-rent-boat-jetski',
+      name: 'Garda Rent Boat — Jet Ski Rental',
+      category: 'water-sports',
+      description: 'Jet ski rental from Sirmione (peninsula at the south end of the lake). Yamaha craft, hourly rates, no licence required for the standard models with operator briefing. Helmets and life-vests included.',
+      location: { label: 'Sirmione', lat: 45.4951, lon: 10.6065 },
+      cost: { display: '€80–120 per hour' },
+      durationHours: 1,
+      driveFromSaloMin: 25,
+      bookingRequired: true,
+      bookingNote: 'Book 1–2 days ahead in peak season.',
+      url: 'https://www.gardarentboat.it/',
+      featured: true,
+    },
+    {
+      slug: 'vittoriale-degli-italiani',
+      name: 'Vittoriale degli Italiani',
+      category: 'culture-history',
+      description: 'D\'Annunzio\'s eccentric villa-museum complex on the hillside above Gardone Riviera. Includes the writer\'s house (Prioria), an open-air theatre, an actual warship (Puglia) embedded in the gardens, and a mausoleum. One of the strangest and most memorable cultural visits on the lake.',
+      location: { label: 'Gardone Riviera', lat: 45.6175, lon: 10.5575 },
+      cost: { display: '€18 grounds · €25 grounds + house' },
+      durationHours: 3,
+      driveFromSaloMin: 10,
+      bookingRequired: true,
+      bookingNote: 'Timed entry for the house — book online to avoid sold-out slots.',
+      url: 'https://www.vittoriale.it/',
+      featured: true,
+    },
+    {
+      slug: 'monte-baldo-cable-car',
+      name: 'Monte Baldo Cable Car (Funivia)',
+      category: 'mountain-cable-car',
+      description: 'Rotating panoramic cable car from Malcesine (lake level) to Monte Baldo (1,760 m). Two stages, ~10-minute ride, 360° views over Lake Garda and the Adamello-Brenta range. Ridge walks, paragliding launches, and a refuge at the top station.',
+      location: { label: 'Malcesine', lat: 45.7681, lon: 10.8108 },
+      cost: { display: '€30 round-trip adult' },
+      durationHours: 4,
+      driveFromSaloMin: 70,
+      bookingRequired: true,
+      bookingNote: 'Sells out on clear summer days — book online for a morning slot.',
+      url: 'https://www.funiviedelbaldo.it/',
+      featured: true,
+    },
+
+    // ── WATER SPORTS (additional 3 beyond featured jetski) ─────────────
+    {
+      slug: 'garda-rent-boat-rental',
+      name: 'Garda Rent Boat — Boat Rental (No Licence)',
+      category: 'water-sports',
+      description: 'Self-drive boat rental from Sirmione for sub-40 hp craft that don\'t require a licence. 4–6 person capacity, perfect for cruising the south basin and the Sirmione peninsula.',
+      location: { label: 'Sirmione', lat: 45.4951, lon: 10.6065 },
+      cost: { display: '€100–180 per half-day' },
+      durationHours: 4,
+      driveFromSaloMin: 25,
+      bookingRequired: true,
+      bookingNote: 'Reserve 2–3 days ahead.',
+      url: 'https://www.gardarentboat.it/',
+      featured: false,
+    },
+    {
+      slug: 'sup-kayak-salo',
+      name: 'SUP / Kayak Rental — Salò Waterfront',
+      category: 'water-sports',
+      description: 'Stand-up paddleboard and kayak rentals on the Salò lakefront promenade. Calm morning water; the bay is sheltered. Walk-in friendly, lifejackets included.',
+      location: { label: 'Salò', lat: 45.6063, lon: 10.5237 },
+      cost: { display: '€15 per hour' },
+      durationHours: 2,
+      driveFromSaloMin: 0,
+      bookingRequired: false,
+      featured: false,
+    },
+    {
+      slug: 'sailing-riva-del-garda',
+      name: 'Sailing Lessons — Riva del Garda',
+      category: 'water-sports',
+      description: 'The north end of the lake (Riva / Torbole) gets reliable thermal winds — Ora in the afternoon, Pelér in the morning — making it Italy\'s best inland sailing school spot. Half-day intro courses available.',
+      location: { label: 'Riva del Garda', lat: 45.8854, lon: 10.8400 },
+      cost: { display: '€60–120 per half-day course' },
+      durationHours: 4,
+      driveFromSaloMin: 75,
+      bookingRequired: true,
+      bookingNote: 'Book 3–5 days ahead in summer.',
+      featured: false,
+    },
+
+    // ── CULTURE & HISTORY (5 beyond Solferino+Vittoriale) ──────────────
+    {
+      slug: 'san-martino-della-battaglia',
+      name: 'San Martino della Battaglia',
+      category: 'culture-history',
+      description: 'Twin battle site to Solferino — the same June 24, 1859 day, fought 8 km north between the Sardinian army and the Austrians. Climb the spiral staircase of the Tower for sweeping views to Lake Garda. Adjacent ossuary and museum. Pair with Solferino as one half-day.',
+      location: { label: 'San Martino della Battaglia', lat: 45.4392, lon: 10.6231 },
+      cost: { display: '€5 · €10 combined Solferino ticket' },
+      durationHours: 1.5,
+      driveFromSaloMin: 30,
+      bookingRequired: false,
+      url: 'https://www.solferinoesanmartino.it/',
+      featured: false,
+    },
+    {
+      slug: 'castiglione-cri-museum',
+      name: 'Castiglione delle Stiviere — International Red Cross Museum',
+      category: 'culture-history',
+      description: 'The third leg of the Red Cross trifecta. Castiglione is where civilians improvised the first triage hospital after Solferino — the practical event Dunant translated into an institution. The museum holds first-edition copies of A Memory of Solferino and original surgical instruments.',
+      location: { label: 'Castiglione delle Stiviere', lat: 45.3892, lon: 10.4889 },
+      cost: { display: '€5' },
+      durationHours: 1.5,
+      driveFromSaloMin: 35,
+      bookingRequired: false,
+      featured: false,
+    },
+    {
+      slug: 'sirmione-grotte-di-catullo',
+      name: 'Sirmione — Grotte di Catullo',
+      category: 'culture-history',
+      description: 'Ruins of a 1st-century Roman villa at the very tip of the Sirmione peninsula — one of the largest Roman residential sites in northern Italy. The "grottoes" are vaulted substructures. Olive groves on-site with a small museum.',
+      location: { label: 'Sirmione', lat: 45.5044, lon: 10.6097 },
+      cost: { display: '€8 adult' },
+      durationHours: 1.5,
+      driveFromSaloMin: 25,
+      bookingRequired: false,
+      featured: false,
+    },
+    {
+      slug: 'sirmione-scaligero-castle',
+      name: 'Sirmione — Scaligero Castle',
+      category: 'culture-history',
+      description: 'A rare moated medieval castle (13th century) guarding the entrance to the Sirmione peninsula — the moat is fed directly by the lake. Climb the keep for views over the old town and the lake.',
+      location: { label: 'Sirmione', lat: 45.4956, lon: 10.6064 },
+      cost: { display: '€6 adult' },
+      durationHours: 1,
+      driveFromSaloMin: 25,
+      bookingRequired: false,
+      featured: false,
+    },
+
+    // ── MOUNTAIN & CABLE CAR (1 beyond featured Monte Baldo) ───────────
+    {
+      slug: 'tremalzo-tremosine',
+      name: 'Tremalzo / Tremosine — Cable Car & Plateau',
+      category: 'mountain-cable-car',
+      description: 'Tremosine sits on a high cliff plateau on the west shore. Drive up via the Strada della Forra (gorge road) and explore the village of Pieve di Tremosine and the Terrazza del Brivido cliff terrace.',
+      location: { label: 'Tremosine sul Garda', lat: 45.7833, lon: 10.7167 },
+      cost: { display: 'Free (driving access)' },
+      durationHours: 3,
+      driveFromSaloMin: 65,
+      bookingRequired: false,
+      featured: false,
+    },
+
+    // ── SCENIC (3) ─────────────────────────────────────────────────────
+    {
+      slug: 'strada-della-forra',
+      name: 'Strada della Forra — Tremosine Gorge Road',
+      category: 'scenic',
+      description: 'A vertiginous 6 km road carved into a limestone gorge, climbing from the lakeshore at Riva di Tremosine to the village of Pieve. James Bond *Quantum of Solace* opening sequence. Drive it, stop at the gallery viewpoints.',
+      location: { label: 'Tremosine sul Garda', lat: 45.7833, lon: 10.7167 },
+      cost: { display: 'Free' },
+      durationHours: 1,
+      driveFromSaloMin: 60,
+      bookingRequired: false,
+      featured: false,
+    },
+    {
+      slug: 'limone-sul-garda',
+      name: 'Limone sul Garda',
+      category: 'scenic',
+      description: 'Lemon-grove village clinging to the west cliff. Restored 18th-century Limonaia del Castel (lemon house) on the lake. Pretty stone harbour. Connected to Riva by the cantilevered Garda by Bike cycle path.',
+      location: { label: 'Limone sul Garda', lat: 45.8133, lon: 10.7867 },
+      cost: { display: '€2 Limonaia entry · village free' },
+      durationHours: 2.5,
+      driveFromSaloMin: 70,
+      bookingRequired: false,
+      featured: false,
+    },
+    {
+      slug: 'punta-san-vigilio',
+      name: 'Punta San Vigilio',
+      category: 'scenic',
+      description: 'A tiny cypress-covered promontory on the east shore. Private chapel, 16th-century Villa Guarienti (locanda), and the small "Baia delle Sirene" bathing area. Quiet at sunset.',
+      location: { label: 'Punta San Vigilio', lat: 45.5894, lon: 10.7233 },
+      cost: { display: 'Free promontory · €15 Baia delle Sirene access' },
+      durationHours: 2,
+      driveFromSaloMin: 45,
+      bookingRequired: false,
+      featured: false,
+    },
+
+    // ── BIKE (2) ───────────────────────────────────────────────────────
+    {
+      slug: 'garda-by-bike-west-coast',
+      name: 'Garda by Bike — West Coast Cliff Path',
+      category: 'bike',
+      description: 'Cantilevered cycle path bolted to the west cliff between Limone and Riva — opened in 2018, suspended 50 m over the water in places. ~2 km headline section, plus easy lakeshore connections each side. Rentable e-bikes nearby.',
+      location: { label: 'Limone sul Garda', lat: 45.8133, lon: 10.7867 },
+      cost: { display: 'Free path · €25–35 e-bike rental' },
+      durationHours: 3,
+      driveFromSaloMin: 70,
+      bookingRequired: false,
+      featured: false,
+    },
+    {
+      slug: 'ebike-rental-salo',
+      name: 'E-Bike Rental — Salò',
+      category: 'bike',
+      description: 'Multiple e-bike rental shops on the Salò waterfront. Lakeshore route south to Desenzano (~25 km) is mostly flat; west toward Gargnano (~20 km) is hilly with lake-view climbs.',
+      location: { label: 'Salò', lat: 45.6063, lon: 10.5237 },
+      cost: { display: '€25–35 per day' },
+      durationHours: 6,
+      driveFromSaloMin: 0,
+      bookingRequired: false,
+      featured: false,
+    },
+
+    // ── WINE (2) ───────────────────────────────────────────────────────
+    {
+      slug: 'lugana-doc-tasting',
+      name: 'Lugana DOC Tasting',
+      category: 'wine',
+      description: 'The white-wine appellation just south of the lake (Sirmione/Desenzano peninsula). Trebbiano di Lugana grape; mineral, citrus, age-worthy whites. Visit a producer like Cà dei Frati or Ottella for cellar tour + tasting.',
+      location: { label: 'Sirmione · Desenzano', lat: 45.4708, lon: 10.5378 },
+      cost: { display: '€20–40 per tasting' },
+      durationHours: 2,
+      driveFromSaloMin: 25,
+      bookingRequired: true,
+      bookingNote: 'Book direct with the producer 2–3 days ahead.',
+      featured: false,
+    },
+    {
+      slug: 'bardolino-wine-route',
+      name: 'Bardolino Wine Route',
+      category: 'wine',
+      description: 'East-shore red-wine appellation (Corvina, Rondinella — same grapes as Valpolicella). Drive the Strada del Vino through the gentle hills above Bardolino and Lazise; stop at producers for tasting flights.',
+      location: { label: 'Bardolino', lat: 45.5489, lon: 10.7194 },
+      cost: { display: '€15–30 per tasting' },
+      durationHours: 4,
+      driveFromSaloMin: 50,
+      bookingRequired: true,
+      bookingNote: 'Book each cellar visit individually.',
+      featured: false,
+    },
+
+    // ── DAY TRIP (1) ───────────────────────────────────────────────────
+    {
+      slug: 'verona-day-trip',
+      name: 'Verona Day Trip',
+      category: 'day-trip',
+      description: 'Roman Arena (still hosts opera in summer), Juliet\'s balcony at Casa di Giulietta, Castelvecchio museum, Piazza delle Erbe. ~1h drive from Salò; park outside the ZTL and walk the historic centre.',
+      location: { label: 'Verona', lat: 45.4384, lon: 10.9916 },
+      cost: { display: '€12 Arena · museums €5–8 each' },
+      durationHours: 8,
+      driveFromSaloMin: 60,
+      bookingRequired: false,
+      bookingNote: 'If opera is on at the Arena, book months ahead.',
+      featured: false,
+    },
+
+    // ── AQUATIC PARK (1) ───────────────────────────────────────────────
+    {
+      slug: 'gardaland-caneva',
+      name: 'Gardaland / Caneva Aquapark',
+      category: 'aquatic-park',
+      description: 'Italy\'s biggest theme park (Gardaland) and adjacent waterpark (Caneva) on the south-east shore. Useful change of pace; ~30 min from Salò. Combined tickets available.',
+      location: { label: 'Castelnuovo del Garda', lat: 45.4528, lon: 10.7050 },
+      cost: { display: '€45 Gardaland · €60 combined' },
+      durationHours: 8,
+      driveFromSaloMin: 35,
+      bookingRequired: true,
+      bookingNote: 'Book online for skip-the-line and a small discount.',
+      url: 'https://www.gardaland.it/',
+      featured: false,
+    },
+
+    // ── HIKING (1) ─────────────────────────────────────────────────────
+    {
+      slug: 'rocca-di-manerba',
+      name: 'Rocca di Manerba',
+      category: 'hiking',
+      description: 'Short hike (~30 min up) to a 13th-century rock fortress jutting over the lake. Easy walk on a marked path. Great late-afternoon light over the south basin.',
+      location: { label: 'Manerba del Garda', lat: 45.5489, lon: 10.5631 },
+      cost: { display: 'Free' },
+      durationHours: 1.5,
+      driveFromSaloMin: 15,
+      bookingRequired: false,
+      featured: false,
+    },
+  ];
+  for (const a of activities) {
+    writeFile(`src/content/activities/${a.slug}.yaml`, toYAML(a).trim() + '\n');
+  }
+}
+
 // --- Main ---
 
 export async function runMigration() {
@@ -518,6 +844,7 @@ export async function runMigration() {
   console.log('Emitting trip metadata...'); emitTrip();
   console.log('Emitting lodgings...'); emitLodgings();
   console.log('Emitting restaurants...'); emitRestaurants();
+  console.log('Emitting activities...'); emitActivities();
   console.log('Emitting days...'); for (const d of days) emitDay(d);
   console.log('Emitting hikes...'); for (const h of hikes) emitHike(h);
   console.log('Emitting bookings...'); emitBookings(bookings);

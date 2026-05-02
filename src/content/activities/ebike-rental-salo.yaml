@@ -1,0 +1,14 @@
+slug: ebike-rental-salo
+name: E-Bike Rental — Salò
+category: bike
+description: Multiple e-bike rental shops on the Salò waterfront. Lakeshore route south to Desenzano (~25 km) is mostly flat; west toward Gargnano (~20 km) is hilly with lake-view climbs.
+location: 
+  label: Salò
+  lat: 45.6063
+  lon: 10.5237
+cost: 
+  display: €25–35 per day
+durationHours: 6
+driveFromSaloMin: 0
+bookingRequired: false
+featured: false

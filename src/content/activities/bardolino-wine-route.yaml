@@ -1,0 +1,15 @@
+slug: bardolino-wine-route
+name: Bardolino Wine Route
+category: wine
+description: "East-shore red-wine appellation (Corvina, Rondinella — same grapes as Valpolicella). Drive the Strada del Vino through the gentle hills above Bardolino and Lazise; stop at producers for tasting flights."
+location: 
+  label: Bardolino
+  lat: 45.5489
+  lon: 10.7194
+cost: 
+  display: €15–30 per tasting
+durationHours: 4
+driveFromSaloMin: 50
+bookingRequired: true
+bookingNote: Book each cellar visit individually.
+featured: false

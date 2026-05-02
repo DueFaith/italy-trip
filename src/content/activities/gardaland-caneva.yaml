@@ -1,0 +1,16 @@
+slug: gardaland-caneva
+name: Gardaland / Caneva Aquapark
+category: aquatic-park
+description: Italy's biggest theme park (Gardaland) and adjacent waterpark (Caneva) on the south-east shore. Useful change of pace; ~30 min from Salò. Combined tickets available.
+location: 
+  label: Castelnuovo del Garda
+  lat: 45.4528
+  lon: 10.705
+cost: 
+  display: €45 Gardaland · €60 combined
+durationHours: 8
+driveFromSaloMin: 35
+bookingRequired: true
+bookingNote: Book online for skip-the-line and a small discount.
+url: https://www.gardaland.it/
+featured: false

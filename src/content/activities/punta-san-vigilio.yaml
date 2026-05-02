@@ -1,0 +1,14 @@
+slug: punta-san-vigilio
+name: Punta San Vigilio
+category: scenic
+description: "A tiny cypress-covered promontory on the east shore. Private chapel, 16th-century Villa Guarienti (locanda), and the small \"Baia delle Sirene\" bathing area. Quiet at sunset."
+location: 
+  label: Punta San Vigilio
+  lat: 45.5894
+  lon: 10.7233
+cost: 
+  display: Free promontory · €15 Baia delle Sirene access
+durationHours: 2
+driveFromSaloMin: 45
+bookingRequired: false
+featured: false
