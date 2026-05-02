@@ -124,6 +124,129 @@ describe('§3.4 map-link format', () => {
   });
 });
 
+describe('§3.6 day record consistency', () => {
+  const lodgingSlugs = new Set(listSlugs(LODGINGS_DIR, '.yaml'));
+  const hikeSlugs = new Set(listSlugs(HIKES_DIR, '.md'));
+
+  it('every day lodgingSlug references a real lodging', () => {
+    const bad: { file: string; lodgingSlug: string }[] = [];
+    for (const f of fs.readdirSync(DAYS_DIR).filter((f) => f.endsWith('.md'))) {
+      const fm = parseFrontmatter(fs.readFileSync(path.join(DAYS_DIR, f), 'utf8'));
+      if (!lodgingSlugs.has(fm.lodgingSlug)) bad.push({ file: f, lodgingSlug: fm.lodgingSlug });
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('every hikeSlugs[] entry references a real hike', () => {
+    const bad: { file: string; hikeSlug: string }[] = [];
+    for (const f of fs.readdirSync(DAYS_DIR).filter((f) => f.endsWith('.md'))) {
+      const fm = parseFrontmatter(fs.readFileSync(path.join(DAYS_DIR, f), 'utf8'));
+      for (const h of fm.hikeSlugs ?? []) {
+        if (!hikeSlugs.has(h)) bad.push({ file: f, hikeSlug: h });
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('day count equals the trip span (endDate - startDate + 1 days)', () => {
+    const trip = yaml.load(fs.readFileSync(path.join(ROOT, 'src/content/trip.yaml'), 'utf8')) as {
+      startDate: string;
+      endDate: string;
+    };
+    const expected =
+      Math.floor(
+        (new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) / 86400000,
+      ) + 1;
+    const actual = fs.readdirSync(DAYS_DIR).filter((f) => f.endsWith('.md')).length;
+    expect(actual).toBe(expected);
+  });
+});
+
+describe('§3.7 service-worker cache key', () => {
+  it('dist/sw.js declares a dolomites-vN cache version', () => {
+    const sw = fs.readFileSync(path.join(DIST, 'sw.js'), 'utf8');
+    const m = sw.match(/['"]dolomites-v(\d+)['"]/);
+    expect(m, 'sw.js missing dolomites-vN cache key').not.toBeNull();
+    expect(parseInt(m![1], 10)).toBeGreaterThan(0);
+  });
+});
+
+describe('§3.8 image alt text on detail pages', () => {
+  it('every <img> on detail-page routes has an alt attribute', () => {
+    const missing: { route: string; src: string }[] = [];
+    for (const { route, html } of allPages(DIST)) {
+      const isDetail =
+        route.startsWith('/hike/') ||
+        route.startsWith('/day/') ||
+        (route.startsWith('/activities/') && route !== '/activities') ||
+        (route.startsWith('/lodgings/') && route !== '/lodgings');
+      if (!isDetail) continue;
+      // For each <img>, check it has an alt attribute (empty alt="" is fine).
+      const imgRe = /<img\b[^>]*>/g;
+      let m: RegExpExecArray | null;
+      while ((m = imgRe.exec(html)) !== null) {
+        const tag = m[0];
+        if (!/\balt="/i.test(tag)) {
+          const srcMatch = tag.match(/\bsrc="([^"]*)"/);
+          missing.push({ route, src: srcMatch ? srcMatch[1] : tag });
+        }
+      }
+    }
+    expect(missing, `Imgs missing alt: ${JSON.stringify(missing, null, 2)}`).toEqual([]);
+  });
+});
+
+describe('§3.9 schedule renders on day pages', () => {
+  it('every day with non-empty schedule renders a Schedule heading + at least one HH:MM row', () => {
+    const issues: { route: string; reason: string }[] = [];
+    for (const f of fs.readdirSync(DAYS_DIR).filter((f) => f.endsWith('.md'))) {
+      const fm = parseFrontmatter(fs.readFileSync(path.join(DAYS_DIR, f), 'utf8'));
+      if (!fm.schedule || fm.schedule.length === 0) continue;
+      const route = `/day/${fm.date}`;
+      const file = path.join(DIST, `day/${fm.date}/index.html`);
+      if (!fs.existsSync(file)) {
+        issues.push({ route, reason: 'built page missing' });
+        continue;
+      }
+      const html = fs.readFileSync(file, 'utf8');
+      // Find <h2> ... Schedule ... </h2>
+      const hasHeading = /<h2\b[^>]*>[^<]*Schedule[^<]*<\/h2>/.test(html);
+      if (!hasHeading) issues.push({ route, reason: 'no Schedule heading' });
+      // At least one <li> ... HH:MM ... </li> in the page (look in main, but the
+      // simple regex just checks the file body has an li with a time pattern)
+      const hasTimeRow = /<li\b[^>]*>[\s\S]*?\d\d:\d\d[\s\S]*?<\/li>/.test(html);
+      if (!hasTimeRow) issues.push({ route, reason: 'no HH:MM row' });
+    }
+    expect(issues, `Schedule rendering issues: ${JSON.stringify(issues, null, 2)}`).toEqual([]);
+  });
+});
+
+describe('§3.10 map ribbon presence on detail pages', () => {
+  it('every detail-page route has exactly one .map-ribbon with an OSM tile <img>', () => {
+    const missing: { route: string; reason: string }[] = [];
+    for (const { route, html } of allPages(DIST)) {
+      const isDetail =
+        route.startsWith('/hike/') ||
+        route.startsWith('/day/') ||
+        (route.startsWith('/activities/') && route !== '/activities') ||
+        (route.startsWith('/lodgings/') && route !== '/lodgings');
+      if (!isDetail) continue;
+      const ribbons = extractByClass(html, 'div', 'map-ribbon');
+      if (ribbons.length !== 1) {
+        missing.push({ route, reason: `expected 1 ribbon, got ${ribbons.length}` });
+        continue;
+      }
+      const ribbon = ribbons[0];
+      const imgSrcs = extractAttr(ribbon, 'img', 'src');
+      const hasOsmTile = imgSrcs.some((s) => /tile\.openstreetmap\.org/.test(s));
+      if (!hasOsmTile) {
+        missing.push({ route, reason: `ribbon img src not an OSM tile: ${imgSrcs.join(',')}` });
+      }
+    }
+    expect(missing, `Ribbon issues: ${JSON.stringify(missing, null, 2)}`).toEqual([]);
+  });
+});
+
 describe('§3.5 activity-card destinations', () => {
   it('every <a href="/activities/SLUG"> points at a real activity file', () => {
     const slugs = new Set(listSlugs(ACTIVITIES_DIR, '.yaml'));
