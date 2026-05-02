@@ -1,0 +1,76 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+type Props = {
+  activity: CollectionEntry<'activities'>;
+  index?: number;
+  total?: number;
+};
+
+const { activity, index, total } = Astro.props;
+const a = activity.data;
+
+const categoryLabel = (c: string) => c.replace(/-/g, ' ');
+const fmtDrive = (m?: number) =>
+  m === undefined ? null : (m === 0 ? 'walk' : `${m} min`);
+---
+
+<a href={`/activities/${activity.id}`} class="hike-poster" style="position: relative;">
+  {/* meta line */}
+  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+    <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); letter-spacing: 0.18em;">
+      {categoryLabel(a.category)}
+    </span>
+    <span style="color: var(--gold); opacity: 0.6;">·</span>
+    <span class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft);">{a.location.label}</span>
+    {a.bookingRequired && (
+      <>
+        <span style="color: var(--gold); opacity: 0.6;">·</span>
+        <span class="mono-cap" style="font-size: 9.5px; color: var(--gold);">book ahead</span>
+      </>
+    )}
+  </div>
+
+  {/* name */}
+  <h3 style="
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 800;
+    font-variation-settings: 'opsz' 80;
+    font-size: clamp(22px, 5.5vw, 28px);
+    line-height: 1.04;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+    margin: 12px 0 10px;
+    max-width: 96%;
+  ">{a.name}</h3>
+
+  {/* 3-stat block: cost · duration · drive */}
+  <div class="poster-stats">
+    <div style="text-align: center;">
+      <div class="stat-num" style="font-size: 14px; padding-top: 6px;">{a.cost.display}</div>
+      <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">cost</div>
+    </div>
+    <div style="text-align: center; border-left: 1px dashed var(--hairline);">
+      <div class="stat-num tabular">{a.durationHours ?? '—'}</div>
+      <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">hours</div>
+    </div>
+    <div style="text-align: center; border-left: 1px dashed var(--hairline);">
+      <div class="stat-num tabular" style="font-size: 14px; padding-top: 6px;">
+        {fmtDrive(a.driveFromSaloMin) ?? '—'}
+      </div>
+      <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">from Salò</div>
+    </div>
+  </div>
+
+  {index !== undefined && total !== undefined && (
+    <span class="mono-cap" style="
+      position: absolute;
+      top: 14px; right: 16px;
+      font-size: 9px;
+      color: var(--ink-soft);
+      opacity: 0.55;
+      letter-spacing: 0.18em;
+    ">{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
+  )}
+</a>
