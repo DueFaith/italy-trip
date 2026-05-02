@@ -57,3 +57,23 @@
   category: lodging
   status: pending-window
   notes: On arrival
+- id: b-12
+  label: Garda Rent Boat — jet ski (Sirmione)
+  category: activity
+  status: pending-window
+  notes: Book 1–2 days ahead in peak season
+- id: b-13
+  label: Vittoriale degli Italiani — timed entry
+  category: activity
+  status: pending-window
+  notes: Book online — house slots sell out
+- id: b-14
+  label: Monte Baldo cable car — morning slot
+  category: cable-car
+  status: pending-window
+  notes: Book online for clear-weather days
+- id: b-15
+  label: Solferino guided tour (English)
+  category: activity
+  status: pending-window
+  notes: Reserve in advance for English narration
