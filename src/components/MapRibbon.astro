@@ -23,11 +23,38 @@ const edgeArrow = (edge: 'left' | 'right' | 'top' | 'bottom') => {
     case 'bottom': return '▼';
   }
 };
+
+// Centroid of pin positions within the tile — used to shift the visible
+// band of the (taller-than-ribbon) tile so pins fall inside the crop.
+// Without this, pins at fy~0.8 land outside the central 28% strip that
+// `object-fit: cover` exposes and look "missing" to the user.
+//
+// Tradeoff: pins use `top: fy*100%` of container, while the tile image is
+// shifted via object-position. For wide pin-spread days (e.g. trailhead +
+// lodging at opposite ends of a valley), the pin markers point at the
+// approximately-right geographic position rather than pixel-perfect. For
+// a decorative ribbon with the "⤢ Full map" link available for precision,
+// this is acceptable. Truly precise placement would require either a
+// multi-tile mosaic (~50 lines) or 1:1 inline tile-area sizing with JS
+// post-mount adjustment. Neither was worth the complexity.
+let centroidFy = 0.5;
+let centroidFx = 0.5;
+if (spec && spec.projected.length > 0) {
+  const fys = spec.projected.map((p) => p.fy);
+  const fxs = spec.projected.map((p) => p.fx);
+  centroidFy = (Math.min(...fys) + Math.max(...fys)) / 2;
+  centroidFx = (Math.min(...fxs) + Math.max(...fxs)) / 2;
+}
+// Pin position in the rendered (cropped) ribbon, expressed as a percentage
+// of the ribbon container. With object-position aligning the image's
+// `centroidFy` point to container Y = centroidFy * 100%, every pin's
+// container-Y becomes pin.fy * 100% directly. Same for X. So we can use
+// fy/fx straight as percentages — no extra translation needed.
 ---
 {spec && (
   <div class="map-ribbon" style="
     position: relative;
-    height: 80px;
+    height: 110px;
     overflow: hidden;
     border-bottom: 1px solid var(--hairline);
     background: #d8c79a;
@@ -39,15 +66,16 @@ const edgeArrow = (edge: 'left' | 'right' | 'top' | 'bottom') => {
       alt=""
       loading="lazy"
       decoding="async"
-      style="
+      style={`
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: ${(centroidFx * 100).toFixed(1)}% ${(centroidFy * 100).toFixed(1)}%;
         z-index: 0;
         filter: sepia(0.35) saturate(0.85) hue-rotate(-10deg) contrast(0.95) brightness(1.02);
-      "
+      `}
     />
     {spec.projected.map((p) => (
       p.edge === null ? (
