@@ -10,12 +10,25 @@ export async function getStaticPaths() {
 const { activity } = Astro.props;
 const a = activity.data;
 
+import MapRibbon from '@/components/MapRibbon.astro';
+import type { Pin } from '@/lib/tile-math';
+
+const ribbonPins: Pin[] = [{
+  lat: a.location.lat,
+  lon: a.location.lon,
+  label: a.name,
+  href: `/activities/${activity.id}`,
+  category: 'activity',
+}];
+
 const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${a.location.lat},${a.location.lon}`;
 const amapsUrl = `https://maps.apple.com/?ll=${a.location.lat},${a.location.lon}&q=${encodeURIComponent(a.name)}`;
 
 const categoryLabel = (c: string) => c.replace(/-/g, ' ');
 ---
 <BaseLayout title={`${a.name} · Activities`} bodyClass="home-bg">
+  <MapRibbon pins={ribbonPins} expandHref={`/map?focus=activity-${activity.id}`} caption={`${a.location.label} · ${a.name}`} />
+
   {/* HERO ─────────────────────────────────────────────────────────── */}
   <section class="stagger" style="padding: 28px var(--page-x) 12px;">
     <p class="eyebrow with-rule" style="margin: 0;">{categoryLabel(a.category)}</p>

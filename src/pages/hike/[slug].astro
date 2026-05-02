@@ -60,8 +60,20 @@ const fmtFull = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en
 const stars = hike.data.rating?.stars ?? null;
 const fullStars = stars ? Math.floor(stars) : 0;
 const halfStar = stars ? (stars - fullStars >= 0.5 ? 1 : 0) : 0;
+
+import MapRibbon from '@/components/MapRibbon.astro';
+import type { Pin } from '@/lib/tile-math';
+
+const ribbonPins: Pin[] = [{
+  lat: hike.data.trailhead.lat,
+  lon: hike.data.trailhead.lon,
+  label: `${hike.data.name} (trailhead)`,
+  href: `/hike/${hike.slug}`,
+  category: 'trailhead',
+}];
 ---
 <BaseLayout title={hike.data.name} activeDayDate={dayForHike?.data.date}>
+  <MapRibbon pins={ribbonPins} expandHref={`/map?focus=hike-${hike.slug}`} caption={`${hike.data.name} · trailhead`} />
 
   {/* ════════ PART I — THE ROUTE ════════ */}
 

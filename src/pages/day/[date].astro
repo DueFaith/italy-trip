@@ -25,10 +25,37 @@ const hikes = await Promise.all(day.data.hikeSlugs.map((slug: string) => getHike
 const lodgings = await getLodgings();
 const lodging = lodgings.find((l) => l.id === day.data.lodgingSlug);
 
+import MapRibbon from '@/components/MapRibbon.astro';
+import type { Pin } from '@/lib/tile-math';
+
+const ribbonPins: Pin[] = [];
+for (const h of hikes) {
+  if (h?.data?.trailhead) {
+    ribbonPins.push({
+      lat: h.data.trailhead.lat,
+      lon: h.data.trailhead.lon,
+      label: `${h.data.name} (trailhead)`,
+      href: `/hike/${h.slug}`,
+      category: 'trailhead',
+    });
+  }
+}
+if (lodging) {
+  ribbonPins.push({
+    lat: lodging.data.lat,
+    lon: lodging.data.lon,
+    label: lodging.data.name,
+    href: `/lodgings/${lodging.id}`,
+    category: 'lodging',
+  });
+}
+const ribbonCaption = `Day ${dayIndex + 1} · ${hikes.length} ${hikes.length === 1 ? 'hike' : 'hikes'} · lodging`;
+
 const fmtFull = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 ---
 <BaseLayout title={`Day ${dayIndex + 1} — ${day.data.theme}`} activeDayDate={day.data.date}>
+  <MapRibbon pins={ribbonPins} expandHref={`/map?day=${day.data.date}`} caption={ribbonCaption} />
 
   {/* Hero ─ Day stamp + date + theme */}
   <section class="stagger" style="padding: 24px var(--page-x) 14px;">
