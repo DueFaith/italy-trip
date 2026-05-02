@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { getActivities } from '@/lib/content';
 import { haversineKm } from '@/lib/geo';
+import { sharedSlugPrefix } from '@/lib/related';
 
 type Props = { current: CollectionEntry<'activities'> };
 const { current } = Astro.props;
@@ -14,17 +15,6 @@ const all = await getActivities();
 const dropped = all.filter((a) => a.id !== current.id && (typeof a.data.location?.lat !== 'number' || typeof a.data.location?.lon !== 'number'));
 if (dropped.length > 0) {
   console.warn(`[RelatedActivities] Excluding ${dropped.length} activity entries lacking location.lat/lon: ${dropped.map((d) => d.id).join(', ')}`);
-}
-
-// Count shared hyphen-separated tokens at the start of two slugs.
-// Used to exclude same-business activities (e.g. garda-rent-boat-jetski +
-// garda-rent-boat-rental share 3 prefix tokens — same business, different boat).
-function sharedSlugPrefix(a: string, b: string): number {
-  const at = a.split('-');
-  const bt = b.split('-');
-  let i = 0;
-  while (i < at.length && i < bt.length && at[i] === bt[i]) i++;
-  return i;
 }
 
 const candidates = all.filter((a) =>
