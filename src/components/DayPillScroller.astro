@@ -56,3 +56,29 @@ const fmtMon = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-
     })}
   </div>
 </aside>
+
+<script is:inline>
+  // Auto-scroll the active pill into view when it's off-screen.
+  // Runs on initial mount AND after astro:after-swap (View Transitions).
+  // Visibility check ensures we don't yank the user's manual scroll position.
+  (function () {
+    function maybeCenterActive() {
+      const scroller = document.querySelector('.day-pill-scroll');
+      if (!scroller) return;
+      const active = scroller.querySelector('.day-pill.is-active');
+      if (!active) return;
+      const sBox = scroller.getBoundingClientRect();
+      const aBox = active.getBoundingClientRect();
+      const isFullyVisible = aBox.left >= sBox.left && aBox.right <= sBox.right;
+      if (isFullyVisible) return;
+      active.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', maybeCenterActive);
+    } else {
+      maybeCenterActive();
+    }
+    document.addEventListener('astro:after-swap', maybeCenterActive);
+  })();
+</script>
