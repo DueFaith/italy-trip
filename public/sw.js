@@ -1,4 +1,4 @@
-const CACHE = 'dolomites-v2';
+const CACHE = 'dolomites-v3';
 const ASSETS = [
   '/',
   '/manifest.webmanifest',
