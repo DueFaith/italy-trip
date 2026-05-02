@@ -410,7 +410,7 @@ function emitBookings(bookings) {
 
 function emitTrip() {
   const trip = {
-    name: 'Dolomites',
+    name: "Italia '26",
     startDate: '2026-07-15',
     endDate: '2026-07-27',
     travelers: ['Kevin', '+ party'],

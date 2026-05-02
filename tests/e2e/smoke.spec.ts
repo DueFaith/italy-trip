@@ -11,7 +11,7 @@ const activities = fs.readdirSync(path.join(ROOT, 'src/content/activities')).fil
 
 test('home page renders core elements', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /The Dolomites/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Italia '26/i })).toBeVisible();
   await expect(page.getByText('Days Until Departure')).toBeVisible();
   await expect(page.getByText(/Booked/)).toBeVisible();
 });
