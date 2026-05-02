@@ -30,7 +30,6 @@ import MapRibbon from '@/components/MapRibbon.astro';
 import type { Pin } from '@/lib/tile-math';
 import { getTrip } from '@/lib/content';
 import { phaseBoundary } from '@/lib/phase';
-import { getWordmark } from '@/lib/wordmark';
 const trip = getTrip();
 const boundary = phaseBoundary(trip);
 const isGardaFreeForm = day.data.hikeSlugs.length === 0 && day.data.date >= boundary;
@@ -78,7 +77,6 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
 <BaseLayout
   title={`Day ${dayIndex + 1} — ${day.data.theme}`}
   activeDayDate={day.data.date}
-  headerTitle={getWordmark({ pathname: Astro.url.pathname, dayLodgingSlug: day.data.lodgingSlug })}
 >
   <MapRibbon pins={ribbonPins} expandHref={`/map?day=${day.data.date}`} caption={ribbonCaption} />
 

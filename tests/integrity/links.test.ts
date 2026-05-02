@@ -87,7 +87,9 @@ describe('§3.3 header wordmark — property check', () => {
       const wordmarkMatch = html.match(
         /<a[^>]*\baria-label="Home"[\s\S]*?<span\b[^>]*\bclass="font-mono"[^>]*>([^<]+)<\/span>/,
       );
-      const actual = wordmarkMatch ? wordmarkMatch[1].trim() : '';
+      // Astro HTML-encodes apostrophes as &#39; — decode before comparison.
+      const raw = wordmarkMatch ? wordmarkMatch[1].trim() : '';
+      const actual = raw.replace(/&#39;/g, "'").replace(/&amp;/g, '&');
       if (actual !== expected) {
         mismatches.push({ route, expected, actual });
       }

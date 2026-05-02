@@ -155,15 +155,12 @@ test.describe('navigation / render', () => {
     expect(aBox!.x + aBox!.width).toBeLessThanOrEqual(sBox!.x + sBox!.width + 1);
   });
 
-  test('header wordmark adapts: home, day-Phase-II, lodging-Salò, map', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('header span.font-mono').first()).toHaveText('DOLOMITES + GARDA');
-    await page.goto('/day/2026-07-22');
-    await expect(page.locator('header span.font-mono').first()).toHaveText('LAGO DI GARDA');
-    await page.goto('/lodgings/salo-airbnb');
-    await expect(page.locator('header span.font-mono').first()).toHaveText('LAGO DI GARDA');
-    await page.goto('/map');
-    await expect(page.locator('header span.font-mono').first()).toHaveText('MAP');
+  test('header wordmark is the trip brand on every page', async ({ page }) => {
+    const expected = "ITALIA '26";
+    for (const path of ['/', '/day/2026-07-22', '/lodgings/salo-airbnb', '/map']) {
+      await page.goto(path);
+      await expect(page.locator('header span.font-mono').first()).toHaveText(expected);
+    }
   });
 
   test('bottom-nav active state: Home highlighted on /hike/*, More on /lodgings/*', async ({ page }) => {

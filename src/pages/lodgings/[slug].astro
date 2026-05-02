@@ -3,7 +3,6 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import MapRibbon from '@/components/MapRibbon.astro';
 import type { Pin } from '@/lib/tile-math';
 import { getLodgings } from '@/lib/content';
-import { getWordmark } from '@/lib/wordmark';
 
 export async function getStaticPaths() {
   const lodgings = await getLodgings();
@@ -33,7 +32,6 @@ const amapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(l.name)}${l.add
 ---
 <BaseLayout
   title={`${l.name} · Lodgings`}
-  headerTitle={getWordmark({ pathname: Astro.url.pathname, lodgingId: lodging.id })}
 >
   <MapRibbon pins={ribbonPins} expandHref={`/map?focus=lodging-${lodging.id}`} caption={`${l.location} · ${l.nights} ${l.nights === 1 ? 'night' : 'nights'}`} />
 
