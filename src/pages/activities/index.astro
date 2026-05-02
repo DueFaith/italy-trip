@@ -1,0 +1,146 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ActivityCard from '@/components/ActivityCard.astro';
+import { getActivities } from '@/lib/content';
+
+const activities = (await getActivities()).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name)
+);
+const featured = activities.filter((a) => a.data.featured);
+
+// Categories preserved in the order the spec lists them
+const CATEGORIES: { id: string; label: string }[] = [
+  { id: 'all',                label: 'All' },
+  { id: 'water-sports',       label: 'Water' },
+  { id: 'culture-history',    label: 'Culture' },
+  { id: 'mountain-cable-car', label: 'Mountain' },
+  { id: 'scenic',             label: 'Scenic' },
+  { id: 'bike',               label: 'Bike' },
+  { id: 'wine',               label: 'Wine' },
+  { id: 'day-trip',           label: 'Day trip' },
+  { id: 'aquatic-park',       label: 'Aquatic' },
+  { id: 'hiking',             label: 'Hiking' },
+];
+---
+<BaseLayout title="Activities · Lake Garda" bodyClass="home-bg">
+  {/* HERO ─────────────────────────────────────────────────────────── */}
+  <section class="stagger" style="padding: 28px var(--page-x) 8px;">
+    <p class="eyebrow with-rule" style="margin: 0;">Phase II</p>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 900;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(40px, 11vw, 68px);
+      line-height: 0.94;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      margin: 12px 0 6px;
+    ">Attività</h1>
+    <p class="mono-cap" style="font-size: 12px; color: var(--ink-soft); margin: 0;">
+      Lago di Garda · {activities.length} entries
+    </p>
+  </section>
+
+  {/* FILTER PILLS ─────────────────────────────────────────────────── */}
+  <nav
+    aria-label="Filter activities by category"
+    class="day-pill-scroll"
+    id="activity-filter"
+    style="
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 14px var(--page-x) 12px;
+      position: sticky;
+      top: 56px;
+      z-index: 5;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--hairline);
+    "
+  >
+    {CATEGORIES.map((c) => (
+      <button
+        type="button"
+        class="day-pill activity-pill"
+        data-category={c.id}
+        aria-pressed={c.id === 'all' ? 'true' : 'false'}
+        style="scroll-snap-align: start; cursor: pointer; min-height: 36px;"
+      >{c.label}</button>
+    ))}
+  </nav>
+
+  {/* FEATURED ROW ─────────────────────────────────────────────────── */}
+  {featured.length > 0 && (
+    <section class="stagger" style="padding: 22px var(--page-x) 8px;" data-featured-section>
+      <h2 class="eyebrow with-rule" style="margin: 0 0 14px;">Featured</h2>
+      <div style="display: grid; gap: 14px;">
+        {featured.map((a) => (
+          <ActivityCard activity={a} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* FULL GRID ────────────────────────────────────────────────────── */}
+  <section class="stagger" style="padding: 24px var(--page-x) 32px;">
+    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;">
+      <h2 class="eyebrow with-rule" style="margin: 0;">All Activities</h2>
+      <span style="flex: 1; height: 1px; background: var(--hairline);"></span>
+    </div>
+    <div id="activity-grid" style="display: grid; gap: 14px;">
+      {activities.map((a, i) => (
+        <div data-activity-card data-category={a.data.category}>
+          <ActivityCard activity={a} index={i} total={activities.length} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <style is:global>
+    .activity-pill[aria-pressed='true'] {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+  </style>
+
+  <script is:inline>
+    // Filter pills + URL param sync. Reads ?category=... on load,
+    // updates DOM + URL on click. Uses display:none for non-matching
+    // cards (no Astro re-render needed).
+    (function () {
+      const grid = document.getElementById('activity-grid');
+      const filter = document.getElementById('activity-filter');
+      const featured = document.querySelector('[data-featured-section]');
+      if (!grid || !filter) return;
+
+      const params = new URLSearchParams(location.search);
+      const initial = params.get('category') || 'all';
+
+      function apply(cat) {
+        for (const card of grid.querySelectorAll('[data-activity-card]')) {
+          const matches = cat === 'all' || card.dataset.category === cat;
+          card.style.display = matches ? '' : 'none';
+        }
+        for (const btn of filter.querySelectorAll('.activity-pill')) {
+          btn.setAttribute('aria-pressed', btn.dataset.category === cat ? 'true' : 'false');
+        }
+        if (featured) featured.style.display = cat === 'all' ? '' : 'none';
+        const next = new URL(location.href);
+        if (cat === 'all') next.searchParams.delete('category');
+        else next.searchParams.set('category', cat);
+        history.replaceState(null, '', next.toString());
+      }
+
+      filter.addEventListener('click', (e) => {
+        const btn = e.target.closest('.activity-pill');
+        if (!btn) return;
+        apply(btn.dataset.category);
+      });
+
+      if (initial !== 'all') apply(initial);
+    })();
+  </script>
+</BaseLayout>
