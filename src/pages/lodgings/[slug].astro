@@ -22,8 +22,13 @@ const ribbonPins: Pin[] = [{
 
 const fmt = (iso: string) => new Date(iso).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-const gmapsUrl = `https://www.google.com/maps?q=${l.lat},${l.lon}`;
-const amapsUrl = `https://maps.apple.com/?ll=${l.lat},${l.lon}&q=${encodeURIComponent(l.name)}`;
+// Map links: prefer name + address so Google/Apple resolve to the actual
+// hotel/B&B when there is one. For AirBnBs not listed as a public business,
+// the address still places the pin at the right street. Coordinates kept
+// as `ll` on Apple Maps as a fallback.
+const mapQuery = l.address ? `${l.name}, ${l.address}` : l.name;
+const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+const amapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(l.name)}${l.address ? `&address=${encodeURIComponent(l.address)}` : ''}&ll=${l.lat},${l.lon}`;
 ---
 <BaseLayout title={`${l.name} · Lodgings`}>
   <MapRibbon pins={ribbonPins} expandHref={`/map?focus=lodging-${lodging.id}`} caption={`${l.location} · ${l.nights} ${l.nights === 1 ? 'night' : 'nights'}`} />

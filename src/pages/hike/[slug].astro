@@ -195,7 +195,7 @@ const ribbonPins: Pin[] = [{
         </svg>
         <div style="flex: 1;">
           <div style="font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--ink); line-height: 1.15;">{hike.data.trailhead.name}</div>
-          <a href={`https://www.google.com/maps?q=${hike.data.trailhead.lat},${hike.data.trailhead.lon}`} class="mono tabular" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; display: inline-block; border-bottom: 1px dashed var(--gold); padding-bottom: 1px; letter-spacing: 0.03em;">
+          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hike.data.trailhead.name} ${hike.data.region}`)}`} class="mono tabular" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; display: inline-block; border-bottom: 1px dashed var(--gold); padding-bottom: 1px; letter-spacing: 0.03em;">
             {hike.data.trailhead.lat}, {hike.data.trailhead.lon}
           </a>
         </div>

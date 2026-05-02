@@ -24,8 +24,12 @@ const ribbonPins: Pin[] = [{
   category: 'activity',
 }];
 
-const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${a.location.lat},${a.location.lon}`;
-const amapsUrl = `https://maps.apple.com/?ll=${a.location.lat},${a.location.lon}&q=${encodeURIComponent(a.name)}`;
+// Map links: search by name + town so Google/Apple resolve to the real
+// place page (with photos, reviews, hours) rather than dropping a generic
+// pin at coordinates. Coordinates kept on Apple Maps as a `ll` fallback.
+const mapQuery = `${a.name} ${a.location.label}`;
+const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+const amapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(mapQuery)}&ll=${a.location.lat},${a.location.lon}`;
 ---
 <BaseLayout title={`${a.name} · Activities`} bodyClass="home-bg">
   <MapRibbon pins={ribbonPins} expandHref={`/map?focus=activity-${activity.id}`} caption={`${a.location.label} · ${a.name}`} />
