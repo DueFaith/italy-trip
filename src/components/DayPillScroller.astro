@@ -8,10 +8,14 @@
  *   activeDate — ISO date (YYYY-MM-DD) of the day matching the current page.
  *                The matching pill gets aria-current="true" and the gold border.
  */
-import { getDays } from '@/lib/content';
+import { getDays, getTrip } from '@/lib/content';
 
 const { activeDate } = Astro.props as { activeDate: string };
 const days = await getDays();
+const trip = getTrip();
+// Phase II starts on Garda phase start; insert a divider between the last
+// Phase I pill (the transition day, Jul 20) and the first Phase II pill (Jul 21)
+const phaseBoundary = trip.phases?.find((p) => p.id === 'garda')?.start ?? trip.endDate;
 
 const fmtDay = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric' });
 const fmtMon = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
@@ -40,18 +44,28 @@ const fmtMon = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-
       -webkit-overflow-scrolling: touch;
     "
   >
-    {days.map((d) => {
+    {days.map((d, i) => {
       const isActive = d.data.date === activeDate;
+      // Insert a Phase I → Phase II divider when transitioning from a pre-boundary
+      // day to a post-boundary day. The boundary is Jul 20 (Garda start) — divider
+      // sits between Jul 20 and Jul 21.
+      const prev = days[i - 1];
+      const isPhaseTransition = prev && prev.data.date < phaseBoundary && d.data.date >= phaseBoundary;
       return (
-        <a
-          href={`/day/${d.data.date}`}
-          class:list={['day-pill', isActive ? 'is-active' : '']}
-          style="scroll-snap-align: start;"
-          aria-current={isActive ? 'true' : undefined}
-        >
-          <span style="font-weight: 700;">{fmtDay(d.data.date)}</span>
-          <span style="opacity: 0.7;">{fmtMon(d.data.date)}</span>
-        </a>
+        <>
+          {isPhaseTransition && (
+            <span class="day-pill-phase-divider" aria-hidden="true"></span>
+          )}
+          <a
+            href={`/day/${d.data.date}`}
+            class:list={['day-pill', isActive ? 'is-active' : '']}
+            style="scroll-snap-align: start;"
+            aria-current={isActive ? 'true' : undefined}
+          >
+            <span style="font-weight: 700;">{fmtDay(d.data.date)}</span>
+            <span style="opacity: 0.7;">{fmtMon(d.data.date)}</span>
+          </a>
+        </>
       );
     })}
   </div>

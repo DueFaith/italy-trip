@@ -24,10 +24,23 @@ if (dropped.length > 0) {
   console.warn(`[RelatedActivities] Excluding ${dropped.length} activity entries lacking location.lat/lon: ${dropped.map((d) => d.id).join(', ')}`);
 }
 
+// Count shared hyphen-separated tokens at the start of two slugs.
+// Used to exclude same-business activities (e.g. garda-rent-boat-jetski +
+// garda-rent-boat-rental share 3 prefix tokens — same business, different boat).
+function sharedSlugPrefix(a: string, b: string): number {
+  const at = a.split('-');
+  const bt = b.split('-');
+  let i = 0;
+  while (i < at.length && i < bt.length && at[i] === bt[i]) i++;
+  return i;
+}
+
 const candidates = all.filter((a) =>
   a.id !== current.id
   && typeof a.data.location?.lat === 'number'
   && typeof a.data.location?.lon === 'number'
+  // Exclude same-business: shared slug prefix of 3+ tokens (e.g. "garda-rent-boat")
+  && sharedSlugPrefix(a.id, current.id) < 3
 );
 
 const nearest = candidates
@@ -80,7 +93,7 @@ const nearest = candidates
             margin: 6px 0 8px;
           ">{a.data.name}</h3>
           <div class="mono tabular" style="font-size: 11px; color: var(--ink-soft);">
-            {dist < 1 ? `${Math.round(dist * 1000)} m` : `${dist.toFixed(1)} km`} away
+            {dist < 0.05 ? 'Same location' : dist < 1 ? `${Math.round(dist * 1000)} m away` : `${dist.toFixed(1)} km away`}
           </div>
         </a>
       ))}

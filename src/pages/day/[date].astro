@@ -8,7 +8,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import EditDayButton from '@/components/customize/EditDayButton';
 import WeatherWidget from '@/components/WeatherWidget';
 import DriveLegs from '@/components/DriveLegs.astro';
-import { getDays, getHike, getLodgings } from '@/lib/content';
+import { getDays, getHike, getLodgings, getActivities } from '@/lib/content';
 
 export async function getStaticPaths() {
   const days = await getDays();
@@ -31,6 +31,28 @@ import { getTrip } from '@/lib/content';
 const trip = getTrip();
 const phaseBoundary = trip.phases?.find((p) => p.id === 'garda')?.start ?? trip.endDate;
 const isGardaFreeForm = day.data.hikeSlugs.length === 0 && day.data.date >= phaseBoundary;
+
+// 4 nearest activities to Salò (anchor: lodging coords, NOT weatherFor) — same
+// computation as the home page TodayBanner. Only relevant on free-form days.
+const saloLodging = lodgings.find((l: any) => l.id === 'salo-airbnb');
+const allActivities = isGardaFreeForm ? await getActivities() : [];
+function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(bLat - aLat);
+  const dLon = toRad(bLon - aLon);
+  const aa = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(aa));
+}
+const nearestForToday = isGardaFreeForm && saloLodging
+  ? [...allActivities]
+      .filter((a: any) => typeof a.data.location?.lat === 'number')
+      .sort((x: any, y: any) =>
+        haversineKm(saloLodging.data.lat, saloLodging.data.lon, x.data.location.lat, x.data.location.lon) -
+        haversineKm(saloLodging.data.lat, saloLodging.data.lon, y.data.location.lat, y.data.location.lon)
+      )
+      .slice(0, 4)
+  : [];
 
 const ribbonPins: Pin[] = [];
 for (const h of hikes) {
@@ -185,30 +207,45 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
   )}
 
   {isGardaFreeForm && (
-    <section class="stagger" style="padding: 22px var(--page-x);">
-      <h2 class="eyebrow" style="margin: 0 0 12px;">Today</h2>
-      <a href="/activities" style="
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-        padding: 16px;
-        background: var(--bg-paper);
-        border: 1px dashed var(--gold);
-        border-radius: var(--r-md);
-        box-shadow: var(--shadow-paper-sm);
-      ">
-        <div>
-          <div class="mono-cap" style="font-size: 11px; color: var(--gold); letter-spacing: 0.18em;">Free-form</div>
-          <div style="font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--ink); margin-top: 4px;">
-            Pick today's activities
-          </div>
-          <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px;">
-            Browse the full catalog · {day.data.theme}
-          </div>
+    <section class="stagger" style="padding: 22px var(--page-x) 8px;">
+      <h2 class="eyebrow" style="margin: 0 0 12px;">Today · Free at Salò</h2>
+      {nearestForToday.length > 0 && (
+        <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;">
+          {nearestForToday.map((a: any) => (
+            <a href={`/activities/${a.id}`} style="
+              flex: 0 0 auto;
+              scroll-snap-align: start;
+              padding: 10px 14px;
+              background: var(--bg-paper);
+              border: 1px solid var(--hairline);
+              border-radius: var(--r-sm);
+              text-decoration: none;
+              min-width: 150px;
+              max-width: 220px;
+              box-shadow: var(--shadow-paper-sm);
+            ">
+              <div class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft); letter-spacing: 0.18em;">{a.data.location.label}</div>
+              <div style="font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 14.5px; color: var(--ink); margin-top: 4px; line-height: 1.2;">{a.data.name}</div>
+            </a>
+          ))}
         </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--gold); flex: 0 0 auto;">
-          <path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      )}
+      <a href="/activities" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        padding: 8px 0;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-soft);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--gold);
+      ">Browse all {allActivities.length} activities
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
         </svg>
       </a>
     </section>

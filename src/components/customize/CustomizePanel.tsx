@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DndContext, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core';
+import { DndContext, useDraggable, useDroppable, closestCenter, useSensor, useSensors, MouseSensor, TouchSensor } from '@dnd-kit/core';
 import { useLocalState } from '@/stores/localState';
 import { listEffectiveDays, listEffectiveHikes } from '@/stores/selectors';
 import type { DayShape, HikeShape } from '@/stores/types';
@@ -8,12 +8,20 @@ import HikeForm from './HikeForm';
 type Props = { canonicalDays: DayShape[]; canonicalHikes: HikeShape[] };
 
 function DraggableHike({ slug }: { slug: string }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: `hike-${slug}` });
-  const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: `hike-${slug}` });
+  const baseStyle = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 50 } : {};
+  const style = { ...baseStyle, opacity: isDragging ? 0.85 : 1, touchAction: 'none' as const };
   return (
-    <span ref={setNodeRef} style={style} {...listeners} {...attributes}
-      className="inline-block px-2 py-1 bg-forest/10 border border-forest/30 rounded text-[11px] mr-1 cursor-move">
-      {slug}
+    <span
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="inline-flex items-center gap-1 px-2 py-1 mr-1 mb-1 bg-forest/10 border border-forest/30 rounded text-[11px] cursor-grab active:cursor-grabbing select-none"
+    >
+      {/* Grip handle — visible affordance for touch users */}
+      <span aria-hidden="true" style={{ display: 'inline-block', lineHeight: 1, color: 'var(--ink-soft)', opacity: 0.7, fontFamily: 'sans-serif' }}>⋮⋮</span>
+      <span>{slug}</span>
     </span>
   );
 }
@@ -155,6 +163,13 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
         )}
         <DndContext
           collisionDetection={closestCenter}
+          sensors={useSensors(
+            // Mouse: small distance threshold so accidental clicks don't start drag
+            useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+            // Touch: small delay so the page can still scroll vertically; drag
+            // only kicks in if the user holds and starts moving horizontally
+            useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 6 } }),
+          )}
           onDragEnd={(event) => {
             const { active, over } = event;
             if (!over) return;
