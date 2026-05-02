@@ -833,6 +833,63 @@ function emitActivities() {
   }
 }
 
+function emitGardaDayStubs() {
+  // Pull the return-flight depart string straight from the same source
+  // emitTrip() uses, so the two never drift out of sync.
+  const returnDepart = '2026-07-27T19:10';  // matches emitTrip()'s trip.flights.return[0].depart
+  const departTime = returnDepart.slice(11, 16);          // "19:10"
+  const arriveBy = '16:00';                                // 3h buffer recommended
+
+  const SALO = { lat: 45.6063, lon: 10.5237, label: 'Salò' };
+
+  // Days Jul 21..26 — all identical free-form Garda days.
+  const freeFormDates = ['2026-07-21', '2026-07-22', '2026-07-23', '2026-07-24', '2026-07-25', '2026-07-26'];
+  for (const date of freeFormDates) {
+    const stub = {
+      date,
+      theme: 'Free day at Lake Garda',
+      driving: { legs: [] },
+      schedule: [],
+      hikeSlugs: [],
+      lodgingSlug: 'salo-airbnb',
+      weatherFor: SALO,
+    };
+    const slug = `${date}-free-day-lake-garda`;
+    const target = path.join(ROOT, `src/content/days/${slug}.md`);
+    if (fs.existsSync(target)) {
+      console.log(`  · ${slug} already exists — skipping`);
+      continue;
+    }
+    writeFile(`src/content/days/${slug}.md`, `---\n${toYAML(stub).trim()}\n---\n\n`);
+  }
+
+  // Day 13 (Jul 27) — departure day with the airport drive leg.
+  const dep = {
+    date: '2026-07-27',
+    theme: 'Departure — drive to VCE',
+    driving: {
+      legs: [{
+        from: 'Salò',
+        to: 'Venice Marco Polo Airport (VCE)',
+        distanceKm: 175,
+        durationMin: 130,
+        notes: `Aim to arrive by ${arriveBy} for the ${departTime} flight; allow buffer for traffic`,
+      }],
+    },
+    schedule: [],
+    hikeSlugs: [],
+    lodgingSlug: 'salo-airbnb',
+    weatherFor: SALO,
+  };
+  const depSlug = '2026-07-27-departure-drive-to-vce';
+  const depTarget = path.join(ROOT, `src/content/days/${depSlug}.md`);
+  if (fs.existsSync(depTarget)) {
+    console.log(`  · ${depSlug} already exists — skipping`);
+  } else {
+    writeFile(`src/content/days/${depSlug}.md`, `---\n${toYAML(dep).trim()}\n---\n\n`);
+  }
+}
+
 // --- Main ---
 
 export async function runMigration() {
@@ -847,6 +904,7 @@ export async function runMigration() {
   console.log('Emitting restaurants...'); emitRestaurants();
   console.log('Emitting activities...'); emitActivities();
   console.log('Emitting days...'); for (const d of days) emitDay(d);
+  console.log('Emitting Garda day stubs...'); emitGardaDayStubs();
   console.log('Emitting hikes...'); for (const h of hikes) emitHike(h);
   console.log('Emitting bookings...'); emitBookings(bookings);
   console.log('Done.');
