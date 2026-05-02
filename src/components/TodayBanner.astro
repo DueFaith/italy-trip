@@ -1,0 +1,96 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+type Props = {
+  todayDay: CollectionEntry<'days'> | undefined;
+  todayDayIndex: number;
+  todayFirstHike: CollectionEntry<'hikes'> | undefined;
+  // For Phase II free days
+  saloLodging: CollectionEntry<'lodgings'> | undefined;
+  nearestActivities: CollectionEntry<'activities'>[]; // pre-computed top 4 by haversine from Salò
+};
+const { todayDay, todayDayIndex, todayFirstHike, saloLodging, nearestActivities } = Astro.props;
+
+if (!todayDay) return null;
+
+const isFreeForm = todayDay.data.hikeSlugs.length === 0;
+---
+{isFreeForm ? (
+  <section class="stagger" style="padding: 12px var(--page-x) 0;">
+    <div
+      style="
+        padding: 14px 16px;
+        background: var(--bg-paper);
+        border: 1px solid var(--hairline);
+        border-left: 4px solid var(--gold);
+        border-radius: var(--r-md);
+        box-shadow: var(--shadow-paper-md);
+      "
+    >
+      <span class="mono-cap" style="font-size: 11px; color: var(--gold); font-weight: 700;">
+        Today · Day {String(todayDayIndex + 1).padStart(2, '0')} · Free
+      </span>
+      <div style="font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 22px; color: var(--ink); line-height: 1.1; margin-top: 4px;">
+        Free at {saloLodging?.data.location ?? 'Salò'}
+      </div>
+      <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px;">
+        Pick from today's options
+      </div>
+      {nearestActivities.length > 0 && (
+        <div style="display: flex; gap: 8px; overflow-x: auto; margin-top: 12px; padding-bottom: 4px;">
+          {nearestActivities.map((a) => (
+            <a href={`/activities/${a.id}`} style="
+              flex: 0 0 auto;
+              padding: 8px 12px;
+              background: var(--bg);
+              border: 1px solid var(--hairline);
+              border-radius: var(--r-sm);
+              font-size: 12px;
+              color: var(--ink);
+              text-decoration: none;
+              white-space: nowrap;
+            ">{a.data.name}</a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+) : (
+  <section class="stagger" style="padding: 12px var(--page-x) 0;">
+    <a
+      href={todayFirstHike ? `/hike/${todayFirstHike.slug}` : `/day/${todayDay.data.date}`}
+      style="
+        display: block;
+        padding: 14px 16px;
+        background: var(--bg-paper);
+        border: 1px solid var(--hairline);
+        border-left: 4px solid var(--moss);
+        border-radius: var(--r-md);
+        box-shadow: var(--shadow-paper-md);
+        transform: rotate(-1deg);
+        transition: transform 200ms var(--ease-out);
+      "
+    >
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <div>
+          <span class="mono-cap" style="font-size: 11px; color: var(--moss); font-weight: 700;">
+            Today · Day {String(todayDayIndex + 1).padStart(2, '0')}
+          </span>
+          <div style="font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 22px; color: var(--ink); line-height: 1.1; margin-top: 4px;">
+            {todayFirstHike ? todayFirstHike.data.name : todayDay.data.theme}
+          </div>
+          {todayFirstHike && (
+            <div class="mono tabular" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.04em;">
+              {todayFirstHike.data.distanceKm} <span style="color: var(--ink-soft); opacity: 0.6;">km</span> ·
+              {todayFirstHike.data.elevationGainM} <span style="color: var(--ink-soft); opacity: 0.6;">m</span> ·
+              {todayFirstHike.data.movingTimeHours.min}–{todayFirstHike.data.movingTimeHours.max}h
+            </div>
+          )}
+        </div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex: 0 0 auto; color: var(--moss);">
+          <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        </svg>
+      </div>
+    </a>
+  </section>
+)}

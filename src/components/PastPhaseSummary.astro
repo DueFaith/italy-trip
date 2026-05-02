@@ -1,0 +1,60 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+type Props = {
+  hikes: CollectionEntry<'hikes'>[];
+  startDate: string;
+  endDate: string;
+  nights: number;
+};
+const { hikes, startDate, endDate, nights } = Astro.props;
+
+const sumKm = hikes.reduce((acc, h) => acc + h.data.distanceKm, 0);
+const sumGain = hikes.reduce((acc, h) => acc + h.data.elevationGainM, 0);
+
+const fmtDayMon = (iso: string) =>
+  new Date(iso + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+---
+<section class="stagger" style="padding: 36px var(--page-x) 0;">
+  <div style="display: flex; align-items: baseline; gap: 12px;">
+    <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); letter-spacing: 0.32em; font-weight: 700;">Past Phase</span>
+    <span style="flex: 1; height: 1px; background: var(--hairline);"></span>
+  </div>
+  <a href="/hikes" class="hike-poster" style="display: block; margin-top: 12px;">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); letter-spacing: 0.18em;">Dolomites</span>
+      <span style="color: var(--gold); opacity: 0.6;">·</span>
+      <span class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft);">{fmtDayMon(startDate)} — {fmtDayMon(endDate)}</span>
+    </div>
+    <h3 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 80;
+      font-size: clamp(22px, 5.5vw, 28px);
+      line-height: 1.04;
+      color: var(--ink);
+      margin: 12px 0 10px;
+    ">{hikes.length} hikes · Phase complete</h3>
+    <div class="poster-stats" style="grid-template-columns: repeat(3, 1fr);">
+      <div style="text-align: center;">
+        <div class="stat-num tabular">{Math.round(sumKm)}</div>
+        <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">km</div>
+      </div>
+      <div style="text-align: center; border-left: 1px dashed var(--hairline);">
+        <div class="stat-num tabular">{sumGain}</div>
+        <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">m gain</div>
+      </div>
+      <div style="text-align: center; border-left: 1px dashed var(--hairline);">
+        <div class="stat-num tabular">{nights}</div>
+        <div class="mono-cap" style="font-size: 10px; color: var(--ink-soft); margin-top: 4px;">nights</div>
+      </div>
+    </div>
+    <div style="margin-top: 10px; display: flex; align-items: center; gap: 6px; color: var(--ink-soft);">
+      <span class="mono-cap" style="font-size: 10.5px;">View All Hikes</span>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      </svg>
+    </div>
+  </a>
+</section>

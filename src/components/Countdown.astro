@@ -1,0 +1,52 @@
+---
+type Props = {
+  startDate: string; // ISO YYYY-MM-DD
+  endDate: string;
+  todayISO: string;
+};
+const { startDate, endDate, todayISO } = Astro.props;
+
+let big: number;
+let label: string;
+if (todayISO < startDate) {
+  big = Math.ceil((new Date(startDate).getTime() - new Date(todayISO).getTime()) / 86400000);
+  label = 'Days Until Departure';
+} else if (todayISO <= endDate) {
+  // Day N of M (1-indexed)
+  const dayN = Math.floor((new Date(todayISO).getTime() - new Date(startDate).getTime()) / 86400000) + 1;
+  const totalDays = Math.floor((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000) + 1;
+  big = dayN;
+  label = `of ${totalDays}`;
+} else {
+  big = Math.ceil((new Date(todayISO).getTime() - new Date(endDate).getTime()) / 86400000);
+  label = 'Days Since';
+}
+---
+<section
+  class="stagger"
+  style="padding: 28px var(--page-x) 12px; text-align: center; position: relative;"
+>
+  <div
+    aria-hidden="true"
+    style="
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 40%, rgba(212, 162, 76, 0.18), transparent 60%);
+      pointer-events: none;
+    "
+  ></div>
+  <div
+    class="tabular"
+    style="
+      position: relative;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(78px, 18vw, 124px);
+      line-height: 0.85;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+    "
+  >{String(big).padStart(2, '0')}</div>
+  <p class="mono-cap" style="position: relative; margin: 14px 0 0; font-size: 11px; color: var(--ink-soft);">{label}</p>
+</section>
