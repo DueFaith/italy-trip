@@ -10,6 +10,8 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['tests/unit/**/*.test.{ts,mjs}'],
+    include: ['tests/unit/**/*.test.{ts,mjs}', 'tests/integrity/**/*.test.{ts,mjs}'],
+    globalSetup: ['./tests/integrity/setup.ts'],
+    testTimeout: 60_000,
   },
 });
