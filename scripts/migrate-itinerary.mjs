@@ -525,7 +525,7 @@ function emitRestaurants() {
   }
 }
 
-function emitActivities() {
+export function buildActivities() {
   const activities = [
     // ── FEATURED (4) ───────────────────────────────────────────────────
     {
@@ -828,21 +828,28 @@ function emitActivities() {
       featured: false,
     },
   ];
-  for (const a of activities) {
-    writeFile(`src/content/activities/${a.slug}.yaml`, toYAML(a).trim() + '\n');
+  return activities.map((a) => ({
+    relPath: `src/content/activities/${a.slug}.yaml`,
+    content: toYAML(a).trim() + '\n',
+  }));
+}
+
+function emitActivities() {
+  for (const r of buildActivities()) {
+    writeFile(r.relPath, r.content);
   }
 }
 
-function emitGardaDayStubs() {
+export function buildGardaDayStubs() {
   // Pull the return-flight depart string straight from the same source
   // emitTrip() uses, so the two never drift out of sync.
-  const returnDepart = '2026-07-27T19:10';  // matches emitTrip()'s trip.flights.return[0].depart
-  const departTime = returnDepart.slice(11, 16);          // "19:10"
-  const arriveBy = '16:00';                                // 3h buffer recommended
-
+  const returnDepart = '2026-07-27T19:10';
+  const departTime = returnDepart.slice(11, 16);
+  const arriveBy = '16:00';
   const SALO = { lat: 45.6063, lon: 10.5237, label: 'Salò' };
 
-  // Days Jul 21..26 — all identical free-form Garda days.
+  const records = [];
+
   const freeFormDates = ['2026-07-21', '2026-07-22', '2026-07-23', '2026-07-24', '2026-07-25', '2026-07-26'];
   for (const date of freeFormDates) {
     const stub = {
@@ -854,16 +861,12 @@ function emitGardaDayStubs() {
       lodgingSlug: 'salo-airbnb',
       weatherFor: SALO,
     };
-    const slug = `${date}-free-day-lake-garda`;
-    const target = path.join(ROOT, `src/content/days/${slug}.md`);
-    if (fs.existsSync(target)) {
-      console.log(`  · ${slug} already exists — skipping`);
-      continue;
-    }
-    writeFile(`src/content/days/${slug}.md`, `---\n${toYAML(stub).trim()}\n---\n\n`);
+    records.push({
+      relPath: `src/content/days/${date}-free-day-lake-garda.md`,
+      content: `---\n${toYAML(stub).trim()}\n---\n\n`,
+    });
   }
 
-  // Day 13 (Jul 27) — departure day with the airport drive leg.
   const dep = {
     date: '2026-07-27',
     theme: 'Departure — drive to VCE',
@@ -881,12 +884,22 @@ function emitGardaDayStubs() {
     lodgingSlug: 'salo-airbnb',
     weatherFor: SALO,
   };
-  const depSlug = '2026-07-27-departure-drive-to-vce';
-  const depTarget = path.join(ROOT, `src/content/days/${depSlug}.md`);
-  if (fs.existsSync(depTarget)) {
-    console.log(`  · ${depSlug} already exists — skipping`);
-  } else {
-    writeFile(`src/content/days/${depSlug}.md`, `---\n${toYAML(dep).trim()}\n---\n\n`);
+  records.push({
+    relPath: `src/content/days/2026-07-27-departure-drive-to-vce.md`,
+    content: `---\n${toYAML(dep).trim()}\n---\n\n`,
+  });
+
+  return records;
+}
+
+function emitGardaDayStubs() {
+  for (const r of buildGardaDayStubs()) {
+    const target = path.join(ROOT, r.relPath);
+    if (fs.existsSync(target)) {
+      console.log(`  · ${r.relPath} already exists — skipping`);
+      continue;
+    }
+    writeFile(r.relPath, r.content);
   }
 }
 
