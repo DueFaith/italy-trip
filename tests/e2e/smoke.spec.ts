@@ -85,3 +85,110 @@ test('today banner is absent outside trip dates (May 2026)', async ({ page }) =>
   await page.goto('/');
   await expect(page.getByText(/Today · Day/)).toHaveCount(0);
 });
+
+test.describe('navigation / render', () => {
+  test('/activities renders cards, featured, and filter pills', async ({ page }) => {
+    await page.goto('/activities');
+    // Featured cards
+    const featured = page.locator('[data-featured-section] .hike-poster');
+    await expect(featured).toHaveCount(4);
+    // Catalog cards (only non-featured shown by default; featured are hidden inline)
+    const allCards = page.locator('[data-activity-card]');
+    await expect(allCards).toHaveCount(activities.length);
+    // 1 'All' + 9 categories
+    const pills = page.locator('.activity-pill');
+    await expect(pills).toHaveCount(10);
+  });
+
+  test('clicking the Water Sports pill filters the grid and updates the URL', async ({ page }) => {
+    await page.goto('/activities');
+    await page.locator('.activity-pill[data-category="water-sports"]').click();
+    await expect(page).toHaveURL(/\?category=water-sports/);
+    await expect(page.locator('#grid-heading')).toHaveText('All matching');
+    const visibleCards = page.locator('[data-activity-card]:visible');
+    const count = await visibleCards.count();
+    for (let i = 0; i < count; i++) {
+      await expect(visibleCards.nth(i)).toHaveAttribute('data-category', 'water-sports');
+    }
+  });
+
+  test('/activities/solferino-red-cross-memorial renders breadcrumb + ribbon + nearby', async ({ page }) => {
+    await page.goto('/activities/solferino-red-cross-memorial');
+    await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible();
+    await expect(page.locator('.map-ribbon')).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Nearby activities' })).toBeVisible();
+    await expect(page.locator('a').filter({ hasText: /Back to catalog/ })).toBeVisible();
+  });
+
+  test('/lodgings/baita-fraina renders ribbon, address, and contact buttons', async ({ page }) => {
+    await page.goto('/lodgings/baita-fraina');
+    await expect(page.locator('.map-ribbon')).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Address' })).toBeVisible();
+    await expect(page.locator('a[href^="https://maps.apple.com"]')).toHaveCount(1);
+    await expect(page.locator('a[href^="https://www.google.com/maps"]')).toHaveCount(1);
+  });
+
+  test('/lodgings lists 3 lodgings in chronological order', async ({ page }) => {
+    await page.goto('/lodgings');
+    const cards = page.locator('main a[href^="/lodgings/"]');
+    await expect(cards).toHaveCount(3);
+    await expect(cards.nth(0)).toContainText(/Baita Fraina/);
+    await expect(cards.nth(1)).toContainText(/Kircher Sepp/);
+    await expect(cards.nth(2)).toContainText(/Salò/);
+  });
+
+  test('day pill scroller has a Phase I/II divider', async ({ page }) => {
+    await page.goto('/day/2026-07-22');
+    await expect(page.locator('.day-pill-phase-divider')).toHaveCount(1);
+  });
+
+  test('day pill auto-scroll: Jul 25 active pill is in viewport', async ({ page }) => {
+    await page.goto('/day/2026-07-25');
+    const active = page.locator('.day-pill.is-active');
+    await expect(active).toBeVisible();
+    const scroller = page.locator('.day-pill-scroll');
+    const sBox = await scroller.boundingBox();
+    const aBox = await active.boundingBox();
+    expect(sBox).not.toBeNull();
+    expect(aBox).not.toBeNull();
+    expect(aBox!.x).toBeGreaterThanOrEqual(sBox!.x - 1);
+    expect(aBox!.x + aBox!.width).toBeLessThanOrEqual(sBox!.x + sBox!.width + 1);
+  });
+
+  test('header wordmark adapts: home, day-Phase-II, lodging-Salò, map', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('header span.font-mono').first()).toHaveText('DOLOMITES + GARDA');
+    await page.goto('/day/2026-07-22');
+    await expect(page.locator('header span.font-mono').first()).toHaveText('LAGO DI GARDA');
+    await page.goto('/lodgings/salo-airbnb');
+    await expect(page.locator('header span.font-mono').first()).toHaveText('LAGO DI GARDA');
+    await page.goto('/map');
+    await expect(page.locator('header span.font-mono').first()).toHaveText('MAP');
+  });
+
+  test('bottom-nav active state: Home highlighted on /hike/*, More on /lodgings/*', async ({ page }) => {
+    await page.goto('/hike/tre-cime');
+    await expect(page.locator('nav[aria-label="Primary"] a[aria-current="page"]')).toHaveAttribute('href', '/');
+    await page.goto('/lodgings/baita-fraina');
+    await expect(page.locator('nav[aria-label="Primary"] a[aria-current="page"]')).toHaveAttribute('href', '/more');
+  });
+
+  test('/map?focus=hike-tre-cime auto-opens the popup', async ({ page }) => {
+    await page.goto('/map?focus=hike-tre-cime');
+    // Wait for MapLibre to settle + the setTimeout(togglePopup, 350) to fire
+    await page.waitForTimeout(1500);
+    await expect(page.locator('.maplibregl-popup')).toBeVisible();
+  });
+
+  test('Phase II free-day banner shows nearest activities on /day/2026-07-22', async ({ page }) => {
+    await page.goto('/day/2026-07-22');
+    await expect(page.getByRole('heading', { name: 'Today · Free at Salò' })).toBeVisible();
+    await expect(page.locator('a').filter({ hasText: /Browse all \d+ activities/ })).toBeVisible();
+  });
+
+  test('schedule renders on /day/2026-07-17 with at least 5 HH:MM rows', async ({ page }) => {
+    await page.goto('/day/2026-07-17');
+    const rows = page.locator('main ol li').filter({ hasText: /\d\d:\d\d/ });
+    expect(await rows.count()).toBeGreaterThanOrEqual(5);
+  });
+});
