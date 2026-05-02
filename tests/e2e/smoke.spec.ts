@@ -1,19 +1,28 @@
 import { test, expect } from '@playwright/test';
+import yaml from 'js-yaml';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '../..');
+const bookings = yaml.load(fs.readFileSync(path.join(ROOT, 'src/content/bookings.yaml'), 'utf8')) as Array<unknown>;
+const activities = fs.readdirSync(path.join(ROOT, 'src/content/activities')).filter((f) => f.endsWith('.yaml'));
 
 test('home page renders core elements', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /The Dolomites/i })).toBeVisible();
-  await expect(page.getByText('Days to go')).toBeVisible();
-  await expect(page.getByText('Booked')).toBeVisible();
+  await expect(page.getByText('Days Until Departure')).toBeVisible();
+  await expect(page.getByText(/Booked/)).toBeVisible();
 });
 
-test('day page renders hikes and driving (schedule lives on hike page now)', async ({ page }) => {
-  await page.goto('/day/2026-07-16');
-  await expect(page.getByRole('main').getByText(/Hike/i)).toBeVisible();
-  // Schedule section was moved to the hike page in spec §4 — ensure it's NOT here
-  await expect(page.locator('main').getByText('Wake, breakfast', { exact: false })).toHaveCount(0);
-  // The "View Full Schedule" callout inside hike cards stays
-  await expect(page.locator('main').getByText('View Full Schedule', { exact: true })).toBeVisible();
+test('day page renders schedule, hikes, and driving', async ({ page }) => {
+  await page.goto('/day/2026-07-17');
+  await expect(page.getByRole('heading', { name: 'Schedule', exact: true })).toBeVisible();
+  // At least one HH:MM row in the schedule list
+  await expect(page.locator('main ol li').filter({ hasText: /\d\d:\d\d/ }).first()).toBeVisible();
+  // Hikes section still renders (uses an "eyebrow" h2 — match by role/heading + text)
+  await expect(page.getByRole('main').getByRole('heading', { name: /^Hikes?$/ }).first()).toBeVisible();
 });
 
 test('hike page renders stats', async ({ page }) => {
@@ -27,12 +36,11 @@ test('map page mounts', async ({ page }) => {
   await expect(page.locator('canvas')).toBeVisible({ timeout: 5000 });
 });
 
-test('checklist renders bookings grouped by category', async ({ page }) => {
+test('checklist renders one row per booking', async ({ page }) => {
   await page.goto('/checklist');
   await expect(page.getByRole('heading', { name: 'Flights' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Lodging' })).toBeVisible();
-  // At least one "+ Add Confirmation #" button exists for items without a stored confirmation
-  await expect(page.getByText('+ Add Confirmation', { exact: false }).first()).toBeVisible();
+  await expect(page.locator('main input[type="checkbox"]')).toHaveCount(bookings.length);
 });
 
 test('customize page renders', async ({ page }) => {
@@ -40,15 +48,15 @@ test('customize page renders', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /Customize/i })).toBeVisible();
 });
 
-test('bottom nav has 4 items: home, map, checklist, more', async ({ page }) => {
+test('bottom nav has 4 items: home, map, activities, more', async ({ page }) => {
   await page.goto('/');
   const nav = page.getByRole('navigation', { name: /primary/i });
   await expect(nav.getByText('Home', { exact: true })).toBeVisible();
   await expect(nav.getByText('Map', { exact: true })).toBeVisible();
-  await expect(nav.getByText('Checklist', { exact: true })).toBeVisible();
+  await expect(nav.getByText('Activities', { exact: true })).toBeVisible();
   await expect(nav.getByText('More', { exact: true })).toBeVisible();
+  await expect(nav.getByText('Checklist', { exact: true })).toHaveCount(0);
   await expect(nav.getByText('Day', { exact: true })).toHaveCount(0);
-  await expect(nav.getByText('Hikes', { exact: true })).toHaveCount(0);
 });
 
 test('persistent day-pill scroller appears on day and hike pages', async ({ page }) => {
@@ -73,7 +81,7 @@ test('hike page prev/next walks trip order across day boundaries', async ({ page
 });
 
 test('today banner is absent outside trip dates (May 2026)', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-05-02T10:00:00Z') });
   await page.goto('/');
-  // Today banner should not render today (May 2026, before Jul 15 trip start)
   await expect(page.getByText(/Today · Day/)).toHaveCount(0);
 });
