@@ -1,16 +1,44 @@
 ---
 /* Custom 1.5px-stroke vintage map glyphs — no Lucide / Heroicons. */
-const items = [
-  { href: '/',          label: 'Home',      icon: 'home' },
-  { href: '/map',       label: 'Map',       icon: 'map' },
-  { href: '/activities', label: 'Activities', icon: 'activities' },
-  { href: '/more',      label: 'More',      icon: 'more' },
-] as const;
+type Tab = { href: string; label: string; icon: 'home' | 'map' | 'activities' | 'more'; matches: (path: string) => boolean };
+
+const items: Tab[] = [
+  {
+    href: '/',
+    label: 'Home',
+    icon: 'home',
+    matches: (p) => p === '/' || p.startsWith('/hike/') || p.startsWith('/day/'),
+  },
+  {
+    href: '/map',
+    label: 'Map',
+    icon: 'map',
+    matches: (p) => p === '/map',
+  },
+  {
+    href: '/activities',
+    label: 'Activities',
+    icon: 'activities',
+    matches: (p) => p === '/activities' || p.startsWith('/activities/'),
+  },
+  {
+    href: '/more',
+    label: 'More',
+    icon: 'more',
+    matches: (p) =>
+      p === '/more'
+      || p === '/checklist'
+      || p === '/restaurants'
+      || p === '/contingencies'
+      || p === '/lodgings'
+      || p.startsWith('/lodgings/')
+      || p === '/photos'
+      || p === '/customize',
+  },
+];
+
 const path = Astro.url.pathname;
-const activeIndex = Math.max(
-  0,
-  items.findIndex((it) => (it.href === '/' ? path === '/' : path === it.href || path.startsWith(it.href + '/')))
-);
+const activeIndex = Math.max(0, items.findIndex((it) => it.matches(path)));
 ---
 <nav
   aria-label="Primary"

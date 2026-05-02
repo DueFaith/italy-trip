@@ -11,6 +11,8 @@ const { activity } = Astro.props;
 const a = activity.data;
 
 import MapRibbon from '@/components/MapRibbon.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import { CATEGORY_LABELS } from '@/lib/category-labels';
 import type { Pin } from '@/lib/tile-math';
 
 const ribbonPins: Pin[] = [{
@@ -23,15 +25,18 @@ const ribbonPins: Pin[] = [{
 
 const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${a.location.lat},${a.location.lon}`;
 const amapsUrl = `https://maps.apple.com/?ll=${a.location.lat},${a.location.lon}&q=${encodeURIComponent(a.name)}`;
-
-const categoryLabel = (c: string) => c.replace(/-/g, ' ');
 ---
 <BaseLayout title={`${a.name} · Activities`} bodyClass="home-bg">
   <MapRibbon pins={ribbonPins} expandHref={`/map?focus=activity-${activity.id}`} caption={`${a.location.label} · ${a.name}`} />
 
+  <Breadcrumb crumbs={[
+    { label: 'Activities', href: '/activities' },
+    { label: CATEGORY_LABELS[a.category] },
+  ]} />
+
   {/* HERO ─────────────────────────────────────────────────────────── */}
   <section class="stagger" style="padding: 28px var(--page-x) 12px;">
-    <p class="eyebrow with-rule" style="margin: 0;">{categoryLabel(a.category)}</p>
+    <p class="eyebrow with-rule" style="margin: 0;">{CATEGORY_LABELS[a.category]}</p>
     <h1 style="
       font-family: var(--font-display);
       font-style: italic;
