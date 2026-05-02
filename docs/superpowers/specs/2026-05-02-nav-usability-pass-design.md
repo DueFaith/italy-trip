@@ -58,6 +58,8 @@ Logo → `/`, gear → `/customize`, customize-pill island as today.
 
 A new `MapRibbon.astro` component, ~80px tall, sepia-toned to match the existing map page filter (`sepia(0.35) saturate(0.85) hue-rotate(-10deg) contrast(0.95) brightness(1.02)`), rendered inline at the top of every detail page.
 
+**Hydration posture: fully static (no MapLibre on detail pages).** The ribbon renders a single `<img>` of an OSM raster tile (zoom 11–13 depending on pin spread), with absolutely-positioned `<span>` pins overlaid. Image URL is the standard OSM tile (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`) selected at build time from the pin centroid. Roughly 5–10 KB per ribbon vs ~120 KB+ for an idle MapLibre instance. The ribbon is non-interactive: pan/zoom/popup are not supported — the "⤢ Full map" control is the entry point to the interactive map. This decision favours fast paint on marginal 4G in the Dolomites over in-place interactivity. View Transitions: ribbon opts out (`view-transition-name: none`) so each page renders a fresh ribbon without an empty-tile flash during swap.
+
 | Page | Pins |
 |---|---|
 | `/day/[date]` | Each `hikeSlug`'s trailhead + the day's lodging |
@@ -73,21 +75,27 @@ Each ribbon has a "⤢ Full map" control (bottom-right) linking to:
 
 ### Phase-aware home page (medium awareness)
 
-`phaseBoundary = '2026-07-20'` already exists in `index.astro`. Three behaviour changes driven by date:
+**`phaseBoundary` is derived, not hardcoded.** Computed in the home-page frontmatter as `trip.phases?.find(p => p.id === 'garda')?.start ?? trip.endDate`. The fallback to `trip.endDate` means if `phases` is ever removed from `trip.yaml`, the boundary collapses to "after the trip ends" — safe degradation. `/customize` continues to be unable to shift trip dates (see Out of scope).
+
+Four behaviour changes driven by date:
 
 1. **Adaptive countdown copy.** The big number means different things by phase:
    - `today < startDate` → "X" + label "Days Until Departure" (current)
-   - `startDate ≤ today ≤ endDate` → "X" + label "of 13" (e.g. "07 of 13")
+   - `startDate ≤ today ≤ endDate` → "X" + label "of N" (e.g. "07 of 13", where N = day count from `trip.startDate`/`endDate`)
    - `today > endDate` → "X" + label "Days Since"
 
 2. **Today banner adapts to phase.**
    - Phase I day with hikes → today's first hike (current behaviour, `/hike/<slug>` href)
-   - Phase II day (no hikeSlugs) → "Today: free at Salò" + a horizontal quick-row of 4 nearest activities (computed by haversine from Salò)
+   - Phase II day (no hikeSlugs) → "Today: free at Salò" + a horizontal quick-row of 4 nearest activities. **Anchor**: haversine distance from `lodgings.find(l => l.data.slug === 'salo-airbnb').data.{lat, lon}` (NOT the `weatherFor` coordinates — the AirBnB and the lake bay coordinates may diverge).
    - Outside trip dates → banner hidden (current behaviour)
 
-3. **Booking ring auto-collapses.** When `bookedCount === totalBookings`, render a small green checkmark badge instead of the 168×168 ring. Frees vertical space during the trip when no further bookings are pending.
+3. **Booking ring auto-collapses.** Two collapse triggers, OR'd:
+   - `bookedCount === totalBookings` (everything booked), OR
+   - `today >= phaseBoundary` (Phase II started — even if some non-critical bookings remain pending)
 
-4. **Section ordering swaps by phase.** Currently the home page is: Hero → Today banner → Countdown → PARTE I → All Hikes → Booking Ring → PARTE II → Salò card → Activities CTA → Itinerary. Phase II reorders to: Hero → Today banner → Countdown → PARTE II → Salò card → Activities CTA → Booking Ring (collapsed) → PARTE I (now collapsed to a "Past phase" summary card linking to /hikes) → Itinerary.
+   Collapsed render: a small (~40 px) green-check badge with the `n/m` ratio underneath, linking to `/checklist`. Rationale: the ring's job is pre-trip booking pressure; once Phase II begins, that pressure is moot — outstanding bookings (e.g. an unconfirmed restaurant reservation) belong on the checklist itself, not the home hero.
+
+4. **Section ordering swaps by phase.** Phase I default order: Hero → Today banner → Countdown → PARTE I → All Hikes → Booking Ring → PARTE II → Salò card → Activities CTA → Itinerary. Phase II reorders to: Hero → Today banner → Countdown → PARTE II → Salò card → Activities CTA → Booking Ring (collapsed) → **Past phase summary card** → Itinerary. The Past phase summary card replaces the full PARTE I + 6-poster grid: a single `.hike-poster`-styled card with the eyebrow "Past phase · Dolomites", title "6 hikes · Jul 15–20", a 3-stat strip (`{distanceKm sum} km · {elevationGainM sum} m · {nightsInDolomites} nights`), and a chevron link to `/hikes` for the full grid.
 
 ---
 
@@ -159,10 +167,12 @@ New, optional, additive — no impact on existing `/map` behaviour:
 | Param | Effect |
 |---|---|
 | `?day=YYYY-MM-DD` | Filter pins to that day's hikes + lodging; fit bounds to those pins; default Phase I/II layer toggle to Phase I only |
-| `?focus=hike-<slug>` | Centre + zoom on that pin; auto-open its popup |
+| `?focus=hike-<slug>` | Centre on that pin at zoom 14 with 80 px padding (`map.flyTo({ center, zoom: 14, padding: 80 })`); auto-open its popup |
 | `?focus=activity-<slug>` | Same |
 | `?focus=lodging-<slug>` | Same |
 | (no param) | Current global behaviour unchanged |
+
+**Precedence when both `day` and `focus` are present**: `focus` wins; `day` is ignored. Rationale: a focus is a more specific intent than a day filter.
 
 ### `/lodgings` path restructure
 
@@ -181,9 +191,9 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 
 | Path | Responsibility |
 |---|---|
-| `src/components/MapRibbon.astro` | 80px sepia map. Props: `pins: Pin[]`, `expandHref: string`. Internally renders MapView with `client:visible` so off-screen ribbons don't load maplibre eagerly. |
+| `src/components/MapRibbon.astro` | 80px sepia map. Props: `pins: Pin[]`, `expandHref: string`. **Static — no JS, no MapLibre.** Renders an `<img src="https://tile.openstreetmap.org/{z}/{x}/{y}.png">` for the centroid tile (zoom selected by pin spread: 13 if all pins fit one tile, 12 otherwise, 11 for cross-region day stubs) plus absolutely-positioned `<span>` pins overlaid in the same colour scheme as MapView. Sepia filter via inline CSS. `view-transition-name: none` so each page paints fresh. |
 | `src/components/Breadcrumb.astro` | Mono-cap breadcrumb. Props: `crumbs: { label: string, href?: string }[]`. Last crumb has no link. |
-| `src/components/RelatedActivities.astro` | Horizontal scroll of 3 activity cards. Props: `current: CollectionEntry<'activities'>`. Computes haversine and sorts internally. |
+| `src/components/RelatedActivities.astro` | Horizontal scroll-snap row of 3 activity cards. Props: `current: CollectionEntry<'activities'>`. Computes haversine internally; **excludes activities lacking `location.lat`/`lon`** (logs a build-time `console.warn` if any are excluded — surfaces data-quality issues without failing the build). Container uses `scroll-snap-type: x mandatory`; each card uses `scroll-snap-align: start`. |
 | `src/pages/lodgings/index.astro` | Renamed from `lodgings.astro`. Grid of lodging cards, each linking to `/lodgings/<slug>`. |
 | `src/pages/lodgings/[slug].astro` | Detail page: map ribbon, address, host, nights/dates, booking link, notes. Mirrors the `/activities/[slug]` rhythm. |
 
@@ -191,8 +201,8 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 
 | Path | Change |
 |---|---|
-| `src/components/BottomNav.astro` | Per-tab active-state matcher per §1 rule table. |
-| `src/components/DayPillScroller.astro` | After mount, scroll `.is-active` pill into centre. Re-run on `astro:after-swap` for View Transitions. |
+| `src/components/BottomNav.astro` | Per-tab active-state matcher per §1 rule table. Each match rule is explicit: e.g. More matches `path === '/lodgings' \|\| path.startsWith('/lodgings/')` (not a glob), preventing accidental matches against e.g. `/lodgings-guide`. |
+| `src/components/DayPillScroller.astro` | After mount AND after `astro:after-swap`, **only re-centre the active pill if it is not currently visible inside the scroller's viewport** (compare `pill.getBoundingClientRect()` against `scroller.getBoundingClientRect()`). If the user has manually scrolled to peek at a future day, that scroll position is preserved across navigation. |
 | `src/layouts/BaseLayout.astro` | Add `astro:after-swap` listener that calls `document.getElementById('main')?.focus()` (with `tabindex="-1"` on `#main` for programmatic focus). |
 | `src/pages/index.astro` | Medium phase awareness — adaptive countdown copy, Phase II free-day banner with quick-row, ring auto-collapse, section ordering swap based on `inPhaseII`. |
 | `src/pages/day/[date].astro` | `<MapRibbon>` at top after day pills. For Garda free-form days (`hikeSlugs.length === 0 && date >= phaseBoundary`), schedule section becomes a "Pick today's activities" CTA. Cross-link to `/contingencies` if `badWeatherOption` is set. |
@@ -200,7 +210,7 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 | `src/pages/activities/[slug].astro` | `<MapRibbon>` at top, `<Breadcrumb>` above hero (`Activities · {category-label}`), `<RelatedActivities current={activity} />` above the back-to-catalog link. |
 | `src/pages/map.astro` + `src/components/MapView.tsx` | Read `?day=` and `?focus=` query params. Filter / fit / open-popup as per §2. Existing global behaviour unchanged when no params. |
 | `scripts/migrate-itinerary.mjs` | New `emitGardaDayStubs()` function — emits 7 day `.md` files for Jul 21-27. Wired into `runMigration()` after `for (const d of days) emitDay(d)`. |
-| `public/sw.js` | Bump cache key `dolomites-v3` → `dolomites-v4`. |
+| `public/sw.js` | Bump cache key `dolomites-v3` → `dolomites-v4`. **Activation strategy**: ensure `self.skipWaiting()` is called in the `install` handler and `self.clients.claim()` in the `activate` handler. Without these, users on a stale tab keep the v3 cache (no Garda day stubs, broken Phase II) until they fully close the PWA. With the day-stub data being new, this is a hard requirement, not a nice-to-have. |
 
 ### Untouched
 
@@ -222,9 +232,9 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 ### Phase 2 — Map embed everywhere
 
 - Add `<MapRibbon>` to `/day/[date]`, `/hike/[slug]`, `/activities/[slug]`
-- Extend `/map.astro` + `MapView.tsx` for `?day=` and `?focus=` query params
+- Extend `/map.astro` + `MapView.tsx` for `?day=` and `?focus=` query params (precedence: focus wins)
 - Wire each ribbon's expand control to the right `/map?...` href
-- Verify each ribbon stays under the View Transitions transition envelope (no jank on swap)
+- Confirm ribbons paint without flicker on View Transitions (they opt out via `view-transition-name: none` per §1)
 
 ### Phase 3 — Lodging detail pages + nav consistency
 
@@ -245,7 +255,7 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 
 - DayPillScroller auto-scrolls active pill into view (mount + after-swap)
 - BaseLayout adds `astro:after-swap` focus-restoration to `#main` (with `tabindex="-1"` on the main element)
-- Full clean build + smoke each route + Lighthouse on `/activities` and one new `/lodgings/[slug]` (target ≥ 95)
+- Full clean build + smoke each route + Lighthouse on `/activities`, one new `/lodgings/[slug]`, one `/day/[date]`, and one `/hike/[slug]` (the latter two carry the new map ribbon load — target ≥ 95 on all four)
 - Push to main → Cloudflare auto-deploys
 
 ---
@@ -259,13 +269,18 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 - Multi-language / i18n
 - Authentication / multi-user features (customize panel stays localStorage)
 - Server-side state — site remains static + service-worker offline-first
+- **Trip-date editing via /customize** — `/customize` does not shift `trip.startDate` / `trip.endDate` / `phases`, so deriving `phaseBoundary` from `trip.yaml` at build time is safe. If date editing is added later, the derivation in §1 still works (phases come from trip data); no spec rewrite needed
 
 ## Risks & mitigations
 
 | Risk | Mitigation |
 |---|---|
-| Map ribbon × 4 maplibre instances per detail page balloons JS | `client:visible` directive defers ribbon hydration until scrolled into view; each ribbon is small (one tile zoom) |
+| Map ribbon JS bloat on slow connections | Ribbons are fully static (`<img>` tile + overlaid `<span>` pins); no MapLibre on detail pages — see §1 hydration posture |
 | `?focus=<slug>` collides with existing pin labels | Prefix all focus values with type (`hike-`, `activity-`, `lodging-`) — already in §2 |
 | Garda day stubs without scheduled activities feel empty | "Pick today's activities" CTA + 4-card quick row in Today banner address this — empty days are a feature, not a bug |
 | Section reordering on home page during Phase II disorients returning users | Section labels (PARTE I / PARTE II) make ordering self-explanatory; both sections always present, just reordered |
 | Adding `tabindex="-1"` to `#main` could affect existing focus order | `-1` only allows programmatic focus; doesn't appear in tab order |
+| OSM tile-server traffic from static ribbons | Each detail page hits one tile (already widely cached); user agents respect HTTP cache headers — no measurable load. If volume ever becomes a concern, switch to a Cloudflare-cached tile proxy |
+| Day-pill auto-scroll yanks user's scroll on swap | Visibility check (§3) — only re-centre if active pill is off-screen, preserving manual scroll otherwise |
+| Stale v3 service worker leaves users with broken Phase II | `skipWaiting()` + `clients.claim()` in v4 SW (§3) — first reload of any tab activates v4 immediately |
+| Activities missing `location.lat`/`lon` break RelatedActivities | Excluded from haversine calc with build-time warning (§3); current 22 entries all have GPS so this is defensive |
