@@ -34,6 +34,12 @@ export const TripSchema = z.object({
     insurance: z.string(),
     cost: z.object({ amount: z.number(), currency: z.string() }),
   }),
+  phases: z.array(z.object({
+    id: z.string(),
+    label: z.string(),
+    start: ISODate,
+    end: ISODate,
+  })).optional(),
 });
 
 const DriveLeg = z.object({
@@ -117,10 +123,41 @@ export const RestaurantSchema = z.object({
   })),
 });
 
+export const ActivitySchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  category: z.enum([
+    'water-sports',
+    'culture-history',
+    'mountain-cable-car',
+    'scenic',
+    'bike',
+    'wine',
+    'day-trip',
+    'aquatic-park',
+    'hiking',
+  ]),
+  description: z.string(),
+  location: z.object({
+    label: z.string(),
+    lat: z.number(),
+    lon: z.number(),
+  }),
+  cost: z.object({
+    display: z.string(),
+  }),
+  durationHours: z.number().optional(),
+  driveFromSaloMin: z.number().optional(),
+  bookingRequired: z.boolean(),
+  bookingNote: z.string().optional(),
+  url: z.string().url().optional(),
+  featured: z.boolean().default(false),
+});
+
 export const BookingSchema = z.object({
   id: z.string(),
   label: z.string(),
-  category: z.enum(['flight', 'car', 'lodging', 'parking', 'cable-car', 'restaurant', 'other']),
+  category: z.enum(['flight', 'car', 'lodging', 'parking', 'cable-car', 'restaurant', 'activity', 'other']),
   status: z.enum(['booked', 'pending-window', 'not-needed']),
   bookingOpens: ISODate.optional(),
   bookingUrl: z.string().url().optional(),
@@ -135,4 +172,5 @@ export const collections = {
   hikes: defineCollection({ type: 'content', schema: HikeSchema }),
   lodgings: defineCollection({ type: 'data', schema: LodgingSchema }),
   restaurants: defineCollection({ type: 'data', schema: RestaurantSchema }),
+  activities: defineCollection({ type: 'data', schema: ActivitySchema }),
 };

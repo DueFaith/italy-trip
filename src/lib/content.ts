@@ -29,6 +29,14 @@ export async function getRestaurants() {
   return await getCollection('restaurants');
 }
 
+export async function getActivities() {
+  return await getCollection('activities');
+}
+
+export async function getActivity(slug: string) {
+  return await getEntry('activities', slug);
+}
+
 // Trip metadata + bookings live as plain YAML files (not collections).
 function readYaml<T>(rel: string): T {
   const p = path.join(process.cwd(), 'src/content', rel);
@@ -36,7 +44,15 @@ function readYaml<T>(rel: string): T {
 }
 
 export function getTrip() {
-  return readYaml<{ name: string; startDate: string; endDate: string; travelers: string[]; flights: any; rentalCar: any }>('trip.yaml');
+  return readYaml<{
+    name: string;
+    startDate: string;
+    endDate: string;
+    travelers: string[];
+    flights: any;
+    rentalCar: any;
+    phases?: Array<{ id: string; label: string; start: string; end: string }>;
+  }>('trip.yaml');
 }
 
 export function getBookings() {
