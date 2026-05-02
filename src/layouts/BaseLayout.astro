@@ -6,6 +6,7 @@ import BottomNav from '@/components/BottomNav.astro';
 import DayPillScroller from '@/components/DayPillScroller.astro';
 import ReceiveShareLink from '@/components/ReceiveShareLink';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker.astro';
+import { getWordmark } from '@/lib/wordmark';
 const { title = 'Dolomites + Garda', headerTitle, bodyClass, activeDayDate } = Astro.props as {
   title?: string;
   headerTitle?: string;
@@ -13,31 +14,7 @@ const { title = 'Dolomites + Garda', headerTitle, bodyClass, activeDayDate } = A
   activeDayDate?: string;
 };
 
-// Wordmark in the top-left header. Pages can override via `headerTitle` prop;
-// otherwise we pick a sensible default from the URL path. The trip spans two
-// regions (Dolomites + Lake Garda), so showing "DOLOMITES" everywhere was
-// misleading once Phase II content shipped.
-function wordmarkForPath(rawPath: string): string {
-  // Astro can emit static pages with a trailing slash (e.g. "/map/" instead
-  // of "/map"); normalise so equality checks below catch both forms.
-  const p = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
-  if (p === '/') return 'Dolomites + Garda';
-  if (p === '/activities' || p.startsWith('/activities/')) return 'Lago di Garda';
-  if (p === '/map') return 'Map';
-  if (p === '/checklist') return 'Checklist';
-  if (p === '/customize') return 'Customize';
-  if (p === '/photos') return 'Photos';
-  if (p === '/more') return 'More';
-  if (p === '/restaurants') return 'Restaurants';
-  if (p === '/contingencies') return 'Contingencies';
-  if (p === '/hikes') return 'Hikes';
-  if (p === '/lodgings') return 'Lodgings';
-  // /hike/*, /day/*, /lodgings/* — these have geographic context only the
-  // page itself knows (which lodging, which region). Those pages pass
-  // headerTitle explicitly. Fall back to the trip name.
-  return 'Dolomites + Garda';
-}
-const resolvedHeaderTitle = headerTitle ?? wordmarkForPath(Astro.url.pathname);
+const resolvedHeaderTitle = headerTitle ?? getWordmark({ pathname: Astro.url.pathname });
 ---
 <!DOCTYPE html>
 <html lang="en">

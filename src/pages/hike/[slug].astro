@@ -11,6 +11,7 @@
  * that day — you never have to hop back and forth between hike and day pages.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getWordmark } from '@/lib/wordmark';
 import EditHikeButton from '@/components/customize/EditHikeButton';
 import WeatherWidget from '@/components/WeatherWidget';
 import DriveLegs from '@/components/DriveLegs.astro';
@@ -72,7 +73,7 @@ const ribbonPins: Pin[] = [{
   category: 'trailhead',
 }];
 ---
-<BaseLayout title={hike.data.name} activeDayDate={dayForHike?.data.date} headerTitle="Dolomites">
+<BaseLayout title={hike.data.name} activeDayDate={dayForHike?.data.date} headerTitle={getWordmark({ pathname: Astro.url.pathname })}>
   <MapRibbon pins={ribbonPins} expandHref={`/map?focus=hike-${hike.slug}`} caption={`${hike.data.name} · trailhead`} />
 
   {/* ════════ PART I — THE ROUTE ════════ */}
