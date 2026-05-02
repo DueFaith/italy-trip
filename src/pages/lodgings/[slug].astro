@@ -30,7 +30,10 @@ const mapQuery = l.address ? `${l.name}, ${l.address}` : l.name;
 const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
 const amapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(l.name)}${l.address ? `&address=${encodeURIComponent(l.address)}` : ''}&ll=${l.lat},${l.lon}`;
 ---
-<BaseLayout title={`${l.name} · Lodgings`}>
+<BaseLayout
+  title={`${l.name} · Lodgings`}
+  headerTitle={lodging.id === 'salo-airbnb' ? 'Lago di Garda' : 'Dolomites'}
+>
   <MapRibbon pins={ribbonPins} expandHref={`/map?focus=lodging-${lodging.id}`} caption={`${l.location} · ${l.nights} ${l.nights === 1 ? 'night' : 'nights'}`} />
 
   <section class="stagger" style="padding: 24px var(--page-x) 8px;">

@@ -80,7 +80,11 @@ const ribbonCaption = `Day ${dayIndex + 1} · ${hikes.length} ${hikes.length ===
 const fmtFull = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 ---
-<BaseLayout title={`Day ${dayIndex + 1} — ${day.data.theme}`} activeDayDate={day.data.date}>
+<BaseLayout
+  title={`Day ${dayIndex + 1} — ${day.data.theme}`}
+  activeDayDate={day.data.date}
+  headerTitle={day.data.lodgingSlug === 'salo-airbnb' ? 'Lago di Garda' : 'Dolomites'}
+>
   <MapRibbon pins={ribbonPins} expandHref={`/map?day=${day.data.date}`} caption={ribbonCaption} />
 
   {/* Hero ─ Day stamp + date + theme */}

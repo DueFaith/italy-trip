@@ -6,12 +6,38 @@ import BottomNav from '@/components/BottomNav.astro';
 import DayPillScroller from '@/components/DayPillScroller.astro';
 import ReceiveShareLink from '@/components/ReceiveShareLink';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker.astro';
-const { title = 'Dolomites Trip', headerTitle, bodyClass, activeDayDate } = Astro.props as {
+const { title = 'Dolomites + Garda', headerTitle, bodyClass, activeDayDate } = Astro.props as {
   title?: string;
   headerTitle?: string;
   bodyClass?: string;
   activeDayDate?: string;
 };
+
+// Wordmark in the top-left header. Pages can override via `headerTitle` prop;
+// otherwise we pick a sensible default from the URL path. The trip spans two
+// regions (Dolomites + Lake Garda), so showing "DOLOMITES" everywhere was
+// misleading once Phase II content shipped.
+function wordmarkForPath(rawPath: string): string {
+  // Astro can emit static pages with a trailing slash (e.g. "/map/" instead
+  // of "/map"); normalise so equality checks below catch both forms.
+  const p = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
+  if (p === '/') return 'Dolomites + Garda';
+  if (p === '/activities' || p.startsWith('/activities/')) return 'Lago di Garda';
+  if (p === '/map') return 'Map';
+  if (p === '/checklist') return 'Checklist';
+  if (p === '/customize') return 'Customize';
+  if (p === '/photos') return 'Photos';
+  if (p === '/more') return 'More';
+  if (p === '/restaurants') return 'Restaurants';
+  if (p === '/contingencies') return 'Contingencies';
+  if (p === '/hikes') return 'Hikes';
+  if (p === '/lodgings') return 'Lodgings';
+  // /hike/*, /day/*, /lodgings/* — these have geographic context only the
+  // page itself knows (which lodging, which region). Those pages pass
+  // headerTitle explicitly. Fall back to the trip name.
+  return 'Dolomites + Garda';
+}
+const resolvedHeaderTitle = headerTitle ?? wordmarkForPath(Astro.url.pathname);
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -35,7 +61,7 @@ const { title = 'Dolomites Trip', headerTitle, bodyClass, activeDayDate } = Astr
   </head>
   <body class={bodyClass}>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <Header title={headerTitle} />
+    <Header title={resolvedHeaderTitle} />
     {activeDayDate && <DayPillScroller activeDate={activeDayDate} />}
     <main id="main" tabindex="-1" class="mx-auto" style="max-width: var(--max-content); outline: none;"><slot /></main>
     <BottomNav />
