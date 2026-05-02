@@ -72,6 +72,18 @@ const ringR = (ringSize - ringStroke) / 2;
 const ringC = 2 * Math.PI * ringR;
 const ringTarget = ringC * (bookedCount / totalBookings);
 const ringRest = ringC - ringTarget;
+
+const phaseBoundary = '2026-07-20';
+const inPhaseII = todayISO >= phaseBoundary;
+
+// Salò lodging entry (added in earlier task; slug: 'salo-airbnb')
+const lodgings = await import('@/lib/content').then((m) => m.getLodgings());
+const saloLodging = lodgings.find((l) => l.data.slug === 'salo-airbnb');
+
+// Activities count for the Phase II CTA copy (dynamic so it stays accurate
+// if entries are added/removed)
+const activities = await import('@/lib/content').then((m) => m.getActivities());
+const activityCount = activities.length;
 ---
 <BaseLayout title={`${trip.name} · Trip`} bodyClass="home-bg">
 
@@ -184,8 +196,28 @@ const ringRest = ringC - ringTarget;
     </p>
   </section>
 
+  {/* PARTE I — DOLOMITES ─────────────────────────────────────────── */}
+  <section class="stagger" style="padding: 36px var(--page-x) 0;">
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <span class="mono-cap" style="font-size: 11px; color: var(--gold); letter-spacing: 0.32em; font-weight: 700;">Parte I</span>
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
+    </div>
+    <h2 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 700;
+      font-variation-settings: 'opsz' 80;
+      font-size: clamp(28px, 7vw, 38px);
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 0;
+    ">Dolomites</h2>
+    <p class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin: 6px 0 0;">Jul 15 — Jul 20 · 6 days</p>
+  </section>
+
   {/* ALL HIKES — uniform poster treatment ─────────────────────────── */}
-  <section class="stagger" style="padding: 36px var(--page-x) 8px;">
+  <section class="stagger" style="padding: 24px var(--page-x) 8px;">
     <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;">
       <h2 class="eyebrow with-rule" style="margin: 0;">The {hikesInOrder.length} Hikes</h2>
       <span style="flex: 1; height: 1px; background: var(--hairline);"></span>
@@ -353,6 +385,81 @@ const ringRest = ringC - ringTarget;
           gap: 6px;
         "
       >View Checklist <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12 H19 M14 6 L20 12 L14 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg></span>
+    </a>
+  </section>
+
+  {/* PARTE II — GARDA ─────────────────────────────────────────────── */}
+  <section class="stagger" style="padding: 36px var(--page-x) 0;">
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <span class="mono-cap" style="font-size: 11px; color: var(--gold); letter-spacing: 0.32em; font-weight: 700;">Parte II</span>
+      <span style="flex: 1; height: 1px; background: var(--gold); opacity: 0.6;"></span>
+    </div>
+    <h2 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 700;
+      font-variation-settings: 'opsz' 80;
+      font-size: clamp(28px, 7vw, 38px);
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 0;
+    ">Lake Garda</h2>
+    <p class="mono-cap" style="font-size: 11px; color: var(--ink-soft); margin: 6px 0 0;">Jul 20 — Jul 27 · 7 nights</p>
+  </section>
+
+  {/* SALÒ LODGING CARD ─────────────────────────────────────────────── */}
+  {saloLodging && (
+    <section class="stagger" style="padding: 18px var(--page-x) 0;">
+      <a href="/lodgings" class="hike-poster" style="display: block;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span class="mono-cap" style="font-size: 11px; color: var(--ink-soft); letter-spacing: 0.18em;">Lodging · 7 Nights</span>
+          <span style="color: var(--gold); opacity: 0.6;">·</span>
+          <span class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft);">{saloLodging.data.location}</span>
+        </div>
+        <h3 style="
+          font-family: var(--font-display);
+          font-style: italic;
+          font-weight: 800;
+          font-variation-settings: 'opsz' 80;
+          font-size: clamp(24px, 6.5vw, 30px);
+          line-height: 1.02;
+          letter-spacing: -0.018em;
+          color: var(--ink);
+          margin: 12px 0 6px;
+        ">{saloLodging.data.name}</h3>
+        <p class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin: 0;">
+          Check-in Jul 20 · Check-out Jul 27
+        </p>
+      </a>
+    </section>
+  )}
+
+  {/* PHASE II — FREE-FORM CTA ──────────────────────────────────────── */}
+  <section class="stagger" style="padding: 16px var(--page-x) 0;">
+    <a href="/activities" style="
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      background: var(--bg-paper);
+      border: 1px dashed var(--gold);
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow-paper-sm);
+    ">
+      <div>
+        <div class="mono-cap" style="font-size: 11px; color: var(--gold); letter-spacing: 0.18em;">Free-form</div>
+        <div style="font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--ink); margin-top: 4px;">
+          Pick from {activityCount} activities
+        </div>
+        <div class="mono" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px;">
+          Jetski · Vittoriale · Monte Baldo · Solferino · Verona · and more
+        </div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--gold); flex: 0 0 auto;">
+        <path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
     </a>
   </section>
 
