@@ -72,7 +72,12 @@ Extract the helper from `RelatedActivities.astro` to a small utility (`src/lib/r
 - Identical slugs return their token count
 
 **`tests/unit/haversine.test.ts`** — extract + test
-Refactor: move the inline `haversineKm` from `src/pages/index.astro`, `src/components/RelatedActivities.astro`, `src/pages/day/[date].astro` into a single `src/lib/geo.ts`. Three import sites change. Then:
+Refactor: move the inline `haversineKm` into a single `src/lib/geo.ts`. **Confirmed via grep** — exactly 3 sites duplicate the function body:
+- `src/pages/index.astro` (line 42)
+- `src/components/RelatedActivities.astro` (line 8)
+- `src/pages/day/[date].astro` (line 39)
+
+All 3 import from `@/lib/geo` after the refactor. Then test:
 - Salò → Sirmione (~25 km) ±1 km
 - Salò → Verona (~52 km) ±2 km
 - Same point → 0
@@ -84,18 +89,26 @@ Refactor: move the inline `haversineKm` from `src/pages/index.astro`, `src/compo
 - With `phases` stripped from a synthetic trip object: boundary falls back to `endDate`
 - `inPhaseII` truth table: `'2026-07-19'` → false; `'2026-07-20'` → true; `'2026-07-26'` → true; `'2026-08-01'` → true
 
-The boundary derivation is currently duplicated in `index.astro` and `day/[date].astro`. As part of this work, extract to `src/lib/phase.ts`:
+The boundary derivation has drifted across **4 sites** (confirmed via grep) — the spec previously named only 2:
+
+1. `src/pages/index.astro:22` — full `trip.phases?.find(...)` pattern
+2. `src/pages/day/[date].astro:32` — full pattern
+3. `src/components/DayPillScroller.astro:18` — full pattern
+4. `src/components/MapView.tsx:48` — **hardcoded `'2026-07-20'` literal** (`dayDateProp < '2026-07-20'`). This is a real drift bug — if `trip.yaml` ever shifts the Garda phase start, MapView won't notice.
+
+Extract to `src/lib/phase.ts`:
 
 ```ts
-export function phaseBoundary(trip: ReturnType<typeof getTrip>): string {
+import type { TripData } from '@/lib/content';  // or inline the relevant type
+export function phaseBoundary(trip: TripData): string {
   return trip.phases?.find((p) => p.id === 'garda')?.start ?? trip.endDate;
 }
-export function isInPhaseII(trip: ReturnType<typeof getTrip>, todayISO: string): boolean {
+export function isInPhaseII(trip: TripData, todayISO: string): boolean {
   return todayISO >= phaseBoundary(trip);
 }
 ```
 
-Both consumers import from there.
+All 4 consumers import from there. MapView.tsx is a React island so it receives the boundary as a prop from `map.astro` (which can call `phaseBoundary(getTrip())` at SSR time). Verify the fix with: `grep -rn "2026-07-20\|trip.phases?.find" src/` → only matches in `src/lib/phase.ts` plus tests.
 
 ### Total
 - Existing 27 → ~35 (after refresh)
@@ -111,24 +124,55 @@ One file. Runs as a vitest test with a `beforeAll` that ensures `dist/` exists (
 Each invariant is its own `describe` block so failures show which class broke.
 
 ### 3.1 Internal-link resolution
-For every `<a href="/...">` across every `dist/**/*.html`, assert the link resolves:
+For every `<a href="/...">` across every `dist/**/*.html`, **strip query string and fragment first** (so `/map?day=2026-07-16` and `/checklist#parking` both resolve to their underlying route), then assert the link resolves:
 - `/` → `dist/index.html`
 - `/foo` → `dist/foo/index.html`
 - `/foo/bar` → `dist/foo/bar/index.html`
 
-Excludes: `#fragment-only`, `tel:`, `mailto:`, `http(s):`. Failure message: `<source-page> links to <broken-target>`.
+Excludes: `#fragment-only` (no path), `tel:`, `mailto:`, `http(s):`. Failure message: `<source-page> links to <broken-target>`.
+
+```ts
+// helper inside the test
+function resolveTo(href: string): string {
+  const path = href.split('?')[0].split('#')[0];
+  return path;
+}
+```
 
 ### 3.2 Bottom-nav consistency
 Every built page contains exactly 4 nav items with hrefs `/`, `/map`, `/activities`, `/more` (in that order). At most one has `aria-current="page"`. Active state matches the rule table from §1 of the nav-pass spec (Home for `/hike/*`/`/day/*`, Map for `/map`, Activities for `/activities/*`, More for `/checklist`/`/restaurants`/`/contingencies`/`/lodgings*`/`/photos`/`/customize`).
 
-### 3.3 Header wordmark
-Spot-check 8 representative pages:
+### 3.3 Header wordmark — property check, not hardcoded list
 
-| Path | Expected wordmark |
+Refactor (folded into Phase 1): extract the wordmark logic from `src/layouts/BaseLayout.astro` into `src/lib/wordmark.ts`. The helper accepts a richer context so detail pages can use it too:
+
+```ts
+// src/lib/wordmark.ts
+type WordmarkContext = {
+  pathname: string;
+  // Optional content context for detail pages:
+  dayLodgingSlug?: string;  // /day/[date] — pass day.data.lodgingSlug
+  lodgingId?: string;       // /lodgings/[slug] — pass lodging.id
+  // /hike/[slug] always returns 'Dolomites' (every hike is in the Dolomites)
+};
+export function getWordmark(ctx: WordmarkContext): string { /* ... */ }
+```
+
+`BaseLayout.astro` calls `getWordmark({ pathname: Astro.url.pathname })`. Detail pages (day, hike, lodging) pass `headerTitle={getWordmark({ pathname, dayLodgingSlug: ... })}` — no more inline `lodging.id === 'salo-airbnb' ? ... : ...` ternaries.
+
+The integrity test then asserts a **property** for every `dist/**/*.html`:
+
+> The rendered wordmark in the header equals `getWordmark({ pathname, ...detailContext })` where `detailContext` is read from the corresponding content collection (day frontmatter for `/day/*`, lodging YAML for `/lodgings/<slug>`, etc.).
+
+This scales automatically as routes are added; no hardcoded path → wordmark table to maintain.
+
+Spot-check sanity (the test's first 8 cases, but the full assertion runs on all 56 pages):
+
+| Path | Expected |
 |---|---|
 | `/` | `DOLOMITES + GARDA` |
-| `/day/2026-07-17` | `DOLOMITES` |
-| `/day/2026-07-22` | `LAGO DI GARDA` |
+| `/day/2026-07-17` | `DOLOMITES` (lodgingSlug=baita-fraina) |
+| `/day/2026-07-22` | `LAGO DI GARDA` (lodgingSlug=salo-airbnb) |
 | `/hike/tre-cime` | `DOLOMITES` |
 | `/activities` | `LAGO DI GARDA` |
 | `/lodgings/salo-airbnb` | `LAGO DI GARDA` |
@@ -136,19 +180,19 @@ Spot-check 8 representative pages:
 | `/map` | `MAP` |
 
 ### 3.4 Map-link format
-- Every `https://www.google.com/maps...` includes `?api=1&query=` followed by URL-encoded text matching `/[A-Za-z]/` (i.e. contains at least one letter — catches regressions to coord-only `?q=lat,lon`)
-- Every `https://maps.apple.com...` has a `q=` parameter whose decoded value matches `/[A-Za-z]/`
+- Every `https://www.google.com/maps...` includes `?api=1&query=` followed by URL-encoded text matching `/[A-Za-z]{3,}/` (i.e. contains at least 3 consecutive letters — catches regressions to coord-only `?q=lat,lon` and one-letter junk like `q=A`)
+- Every `https://maps.apple.com...` has a `q=` parameter whose decoded value matches `/[A-Za-z]{3,}/`
 
 ### 3.5 Activity-card destinations
 - Every `<a href="/activities/...">` ends with a slug present in `src/content/activities/`
-- The grid on `/activities` has `data-activity-card` count equal to the activity-collection size
+- The grid on `/activities` has `data-activity-card` count **equal to `getActivities().length`** (no hardcoded 22 — assertions against the live collection scale automatically)
 - Each card's `data-category` matches the entry's category in YAML
 
 ### 3.6 Day record consistency
 For every day in `src/content/days/`:
 - `lodgingSlug` references a real `src/content/lodgings/<slug>.yaml`
 - Every entry in `hikeSlugs[]` references a real `src/content/hikes/<slug>.md`
-- Total day count is exactly 13
+- Day count equals trip span: `Math.floor((endDate - startDate) / 86400000) + 1` from `getTrip()` (currently 13, but no hardcoded literal)
 
 ### 3.7 Service-worker cache key
 `dist/sw.js` first non-empty line includes a `dolomites-v` followed by a digit. Catches accidental rollbacks.
@@ -161,6 +205,8 @@ For every day in `src/content/days/` whose `schedule` array is non-empty (Phase 
 
 ### 3.10 Map ribbon presence
 Every detail-page route (`/hike/[slug]`, `/day/[date]`, `/activities/[slug]`, `/lodgings/[slug]`) has exactly one `<div class="map-ribbon">` element, and that element contains an `<img>` with an OSM tile URL.
+
+**Includes Garda free-form day pages** (Jul 21–27): they render a single-pin lodging-only ribbon (Salò AirBnB pin only, no hike pins). The test does not require multi-pin ribbons — single-pin ribbons are valid and should pass.
 
 ### Coverage summary
 ~10 invariants, ~150 individual assertions across the 56 built pages. Runtime under 1s after `dist/` exists.
@@ -181,17 +227,17 @@ Mostly small edits — keep the test names, fix the assertions:
 | `day page renders hikes and driving (schedule lives on hike page now)` | Rename to `day page renders schedule, hikes, and driving` and assert schedule IS visible |
 | `hike page renders stats` | Keep |
 | `map page mounts` | Keep |
-| `checklist renders bookings grouped by category` | Keep, but expect 11 items not "any number" |
+| `checklist renders bookings grouped by category` | Keep, but expect `getBookings().length` items (no hardcoded count) |
 | `customize page renders` | Keep |
 | `persistent day-pill scroller appears on day and hike pages` | Keep |
 | `day-pill scroller is absent from home page` | Keep |
 | `hike page prev/next walks trip order across day boundaries` | Keep |
-| `today banner is absent outside trip dates (May 2026)` | Keep |
+| `today banner is absent outside trip dates (May 2026)` | Keep but **freeze the clock**: `await page.clock.install({ time: new Date('2026-05-02T10:00:00Z') })` before `page.goto('/')`. Otherwise this test silently changes meaning when run after Jul 15 |
 | `home page renders core elements` | Update — assert "Days Until Departure" wording, not generic "Days to go" |
 
 ### 4.2 New navigation / render tests (~12)
 
-- `/activities` renders 22 cards, 4 featured cards, 10 filter pills
+- `/activities` renders `getActivities().length` cards (currently 22), `getActivities().filter(a => a.data.featured).length` featured cards (currently 4), and `1 + Object.keys(CATEGORY_LABELS).length` filter pills (currently 10)
 - Filter-pill click: tap "Water Sports" → catalog grid only shows water-sports cards, URL updates to `?category=water-sports`, "More" heading toggles to "All matching"
 - `/activities/solferino-red-cross-memorial` renders breadcrumb (`Activities / Culture & History`), ribbon, stat block, nearby rail with 3 cards, back link
 - `/lodgings/baita-fraina` renders ribbon, address, 4 contact buttons (phone, booking, Apple Maps, Google Maps), back link
@@ -235,7 +281,7 @@ Mostly small edits — keep the test names, fix the assertions:
 | Risk | Mitigation |
 |---|---|
 | Cheerio parsing differs from real browser | Cheerio is HTML-spec-compliant for static analysis; for the 10 invariants we assert (link resolution, attribute presence, text content), browser parity isn't a concern |
-| Integrity tests run against stale `dist/` | `globalSetup` checks for `dist/index.html` mtime older than 1 min and rebuilds; alternatively `npm run test:all` always builds first |
+| Integrity tests run against stale `dist/` | `globalSetup` always rebuilds (`astro build` is ~5s on this site — cheap). Mtime comparison was tempting but a 1-min window leaves the door open for false-pass on a slow filesystem. Always-rebuild is correct and trivially fast |
 | Playwright drag-drop flakiness | Spec'd around — we test affordance + state actions, not the gesture |
 | LocalStorage state pollutes between e2e tests | Playwright's default `storageState` is per-context; new context per test → empty localStorage. Add explicit `await page.context().clearCookies()` + `await page.evaluate(() => localStorage.clear())` in `beforeEach` for safety |
 | Existing tests fail-on-extract | The haversine + phase-boundary refactors touch existing `index.astro` and `day/[date].astro`. Build+rerun unit tests after each refactor in the implementation plan |
@@ -245,7 +291,16 @@ Mostly small edits — keep the test names, fix the assertions:
 
 5 phases for the implementation plan to follow. Each phase ships a working subset.
 
-1. **Phase 1 — Refactors** (extract `haversine` and `phase` helpers; update 3+2 import sites). Existing 27 unit tests still pass after.
+1. **Phase 1 — Refactors.** Extract three helpers and verify all call sites converged via grep:
+   - `src/lib/geo.ts` (`haversineKm`) — 3 import sites (index.astro, RelatedActivities.astro, day/[date].astro)
+   - `src/lib/phase.ts` (`phaseBoundary`, `isInPhaseII`) — 4 sites (index.astro, day/[date].astro, DayPillScroller.astro, MapView.tsx — the last has a hardcoded `'2026-07-20'` literal that must derive from the helper too; pass via prop from map.astro at SSR)
+   - `src/lib/wordmark.ts` (`getWordmark`) — 1 definition site (BaseLayout.astro) plus 3 detail-page overrides (day/[date].astro, hike/[slug].astro, lodgings/[slug].astro) which now call `getWordmark` instead of inline ternaries
+   
+   **Acceptance gates** (run before moving to Phase 2):
+   - `grep -rn "haversine" src/` shows matches only in `src/lib/geo.ts` and import lines
+   - `grep -rn "2026-07-20\|trip.phases?.find" src/` shows matches only in `src/lib/phase.ts` and import lines
+   - `grep -rn "wordmarkForPath\|'Dolomites + Garda'" src/` shows matches only in `src/lib/wordmark.ts` and import lines
+   - Existing 27 unit tests still pass
 2. **Phase 2 — Unit additions** (5 new files + refresh schemas + migration). Runtime budget ≤ 200ms.
 3. **Phase 3 — Integrity audit** (`tests/integrity/links.test.ts` + cheerio dep + globalSetup hook).
 4. **Phase 4 — E2E refresh + new** (`smoke.spec.ts` rewritten with all 31 tests). Verify against local dev.
