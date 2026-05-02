@@ -81,12 +81,17 @@ const CATEGORIES: { id: 'all' | ActivityCategory; label: string }[] = [
   {/* FULL GRID ────────────────────────────────────────────────────── */}
   <section class="stagger" style="padding: 24px var(--page-x) 32px;">
     <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;">
-      <h2 class="eyebrow with-rule" style="margin: 0;">All Activities</h2>
+      <h2 class="eyebrow with-rule" id="grid-heading" style="margin: 0;">More</h2>
       <span style="flex: 1; height: 1px; background: var(--hairline);"></span>
     </div>
     <div id="activity-grid" style="display: grid; gap: 14px;">
       {activities.map((a, i) => (
-        <div data-activity-card data-category={a.data.category}>
+        <div
+          data-activity-card
+          data-category={a.data.category}
+          data-featured={a.data.featured ? 'true' : 'false'}
+          style={a.data.featured ? 'display: none;' : ''}
+        >
           <ActivityCard activity={a} index={i} total={activities.length} />
         </div>
       ))}
@@ -114,15 +119,23 @@ const CATEGORIES: { id: 'all' | ActivityCategory; label: string }[] = [
       const params = new URLSearchParams(location.search);
       const initial = params.get('category') || 'all';
 
+      const heading = document.getElementById('grid-heading');
       function apply(cat) {
         for (const card of grid.querySelectorAll('[data-activity-card]')) {
-          const matches = cat === 'all' || card.dataset.category === cat;
+          const isFeatured = card.dataset.featured === 'true';
+          // When showing 'all', hide featured cards from this grid — they're
+          // already in the Featured row above. When filtering by category,
+          // show every match (featured + non-featured) since Featured row is hidden.
+          const matches = cat === 'all'
+            ? !isFeatured
+            : card.dataset.category === cat;
           card.style.display = matches ? '' : 'none';
         }
         for (const btn of filter.querySelectorAll('.activity-pill')) {
           btn.setAttribute('aria-pressed', btn.dataset.category === cat ? 'true' : 'false');
         }
         if (featured) featured.style.display = cat === 'all' ? '' : 'none';
+        if (heading) heading.textContent = cat === 'all' ? 'More' : 'All matching';
         const next = new URL(location.href);
         if (cat === 'all') next.searchParams.delete('category');
         else next.searchParams.set('category', cat);

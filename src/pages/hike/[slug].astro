@@ -391,7 +391,7 @@ const ribbonPins: Pin[] = [{
       {dayLodging && (
         <section class="stagger" style="padding: 14px var(--page-x);">
           <h3 class="eyebrow" style="margin: 0 0 10px;">Where You Sleep</h3>
-          <a href="/lodgings" style="
+          <a href={`/lodgings/${dayLodging.id}`} style="
             display: block;
             background: var(--bg-paper);
             border: 1px solid var(--hairline);

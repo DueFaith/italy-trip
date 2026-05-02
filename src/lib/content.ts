@@ -22,7 +22,8 @@ export async function getDay(date: string) {
 }
 
 export async function getLodgings() {
-  return await getCollection('lodgings');
+  const lodgings = await getCollection('lodgings');
+  return lodgings.sort((a, b) => a.data.checkIn.localeCompare(b.data.checkIn));
 }
 
 export async function getRestaurants() {

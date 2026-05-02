@@ -94,6 +94,42 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
     <WeatherWidget lat={day.data.weatherFor.lat} lon={day.data.weatherFor.lon} label={day.data.weatherFor.label} date={day.data.date} client:visible />
   </section>
 
+  {/* Schedule — canonical timing for the day */}
+  {day.data.schedule.length > 0 && (
+    <section class="stagger" style="padding: 18px var(--page-x) 8px;">
+      <h2 class="eyebrow" style="margin: 0 0 12px;">Schedule</h2>
+      <ol style="
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        background: var(--bg-paper);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-md);
+        box-shadow: var(--shadow-paper-sm);
+        overflow: hidden;
+      ">
+        {day.data.schedule.map((row: { time: string; action: string }, i: number) => (
+          <li style={`
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            align-items: baseline;
+            gap: 12px;
+            padding: 10px 14px;
+            ${i > 0 ? 'border-top: 1px dashed var(--hairline);' : ''}
+          `}>
+            <span class="mono tabular" style="
+              font-size: 12px;
+              color: var(--gold);
+              letter-spacing: 0.04em;
+              font-weight: 700;
+            ">{row.time}</span>
+            <span style="font-size: 13.5px; color: var(--ink); line-height: 1.45;">{row.action}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
+
   {/* Hikes — uniform .hike-poster cards (same shape as the home page) */}
   {hikes.length > 0 && (
     <section class="stagger" style="padding: 22px var(--page-x) 8px;">
@@ -190,7 +226,7 @@ const fmtShort = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('e
   {lodging && (
     <section class="stagger" style="padding: 22px var(--page-x);">
       <h2 class="eyebrow" style="margin: 0 0 12px;">Lodging</h2>
-      <a href="/lodgings" style="
+      <a href={`/lodgings/${lodging.id}`} style="
         display: block;
         background: var(--bg-paper);
         border: 1px solid var(--hairline);
