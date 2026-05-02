@@ -481,7 +481,8 @@ function emitLodgings() {
       address: '',
       lat: 45.6063,
       lon: 10.5237,
-      notes: 'AirBnB — address & booking URL to fill in later.',
+      bookingUrl: 'https://www.airbnb.com/trips/v1?confirmationCode=HMPSNRH5NY&reservationType=STAY',
+      notes: 'AirBnB — confirmation HMPSNRH5NY. Address to fill in closer to the trip.',
     },
   ];
   for (const l of lodgings) {
