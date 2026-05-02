@@ -1,0 +1,134 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import MapRibbon from '@/components/MapRibbon.astro';
+import type { Pin } from '@/lib/tile-math';
+import { getLodgings } from '@/lib/content';
+
+export async function getStaticPaths() {
+  const lodgings = await getLodgings();
+  return lodgings.map((l) => ({ params: { slug: l.id }, props: { lodging: l } }));
+}
+
+const { lodging } = Astro.props;
+const l = lodging.data;
+
+const ribbonPins: Pin[] = [{
+  lat: l.lat,
+  lon: l.lon,
+  label: l.name,
+  href: `/lodgings/${lodging.id}`,
+  category: 'lodging',
+}];
+
+const fmt = (iso: string) => new Date(iso).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+const gmapsUrl = `https://www.google.com/maps?q=${l.lat},${l.lon}`;
+const amapsUrl = `https://maps.apple.com/?ll=${l.lat},${l.lon}&q=${encodeURIComponent(l.name)}`;
+---
+<BaseLayout title={`${l.name} · Lodgings`}>
+  <MapRibbon pins={ribbonPins} expandHref={`/map?focus=lodging-${lodging.id}`} caption={`${l.location} · ${l.nights} ${l.nights === 1 ? 'night' : 'nights'}`} />
+
+  <section class="stagger" style="padding: 24px var(--page-x) 8px;">
+    <span class="mono-cap" style="font-size: 10px; color: var(--ink-soft);">Lodging</span>
+    <h1 style="
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 800;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(34px, 9vw, 54px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 8px 0 4px;
+    ">{l.name}</h1>
+    <p class="mono-cap" style="font-size: 12px; color: var(--ink-soft); margin: 0;">{l.location}</p>
+  </section>
+
+  <section class="stagger" style="padding: 14px var(--page-x) 8px;">
+    <div style="
+      background: var(--bg-paper);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow-paper-sm);
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    ">
+      <div>
+        <div class="mono-cap" style="font-size: 9px; color: var(--ink-soft);">Check-In</div>
+        <div class="mono tabular" style="font-size: 13px; color: var(--ink); margin-top: 4px;">{fmt(l.checkIn)}</div>
+      </div>
+      <div>
+        <div class="mono-cap" style="font-size: 9px; color: var(--ink-soft);">Check-Out</div>
+        <div class="mono tabular" style="font-size: 13px; color: var(--ink); margin-top: 4px;">{fmt(l.checkOut)}</div>
+      </div>
+    </div>
+  </section>
+
+  {l.address && (
+    <section class="stagger" style="padding: 14px var(--page-x) 0;">
+      <h2 class="eyebrow" style="margin: 0 0 6px;">Address</h2>
+      <p style="font-size: 14px; color: var(--ink); margin: 0; line-height: 1.5;">{l.address}</p>
+    </section>
+  )}
+
+  <section class="stagger" style="padding: 14px var(--page-x) 0; display: flex; gap: 8px; flex-wrap: wrap;">
+    {l.phone && (
+      <a href={`tel:${l.phone}`} class="mono-cap" style="
+        font-size: 11px;
+        padding: 10px 14px;
+        border: 1px solid var(--gold);
+        border-radius: var(--r-sm);
+        color: var(--ink);
+        background: rgba(212, 162, 76, 0.08);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      ">📞 {l.phone}</a>
+    )}
+    {l.bookingUrl && (
+      <a href={l.bookingUrl} target="_blank" rel="noopener" class="mono-cap" style="
+        font-size: 11px;
+        padding: 10px 14px;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-sm);
+        color: var(--ink-soft);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      ">Booking</a>
+    )}
+    <a href={amapsUrl} target="_blank" rel="noopener" class="mono-cap" style="
+      font-size: 11px;
+      padding: 10px 14px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-sm);
+      color: var(--ink-soft);
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    ">Apple Maps</a>
+    <a href={gmapsUrl} target="_blank" rel="noopener" class="mono-cap" style="
+      font-size: 11px;
+      padding: 10px 14px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-sm);
+      color: var(--ink-soft);
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    ">Google Maps</a>
+  </section>
+
+  {l.notes && (
+    <section class="stagger" style="padding: 18px var(--page-x) 0;">
+      <h2 class="eyebrow" style="margin: 0 0 6px;">Notes</h2>
+      <p style="font-size: 13.5px; color: var(--ink-soft); margin: 0; line-height: 1.55; font-style: italic;">{l.notes}</p>
+    </section>
+  )}
+
+  <section class="stagger" style="padding: 24px var(--page-x) 32px;">
+    <a href="/lodgings" class="mono-cap" style="font-size: 11px; color: var(--ink-soft);">← Back to lodgings</a>
+  </section>
+</BaseLayout>
