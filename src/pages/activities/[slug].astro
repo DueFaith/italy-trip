@@ -12,6 +12,7 @@ const a = activity.data;
 
 import MapRibbon from '@/components/MapRibbon.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
+import RelatedActivities from '@/components/RelatedActivities.astro';
 import { CATEGORY_LABELS } from '@/lib/category-labels';
 import type { Pin } from '@/lib/tile-math';
 
@@ -149,6 +150,8 @@ const amapsUrl = `https://maps.apple.com/?ll=${a.location.lat},${a.location.lon}
       min-height: 44px;
     ">Open in Google Maps</a>
   </section>
+
+  <RelatedActivities current={activity} />
 
   {/* BACK LINK ────────────────────────────────────────────────────── */}
   <section class="stagger" style="padding: 24px var(--page-x) 32px;">

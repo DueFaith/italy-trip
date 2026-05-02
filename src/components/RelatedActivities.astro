@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getActivities } from '@/lib/content';
+
+type Props = { current: CollectionEntry<'activities'> };
+const { current } = Astro.props;
+
+function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(bLat - aLat);
+  const dLon = toRad(bLon - aLon);
+  const aa = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(aa));
+}
+
+const all = await getActivities();
+
+// Exclude the current activity, and any activity missing GPS.
+// Log a build-time warning for any GPS-less entries — surfaces data-quality
+// issues without failing the build.
+const dropped = all.filter((a) => a.id !== current.id && (typeof a.data.location?.lat !== 'number' || typeof a.data.location?.lon !== 'number'));
+if (dropped.length > 0) {
+  console.warn(`[RelatedActivities] Excluding ${dropped.length} activity entries lacking location.lat/lon: ${dropped.map((d) => d.id).join(', ')}`);
+}
+
+const candidates = all.filter((a) =>
+  a.id !== current.id
+  && typeof a.data.location?.lat === 'number'
+  && typeof a.data.location?.lon === 'number'
+);
+
+const nearest = candidates
+  .map((a) => ({
+    activity: a,
+    dist: haversineKm(
+      current.data.location.lat,
+      current.data.location.lon,
+      a.data.location.lat,
+      a.data.location.lon
+    ),
+  }))
+  .sort((x, y) => x.dist - y.dist)
+  .slice(0, 3);
+---
+{nearest.length > 0 && (
+  <section class="stagger" style="padding: 26px var(--page-x) 0;">
+    <h2 class="eyebrow" style="margin: 0 0 12px;">Nearby activities</h2>
+    <div style="
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 6px;
+      -webkit-overflow-scrolling: touch;
+    ">
+      {nearest.map(({ activity: a, dist }) => (
+        <a
+          href={`/activities/${a.id}`}
+          style="
+            flex: 0 0 70%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            background: var(--bg-paper);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-md);
+            padding: 14px;
+            text-decoration: none;
+            box-shadow: var(--shadow-paper-sm);
+          "
+        >
+          <div class="mono-cap" style="font-size: 9.5px; color: var(--ink-soft); letter-spacing: 0.18em;">{a.data.location.label}</div>
+          <h3 style="
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 700;
+            font-size: 17px;
+            line-height: 1.15;
+            color: var(--ink);
+            margin: 6px 0 8px;
+          ">{a.data.name}</h3>
+          <div class="mono tabular" style="font-size: 11px; color: var(--ink-soft);">
+            {dist < 1 ? `${Math.round(dist * 1000)} m` : `${dist.toFixed(1)} km`} away
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
