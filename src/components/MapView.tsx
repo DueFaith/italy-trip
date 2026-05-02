@@ -93,10 +93,10 @@ export default function MapView({ pins }: { pins: Pin[] }) {
 
   return (
     <div style={{ position: 'relative' }}>
-      {/* Layer toggle — sits above the map, top-left, doesn't block tiles */}
+      {/* Layer toggle — sits below the floating caption (which lives at top:70) */}
       <div style={{
         position: 'absolute',
-        top: 70, left: 16, zIndex: 10,
+        top: 110, left: 16, zIndex: 10,
         display: 'flex', gap: 6, flexWrap: 'wrap',
       }}>
         <button
