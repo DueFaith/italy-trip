@@ -41,12 +41,12 @@ Home / Map / Activities / More (no change in count, no relabelling).
 
 Today only `/activities/*` highlights its tab; `/hike/...`, `/day/...`, `/lodgings/...` highlight nothing. New rules:
 
-| Path | Highlights tab |
+| Path (matched against `Astro.url.pathname`, not `.search`) | Highlights tab |
 |---|---|
 | `/`, `/hike/*`, `/day/*` | Home |
-| `/map`, `/map?...` | Map |
+| `/map` | Map (query strings like `?day=...` already match because `pathname` strips them) |
 | `/activities`, `/activities/*` | Activities |
-| `/more`, `/checklist`, `/restaurants`, `/contingencies`, `/lodgings*`, `/photos`, `/customize` | More |
+| `/more`, `/checklist`, `/restaurants`, `/contingencies`, `/lodgings`, `/lodgings/*`, `/photos`, `/customize` | More |
 
 Implementation: replace `BottomNav.astro`'s single `path.startsWith(it.href + '/')` test with a per-tab matcher function.
 
@@ -58,7 +58,15 @@ Logo → `/`, gear → `/customize`, customize-pill island as today.
 
 A new `MapRibbon.astro` component, ~80px tall, sepia-toned to match the existing map page filter (`sepia(0.35) saturate(0.85) hue-rotate(-10deg) contrast(0.95) brightness(1.02)`), rendered inline at the top of every detail page.
 
-**Hydration posture: fully static (no MapLibre on detail pages).** The ribbon renders a single `<img>` of an OSM raster tile (zoom 11–13 depending on pin spread), with absolutely-positioned `<span>` pins overlaid. Image URL is the standard OSM tile (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`) selected at build time from the pin centroid. Roughly 5–10 KB per ribbon vs ~120 KB+ for an idle MapLibre instance. The ribbon is non-interactive: pan/zoom/popup are not supported — the "⤢ Full map" control is the entry point to the interactive map. This decision favours fast paint on marginal 4G in the Dolomites over in-place interactivity. View Transitions: ribbon opts out (`view-transition-name: none`) so each page renders a fresh ribbon without an empty-tile flash during swap.
+**Hydration posture: fully static (no MapLibre on detail pages).** The ribbon renders a single `<img>` raster tile, with absolutely-positioned `<span>` pins overlaid. Roughly 5–10 KB per ribbon vs ~120 KB+ for an idle MapLibre instance. The ribbon is non-interactive: pan/zoom/popup are not supported — the "⤢ Full map" control is the entry point to the interactive map. This decision favours fast paint on marginal 4G in the Dolomites over in-place interactivity.
+
+**Tile provider.** Ribbons use the same tile source as `MapView.tsx` to avoid visual divergence between detail-page ribbons and the full `/map`. Currently `MapView.tsx` uses raw OSM (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`); ribbons use the same URL pattern. Rationale: matching providers means the same tile cache works for both, and any future move to a keyed provider (MapTiler, Stadia, Cloudflare-cached proxy) lands in one place. Per OSM tile-usage policy, this volume (~one tile per detail-page view) sits well within personal-use bounds; if the site is ever publicly shared, switch both `MapView.tsx` and `MapRibbon.astro` to a keyed provider in the same change.
+
+**Pin projection math.** Tile center comes from the bounding-box centre of the pin set (NOT the mean — bounding-box centre handles asymmetric spreads correctly). Zoom is selected as `Math.floor(Math.log2(360 / Math.max(latSpread, lonSpread)) - 1)` clamped to `[10, 13]`. If any pin would project outside the rendered tile rectangle after Web-Mercator projection, decrement zoom and retry; bottom out at zoom 10 and clip overflowing pins to edge markers (small triangle on the nearest edge instead of a circle). Single-pin ribbons use zoom 13 directly with the pin centred.
+
+**Layering.** Tile `<img>` (z-index 0) carries the sepia filter; pin `<span>` overlays (z-index 1) are unfiltered so colour-coded categories (forest green for trailheads, red for lodging, gold for activities) remain legible. Caption pill and "⤢ Full map" control are z-index 2.
+
+**View Transitions.** Ribbon root AND all descendants opt out via `.map-ribbon, .map-ribbon * { view-transition-name: none }` — without the descendant rule, child elements may inherit auto-named transitions from Astro's ClientRouter and animate independently of their parent.
 
 | Page | Pins |
 |---|---|
@@ -191,9 +199,9 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 
 | Path | Responsibility |
 |---|---|
-| `src/components/MapRibbon.astro` | 80px sepia map. Props: `pins: Pin[]`, `expandHref: string`. **Static — no JS, no MapLibre.** Renders an `<img src="https://tile.openstreetmap.org/{z}/{x}/{y}.png">` for the centroid tile (zoom selected by pin spread: 13 if all pins fit one tile, 12 otherwise, 11 for cross-region day stubs) plus absolutely-positioned `<span>` pins overlaid in the same colour scheme as MapView. Sepia filter via inline CSS. `view-transition-name: none` so each page paints fresh. |
+| `src/components/MapRibbon.astro` | 80px sepia map. Props: `pins: Pin[]`, `expandHref: string`. **Static — no JS, no MapLibre.** Renders an `<img>` raster tile (provider matches `MapView.tsx`; currently OSM) plus absolutely-positioned `<span>` pins overlaid in the same colour scheme as MapView. Bounding-box centre for tile centre; zoom = `floor(log2(360 / max(latSpread, lonSpread)) − 1)` clamped to `[10, 13]`; edge-marker fallback if a pin overflows the tile rectangle at the lowest zoom. Sepia filter on tile only (z-index 0); pins unfiltered (z-index 1); caption + expand control z-index 2. `view-transition-name: none` on `.map-ribbon` AND descendants so children don't inherit auto-named transitions from ClientRouter. |
 | `src/components/Breadcrumb.astro` | Mono-cap breadcrumb. Props: `crumbs: { label: string, href?: string }[]`. Last crumb has no link. |
-| `src/components/RelatedActivities.astro` | Horizontal scroll-snap row of 3 activity cards. Props: `current: CollectionEntry<'activities'>`. Computes haversine internally; **excludes activities lacking `location.lat`/`lon`** (logs a build-time `console.warn` if any are excluded — surfaces data-quality issues without failing the build). Container uses `scroll-snap-type: x mandatory`; each card uses `scroll-snap-align: start`. |
+| `src/components/RelatedActivities.astro` | Horizontal scroll-snap row of up-to-3 activity cards. Props: `current: CollectionEntry<'activities'>`. Computes haversine internally; **excludes activities lacking `location.lat`/`lon`** (logs a build-time `console.warn` if any are excluded — surfaces data-quality issues without failing the build). Edge cases: render whatever count is available (1, 2, or 3); if 0 candidates exist after exclusion, the entire section (heading + rail) does not render. Container uses `scroll-snap-type: x mandatory`; each card uses `scroll-snap-align: start` + `scroll-snap-stop: always` (prevents accidental two-card swipe past on mobile). |
 | `src/pages/lodgings/index.astro` | Renamed from `lodgings.astro`. Grid of lodging cards, each linking to `/lodgings/<slug>`. |
 | `src/pages/lodgings/[slug].astro` | Detail page: map ribbon, address, host, nights/dates, booking link, notes. Mirrors the `/activities/[slug]` rhythm. |
 
@@ -204,12 +212,13 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 | `src/components/BottomNav.astro` | Per-tab active-state matcher per §1 rule table. Each match rule is explicit: e.g. More matches `path === '/lodgings' \|\| path.startsWith('/lodgings/')` (not a glob), preventing accidental matches against e.g. `/lodgings-guide`. |
 | `src/components/DayPillScroller.astro` | After mount AND after `astro:after-swap`, **only re-centre the active pill if it is not currently visible inside the scroller's viewport** (compare `pill.getBoundingClientRect()` against `scroller.getBoundingClientRect()`). If the user has manually scrolled to peek at a future day, that scroll position is preserved across navigation. |
 | `src/layouts/BaseLayout.astro` | Add `astro:after-swap` listener that calls `document.getElementById('main')?.focus()` (with `tabindex="-1"` on `#main` for programmatic focus). |
-| `src/pages/index.astro` | Medium phase awareness — adaptive countdown copy, Phase II free-day banner with quick-row, ring auto-collapse, section ordering swap based on `inPhaseII`. |
+| `src/pages/index.astro` | Medium phase awareness — adaptive countdown copy, Phase II free-day banner with quick-row, ring auto-collapse, section ordering swap based on `inPhaseII`. **Decompose, don't inline-stack.** Extract sections into focused components (`Countdown.astro`, `TodayBanner.astro`, `BookingRingOrBadge.astro`, `PastPhaseSummary.astro`); `index.astro` becomes a composition of them per phase. Without this nudge, the file balloons past 600 lines and becomes hard to reason about. The Hero section can stay inline. |
 | `src/pages/day/[date].astro` | `<MapRibbon>` at top after day pills. For Garda free-form days (`hikeSlugs.length === 0 && date >= phaseBoundary`), schedule section becomes a "Pick today's activities" CTA. Cross-link to `/contingencies` if `badWeatherOption` is set. |
 | `src/pages/hike/[slug].astro` | `<MapRibbon>` at top with single trailhead pin. |
-| `src/pages/activities/[slug].astro` | `<MapRibbon>` at top, `<Breadcrumb>` above hero (`Activities · {category-label}`), `<RelatedActivities current={activity} />` above the back-to-catalog link. |
+| `src/pages/activities/[slug].astro` | `<MapRibbon>` at top, `<Breadcrumb>` above hero (`Activities · {CATEGORY_LABELS[a.category]}`), `<RelatedActivities current={activity} />` above the back-to-catalog link. |
+| `src/lib/category-labels.ts` *(new — small enough to inline here)* | `export const CATEGORY_LABELS: Record<ActivityCategory, string> = { 'water-sports': 'Water Sports', 'culture-history': 'Culture & History', 'mountain-cable-car': 'Mountain & Cable Car', 'scenic': 'Scenic', 'bike': 'Bike', 'wine': 'Wine', 'day-trip': 'Day Trip', 'aquatic-park': 'Aquatic Park', 'hiking': 'Hiking' } as const;`. Imported by Breadcrumb consumers + the catalog filter pills (replaces today's ad-hoc capitalisation). |
 | `src/pages/map.astro` + `src/components/MapView.tsx` | Read `?day=` and `?focus=` query params. Filter / fit / open-popup as per §2. Existing global behaviour unchanged when no params. |
-| `scripts/migrate-itinerary.mjs` | New `emitGardaDayStubs()` function — emits 7 day `.md` files for Jul 21-27. Wired into `runMigration()` after `for (const d of days) emitDay(d)`. |
+| `scripts/migrate-itinerary.mjs` | New `emitGardaDayStubs()` function — emits 7 day `.md` files for Jul 21-27. **Idempotency: skip emit if the target file already exists** (so a hand-edited `2026-07-22.md` survives a re-run). Day 27's airport drive-leg note derives departure time from the same hardcoded `trip.flights.return[0].depart` string used in `emitTrip()` — single source of truth. Wired into `runMigration()` after `for (const d of days) emitDay(d)`. |
 | `public/sw.js` | Bump cache key `dolomites-v3` → `dolomites-v4`. **Activation strategy**: ensure `self.skipWaiting()` is called in the `install` handler and `self.clients.claim()` in the `activate` handler. Without these, users on a stale tab keep the v3 cache (no Garda day stubs, broken Phase II) until they fully close the PWA. With the day-stub data being new, this is a hard requirement, not a nice-to-have. |
 
 ### Untouched
@@ -255,7 +264,7 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 
 - DayPillScroller auto-scrolls active pill into view (mount + after-swap)
 - BaseLayout adds `astro:after-swap` focus-restoration to `#main` (with `tabindex="-1"` on the main element)
-- Full clean build + smoke each route + Lighthouse on `/activities`, one new `/lodgings/[slug]`, one `/day/[date]`, and one `/hike/[slug]` (the latter two carry the new map ribbon load — target ≥ 95 on all four)
+- Full clean build + smoke each route + Lighthouse on `/activities`, one new `/lodgings/[slug]`, one `/day/[date]`, and one `/hike/[slug]` — all carry the new static map-ribbon load; target ≥ 95 on all four. **`/map` is excluded from the ≥ 95 target** because MapLibre + raster tiles unavoidably hit performance — tracked separately if it falls below 80
 - Push to main → Cloudflare auto-deploys
 
 ---
@@ -278,9 +287,11 @@ Public URLs are unchanged (`/lodgings` still works; `/lodgings/baita-fraina` is 
 | Map ribbon JS bloat on slow connections | Ribbons are fully static (`<img>` tile + overlaid `<span>` pins); no MapLibre on detail pages — see §1 hydration posture |
 | `?focus=<slug>` collides with existing pin labels | Prefix all focus values with type (`hike-`, `activity-`, `lodging-`) — already in §2 |
 | Garda day stubs without scheduled activities feel empty | "Pick today's activities" CTA + 4-card quick row in Today banner address this — empty days are a feature, not a bug |
-| Section reordering on home page during Phase II disorients returning users | Section labels (PARTE I / PARTE II) make ordering self-explanatory; both sections always present, just reordered |
+| Section reordering on home page during Phase II disorients returning users | Section labels (PARTE I / PARTE II) make ordering self-explanatory; both phases remain represented (PARTE I appears as a Past phase summary card linking to `/hikes` for the full grid) |
 | Adding `tabindex="-1"` to `#main` could affect existing focus order | `-1` only allows programmatic focus; doesn't appear in tab order |
 | OSM tile-server traffic from static ribbons | Each detail page hits one tile (already widely cached); user agents respect HTTP cache headers — no measurable load. If volume ever becomes a concern, switch to a Cloudflare-cached tile proxy |
 | Day-pill auto-scroll yanks user's scroll on swap | Visibility check (§3) — only re-centre if active pill is off-screen, preserving manual scroll otherwise |
 | Stale v3 service worker leaves users with broken Phase II | `skipWaiting()` + `clients.claim()` in v4 SW (§3) — first reload of any tab activates v4 immediately |
 | Activities missing `location.lat`/`lon` break RelatedActivities | Excluded from haversine calc with build-time warning (§3); current 22 entries all have GPS so this is defensive |
+| Tile-server load if site goes public | OSM is fine for personal use; `MapRibbon` and `MapView` share one tile-source constant so swapping to MapTiler/Stadia/Cloudflare-cached proxy is a single-file change. Track as a follow-up to revisit before any public sharing |
+| `index.astro` becomes monolithic after Phase 4 | Spec §3 mandates extracting `Countdown.astro`, `TodayBanner.astro`, `BookingRingOrBadge.astro`, `PastPhaseSummary.astro` — index.astro composes per phase rather than inlining 200 more lines |
