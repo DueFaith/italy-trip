@@ -37,9 +37,17 @@ const { title = 'Dolomites Trip', headerTitle, bodyClass, activeDayDate } = Astr
     <a href="#main" class="skip-link">Skip to main content</a>
     <Header title={headerTitle} />
     {activeDayDate && <DayPillScroller activeDate={activeDayDate} />}
-    <main id="main" class="mx-auto" style="max-width: var(--max-content);"><slot /></main>
+    <main id="main" tabindex="-1" class="mx-auto" style="max-width: var(--max-content); outline: none;"><slot /></main>
     <BottomNav />
     <ReceiveShareLink client:load />
     <RegisterServiceWorker />
+    <script is:inline>
+      // After View Transitions swap a new page in, move keyboard focus to
+      // <main> so screen readers announce the new content. tabindex=-1 lets
+      // .focus() succeed without inserting <main> into the tab order.
+      document.addEventListener('astro:after-swap', () => {
+        document.getElementById('main')?.focus();
+      });
+    </script>
   </body>
 </html>
