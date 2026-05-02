@@ -9,6 +9,7 @@ import EditDayButton from '@/components/customize/EditDayButton';
 import WeatherWidget from '@/components/WeatherWidget';
 import DriveLegs from '@/components/DriveLegs.astro';
 import { getDays, getHike, getLodgings, getActivities } from '@/lib/content';
+import { haversineKm } from '@/lib/geo';
 
 export async function getStaticPaths() {
   const days = await getDays();
@@ -36,14 +37,6 @@ const isGardaFreeForm = day.data.hikeSlugs.length === 0 && day.data.date >= phas
 // computation as the home page TodayBanner. Only relevant on free-form days.
 const saloLodging = lodgings.find((l: any) => l.id === 'salo-airbnb');
 const allActivities = isGardaFreeForm ? await getActivities() : [];
-function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
-  const R = 6371;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(bLat - aLat);
-  const dLon = toRad(bLon - aLon);
-  const aa = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(aa));
-}
 const nearestForToday = isGardaFreeForm && saloLodging
   ? [...allActivities]
       .filter((a: any) => typeof a.data.location?.lat === 'number')

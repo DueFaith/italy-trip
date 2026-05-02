@@ -1,18 +1,10 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { getActivities } from '@/lib/content';
+import { haversineKm } from '@/lib/geo';
 
 type Props = { current: CollectionEntry<'activities'> };
 const { current } = Astro.props;
-
-function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
-  const R = 6371;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(bLat - aLat);
-  const dLon = toRad(bLon - aLon);
-  const aa = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(aa));
-}
 
 const all = await getActivities();
 

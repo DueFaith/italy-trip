@@ -5,6 +5,7 @@ import TodayBanner from '@/components/TodayBanner.astro';
 import BookingRingOrBadge from '@/components/BookingRingOrBadge.astro';
 import PastPhaseSummary from '@/components/PastPhaseSummary.astro';
 import { getDays, getHikes, getTrip, getBookings, getLodgings, getActivities } from '@/lib/content';
+import { haversineKm } from '@/lib/geo';
 
 const trip = getTrip();
 const days = await getDays();
@@ -39,14 +40,6 @@ const todayFirstHike = todayDay && todayDay.data.hikeSlugs.length > 0
 const saloLodging = lodgings.find((l) => l.id === 'salo-airbnb');
 
 // 4 nearest activities to Salò (haversine from lodging coords, NOT weatherFor)
-function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
-  const R = 6371;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(bLat - aLat);
-  const dLon = toRad(bLon - aLon);
-  const aa = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(aa));
-}
 const nearestActivities = saloLodging
   ? [...activities]
       .filter((a) => typeof a.data.location?.lat === 'number' && typeof a.data.location?.lon === 'number')
