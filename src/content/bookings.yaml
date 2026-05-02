@@ -24,12 +24,12 @@
   status: booked
   notes: Booked
 - id: b-6
-  label: Salò AirBnB (Jul 20–27)
+  label: Anna's Home Salò (Jul 20–27)
   category: lodging
   status: booked
   bookingUrl: "https://www.airbnb.com/trips/v1?confirmationCode=HMPSNRH5NY&reservationType=STAY"
   confirmationNumber: HMPSNRH5NY
-  notes: Booked
+  notes: Booked · free cancel until 4pm Jul 15
 - id: b-7
   label: "Tre Cime parking (Jul 16, 07:00)"
   category: parking
