@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import MapView from '@/components/MapView';
-import { getHikes, getLodgings } from '@/lib/content';
+import { getHikes, getLodgings, getActivities } from '@/lib/content';
 
 const hikes = await getHikes();
 const lodgings = await getLodgings();
+const activities = await getActivities();
 
-type Pin = { lat: number; lon: number; label: string; href?: string; category: 'trailhead' | 'lodging' | 'parking' | 'restaurant' };
+type Pin = { lat: number; lon: number; label: string; href?: string; category: 'trailhead' | 'lodging' | 'parking' | 'restaurant' | 'activity' };
 
 const pins: Pin[] = [];
 
@@ -27,6 +28,16 @@ for (const l of lodgings) {
     label: l.data.name,
     href: '/lodgings',
     category: 'lodging',
+  });
+}
+
+for (const a of activities) {
+  pins.push({
+    lat: a.data.location.lat,
+    lon: a.data.location.lon,
+    label: a.data.name,
+    href: `/activities/${a.id}`,
+    category: 'activity',
   });
 }
 ---
@@ -52,7 +63,7 @@ for (const l of lodgings) {
       border-radius: var(--r-sm);
       backdrop-filter: blur(8px);
       box-shadow: var(--shadow-paper-sm);
-    ">{hikes.length} Trailheads · {lodgings.length} Lodgings</span>
+    ">{hikes.length} Trailheads · {lodgings.length} Lodgings · {activities.length} Activities</span>
   </div>
   <MapView pins={pins} client:only="react" />
 
