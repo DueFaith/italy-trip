@@ -3,7 +3,7 @@ slug: cadini
 name: Cadini di Misurina viewpoint
 region: Veneto
 alltrailsUrl: https://www.alltrails.com/trail/italy/veneto/rifugio-auronzo-cadini-di-misurina
-distanceKm: 3.4
+distanceKm: 3.5
 elevationGainM: 211
 movingTimeHours: 
   min: 1.5
@@ -14,7 +14,7 @@ totalTimeHours:
 difficulty: moderate
 rating: 
   stars: 4.8
-  reviews: 2867
+  reviews: 2925
 type: out-and-back
 trailhead: 
   name: Rifugio Auronzo (same lot as Tre Cime)
