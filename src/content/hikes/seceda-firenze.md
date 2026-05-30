@@ -4,7 +4,7 @@ name: Seceda → Rifugio Firenze → Col Raiser loop
 region: South Tyrol
 alltrailsUrl: https://www.alltrails.com/trail/italy/south-tyrol/seceda-rifugio-firenze-col-raiser-2
 distanceKm: 8.5
-elevationGainM: 472
+elevationGainM: 479
 movingTimeHours:
   min: 4
   max: 5
@@ -14,18 +14,18 @@ totalTimeHours:
 difficulty: moderate
 rating:
   stars: 4.7
-  reviews: 354
+  reviews: 365
 type: loop
 trailhead:
   name: Garage Seceda, Ortisei
-  lat: 46.5750
-  lon: 11.6740
-  addr: Streda Antone Demetz, 39046 Ortisei BZ
+  lat: 46.5765
+  lon: 11.6752
+  addr: Streda Val d'Anna 2, 39046 Ortisei BZ
 parking:
   name: Garage Seceda (Ortisei)
   costEur: 30
   mustBook: false
-  capacity: ~250 spaces, covered + open. €2.50/h, €30/day max.
+  capacity: ~250 spaces, covered + open. €2.80/h, €30/day max.
 cableCar:
   name: Ortisei → Furnes → Seceda cableway
   url: https://www.seceda.it/en/summer
@@ -40,8 +40,8 @@ routeHighlights:
   - "Board the Ortisei lift on your pre-booked slot. Step off at the Seceda top station (2,500 m)."
   - "5–10 min walk to the first ridge viewpoint — the Odle/Geisler spires. The €5 turnstile is past this; you do NOT need to pay it for the iconic shot."
   - "Trail 2B west toward Baita Sofie and Malga Pieralongia — twin-spire meadow detour, quieter, photogenic."
-  - "Descend trail 1 to Rifugio Firenze (Regensburger Hütte, 2,040 m). Lunch stop — knödel, goulash, strudel."
-  - "Trail 4 down through the meadows to the Col Raiser cable car top station."
+  - "Descend trail 4 to Rifugio Firenze (Regensburger Hütte, 2,040 m). Lunch stop — knödel, goulash, strudel."
+  - "Trail 1 down through the meadows to the Col Raiser cable car top station."
   - "Col Raiser gondola down (€23 one-way) to Santa Cristina, then bus 350 back up the valley to Ortisei (~10 min, runs ~every 30 min) to retrieve the car."
 foodOnTrail:
   - name: Baita Sofie
