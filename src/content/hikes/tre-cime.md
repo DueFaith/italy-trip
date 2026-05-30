@@ -14,7 +14,7 @@ totalTimeHours:
 difficulty: moderate
 rating: 
   stars: 4.7
-  reviews: 6244
+  reviews: 6227
 type: loop
 trailhead: 
   name: Rifugio Auronzo
@@ -33,7 +33,7 @@ foodOnTrail:
   - name: Rifugio Locatelli
     notes: "full meals, strudel, knödel, beer. Cash preferred, cards work"
   - name: Malga Langalm
-    notes: "rustic alpine pasture hut, summer only"
+    notes: "Off the classic loop — sits ~1.5 km north on the access road below Rifugio Auronzo. Useful only if you take the variant route that drops north."
 hazards: 
   - Wind on the saddle can be brutal — even in July. Bring a windproof layer.
   - "The loop is at 2,200–2,500 m altitude — you may feel slight breathlessness if not acclimatized."
