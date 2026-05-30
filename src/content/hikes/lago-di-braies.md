@@ -17,9 +17,9 @@ rating:
   reviews: 2913
 type: loop
 trailhead: 
-  name: Pragser Wildsee P3
-  lat: 46.6943
-  lon: 12.0854
+  name: Pragser Wildsee P4
+  lat: 46.7000
+  lon: 12.0846
 parking:
   name: Pragser Wildsee P4
   costEur: 18
