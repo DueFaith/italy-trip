@@ -249,6 +249,33 @@ describe('§3.10 map ribbon presence on detail pages', () => {
   });
 });
 
+describe('§3.11 booking-required pill renders when mustBook=true', () => {
+  it('every hike whose parking or cableCar requires booking shows a "Booking required" pill', () => {
+    const missing: { hike: string; reason: string }[] = [];
+
+    for (const file of fs.readdirSync(HIKES_DIR).filter((f) => f.endsWith('.md'))) {
+      const slug = file.replace(/\.md$/, '');
+      const raw = fs.readFileSync(path.join(HIKES_DIR, file), 'utf8');
+      const fm = parseFrontmatter(raw);
+      const parkingMustBook = fm.parking?.mustBook === true;
+      const cableCarMustBook = fm.cableCar?.mustBook === true;
+      if (!parkingMustBook && !cableCarMustBook) continue;
+
+      const builtPath = path.join(DIST, 'hike', slug, 'index.html');
+      if (!fs.existsSync(builtPath)) {
+        missing.push({ hike: slug, reason: 'built page not found' });
+        continue;
+      }
+      const html = fs.readFileSync(builtPath, 'utf8');
+      if (!html.includes('Booking required')) {
+        missing.push({ hike: slug, reason: 'no "Booking required" pill in built HTML' });
+      }
+    }
+
+    expect(missing, `Hikes missing booking pill: ${JSON.stringify(missing, null, 2)}`).toEqual([]);
+  });
+});
+
 describe('§3.5 activity-card destinations', () => {
   it('every <a href="/activities/SLUG"> points at a real activity file', () => {
     const slugs = new Set(listSlugs(ACTIVITIES_DIR, '.yaml'));
