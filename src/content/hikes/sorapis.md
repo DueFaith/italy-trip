@@ -14,7 +14,7 @@ totalTimeHours:
 difficulty: hard
 rating: 
   stars: 4.7
-  reviews: 4569
+  reviews: 4712
 type: out-and-back
 trailhead: 
   name: Passo Tre Croci
@@ -36,6 +36,7 @@ hazards:
   - Trail is busy in summer; etiquette varies — be patient at narrow passes
   - Lake water level varies; can be partly dry late August
   - "Tiny lot at Passo Tre Croci — fills by 08:30 in July. Overflow is roadside; fallback is DolomitiBus 30 from Cortina (runs Jun–Sep)."
+  - "2026 landslide ordinance (rifugiovandelli.it, Jan 12 2026) officially closes: Alta Via 3, Alta Via 4, trail 241 (Cengia del Banco), and trail 242 (Via Ferrata Francesco Berti). Our route — trail 215 to the lake — remains open. Skip the 216/213 loop variant."
 badWeatherOption: "- Wet rock makes the cable sections genuinely dangerous — swap to a different day if storms forecast\n- Backup: 5 Torri area (cable car from Bai de Dones to Rifugio Scoiattoli, easy WWI museum walk)"
 ---
 
