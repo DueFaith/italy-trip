@@ -35,6 +35,7 @@ hazards:
   - "Trail 216/213 loop variant via Forcella Marcoira: **DO NOT TAKE** unless you're an experienced alpine hiker — reviewers describe descent as \"stuff of nightmares\""
   - Trail is busy in summer; etiquette varies — be patient at narrow passes
   - Lake water level varies; can be partly dry late August
+  - "Tiny lot at Passo Tre Croci — fills by 08:30 in July. Overflow is roadside; fallback is DolomitiBus 30 from Cortina (runs Jun–Sep)."
 badWeatherOption: "- Wet rock makes the cable sections genuinely dangerous — swap to a different day if storms forecast\n- Backup: 5 Torri area (cable car from Bai de Dones to Rifugio Scoiattoli, easy WWI museum walk)"
 ---
 
