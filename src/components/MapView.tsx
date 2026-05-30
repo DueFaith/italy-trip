@@ -33,7 +33,11 @@ export default function MapView({ pins, focusId: focusIdProp, dayDate: dayDatePr
   const markersRef = useRef<maplibregl.Marker[]>([]);
   // Static build can't see query params at SSR time, so fall back to
   // window.location at hydration. Props win when provided (e.g. SSR mode).
-  const [focusId, setFocusId] = useState<string | undefined>(focusIdProp);
+  const [focusId, setFocusId] = useState<string | undefined>(() => {
+    if (focusIdProp !== undefined) return focusIdProp;
+    if (typeof window === 'undefined') return undefined;
+    return new URLSearchParams(window.location.search).get('focus') ?? undefined;
+  });
   const [dayDate, setDayDate] = useState<string | undefined>(dayDateProp);
   useEffect(() => {
     if (typeof window === 'undefined') return;

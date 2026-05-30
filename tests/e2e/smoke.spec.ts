@@ -298,3 +298,16 @@ test('Seceda hike page renders the Lift Access card with booking warning', async
   const reserve = page.getByRole('link', { name: 'Reserve' }).first();
   await expect(reserve).toHaveAttribute('href', 'https://www.seceda.it/en/tickets');
 });
+
+test('clicking "Full map" on a hike page focuses that hike on /map', async ({ page }) => {
+  await page.goto('/hike/tre-cime');
+  await page.getByRole('link', { name: /open full map/i }).click();
+  await page.waitForURL(/\/map\?focus=hike-tre-cime/);
+
+  // Wait for MapLibre to hydrate.
+  await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 10_000 });
+
+  // When ?focus= is honored, MapView filters pins down to just the focused one.
+  // MapLibre renders each pin as a .maplibregl-marker element — expect exactly 1.
+  await expect(page.locator('.maplibregl-marker')).toHaveCount(1);
+});
