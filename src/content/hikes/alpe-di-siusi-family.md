@@ -17,9 +17,9 @@ rating:
   reviews: 691
 type: loop
 trailhead: 
-  name: Compatsch / Mont Sëuc cable car top station
-  lat: 46.5419
-  lon: 11.6253
+  name: Compatsch (Seiser Alm)
+  lat: 46.5412
+  lon: 11.6166
 parking:
   name: P2 Compatsch
   costEur: 30
