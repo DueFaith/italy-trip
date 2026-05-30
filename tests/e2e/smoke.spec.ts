@@ -279,3 +279,22 @@ test.describe('customize / edit flow', () => {
     expect(page.url()).toMatch(/\?s=/);
   });
 });
+
+test('Seceda hike page renders the Lift Access card with booking warning', async ({ page }) => {
+  await page.goto('/hike/seceda-firenze');
+
+  // The Lift Access heading is present.
+  await expect(page.getByRole('heading', { name: 'Lift Access' })).toBeVisible();
+
+  // The cable car name renders (as a link).
+  await expect(page.getByRole('link', { name: /Ortisei.*Furnes.*Seceda cableway/i })).toBeVisible();
+
+  // The booking pill is rendered with the warning text + window note.
+  const pill = page.locator('text=Booking required').first();
+  await expect(pill).toBeVisible();
+  await expect(page.locator('text=opens 30d before')).toBeVisible();
+
+  // The Reserve link points to seceda.it/en/tickets.
+  const reserve = page.getByRole('link', { name: 'Reserve' }).first();
+  await expect(reserve).toHaveAttribute('href', 'https://www.seceda.it/en/tickets');
+});
