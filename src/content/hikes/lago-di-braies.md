@@ -20,13 +20,15 @@ trailhead:
   name: Pragser Wildsee P3
   lat: 46.6943
   lon: 12.0854
-parking: 
-  name: Trailhead parking
-  costEur: 12
+parking:
+  name: Pragser Wildsee P4
+  costEur: 18
   mustBook: false
   bookingUrl: https://www.pragsparking.com/en
 routeHighlights: []
 foodOnTrail: []
-hazards: []
+hazards:
+  - "Cars restricted from the lake 09:30–16:00, 10 Jul – 10 Sep 2026 — our trip falls in this window. Arrive before 09:30 walk-in, or pre-book P4 at pragsparking.com."
+  - "Lot fills early on summer mornings. Aim to be parked by 08:30 to avoid stress."
 ---
 
