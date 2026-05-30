@@ -24,6 +24,7 @@ parking:
   name: Trailhead parking
   costEur: 40
   mustBook: true
+  bookingUrl: https://pass.auronzo.info/Frontoffice
   bookingOpensDaysBefore: 30
 routeHighlights: []
 foodOnTrail: 
