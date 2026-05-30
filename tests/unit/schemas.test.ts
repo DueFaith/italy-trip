@@ -138,3 +138,54 @@ describe('ActivitySchema', () => {
     expect(() => ActivitySchema.parse(a)).toThrow();
   });
 });
+
+describe('HikeSchema cableCar field', () => {
+  const baseHike = {
+    slug: 'x', name: 'X', region: 'X', distanceKm: 1, elevationGainM: 1,
+    movingTimeHours: { min: 1, max: 1 }, totalTimeHours: { min: 1, max: 1 },
+    difficulty: 'easy' as const, type: 'loop' as const,
+    trailhead: { name: 'X', lat: 0, lon: 0 },
+    parking: { name: 'X', costEur: 0, mustBook: false },
+    routeHighlights: [], foodOnTrail: [], hazards: [],
+  };
+
+  it('accepts a fully populated cableCar with all new optional fields', () => {
+    const hike = {
+      ...baseHike,
+      cableCar: {
+        name: 'Ortisei → Seceda',
+        url: 'https://www.seceda.it/en/summer',
+        costEur: 74,
+        mustBook: true,
+        oneWayCostEur: 49,
+        hoursSummer: '08:30–17:30',
+        bookingUrl: 'https://www.seceda.it/en/tickets',
+        bookingOpensDaysBefore: 30,
+        notes: 'Timed entry slots.',
+      },
+    };
+    const parsed = HikeSchema.parse(hike);
+    expect(parsed.cableCar?.oneWayCostEur).toBe(49);
+    expect(parsed.cableCar?.hoursSummer).toBe('08:30–17:30');
+    expect(parsed.cableCar?.bookingUrl).toBe('https://www.seceda.it/en/tickets');
+    expect(parsed.cableCar?.bookingOpensDaysBefore).toBe(30);
+    expect(parsed.cableCar?.notes).toBe('Timed entry slots.');
+  });
+
+  it('accepts a minimal cableCar with only the original required fields', () => {
+    const hike = {
+      ...baseHike,
+      cableCar: {
+        name: 'Mont Sëuc',
+        url: 'https://example.com',
+        costEur: 39,
+        mustBook: false,
+      },
+    };
+    expect(() => HikeSchema.parse(hike)).not.toThrow();
+  });
+
+  it('accepts a hike with no cableCar at all (field is optional)', () => {
+    expect(() => HikeSchema.parse(baseHike)).not.toThrow();
+  });
+});
