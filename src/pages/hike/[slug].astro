@@ -228,6 +228,37 @@ const ribbonPins: Pin[] = [{
     </div>
   </section>
 
+  {/* Lift Access */}
+  {hike.data.cableCar && (
+    <section class="stagger" style="padding: 18px var(--page-x);">
+      <h2 class="eyebrow" style="margin: 0 0 10px;">Lift Access</h2>
+      <div style="background: var(--bg-paper); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; box-shadow: var(--shadow-paper-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+          <a href={hike.data.cableCar.url} target="_blank" rel="noopener" style="font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink); border-bottom: 1px dashed var(--gold); text-decoration: none;">
+            {hike.data.cableCar.name}
+          </a>
+          <span class="mono tabular" style="font-size: 14px; font-weight: 700; color: var(--ink-soft);">
+            €{hike.data.cableCar.costEur}
+            {hike.data.cableCar.oneWayCostEur && (<span style="font-weight: 400; opacity: 0.7;"> · €{hike.data.cableCar.oneWayCostEur} one-way</span>)}
+          </span>
+        </div>
+        {hike.data.cableCar.hoursSummer && (
+          <div class="mono tabular" style="font-size: 11.5px; color: var(--ink-soft); margin-top: 4px;">{hike.data.cableCar.hoursSummer}</div>
+        )}
+        {hike.data.cableCar.mustBook && (
+          <div class="mono-cap" style="margin-top: 10px; padding: 8px 10px; font-size: 10px; color: var(--signal); background: rgba(168, 50, 50, 0.06); border: 1px dashed var(--signal); border-radius: var(--r-sm); display: inline-block;">
+            ⚠ Booking required
+            {hike.data.cableCar.bookingOpensDaysBefore && (<> · opens {hike.data.cableCar.bookingOpensDaysBefore}d before</>)}
+            {(hike.data.cableCar.bookingUrl || hike.data.cableCar.url) && (<> · <a href={hike.data.cableCar.bookingUrl ?? hike.data.cableCar.url} style="border-bottom: 1px solid var(--signal); padding-bottom: 1px;">Reserve</a></>)}
+          </div>
+        )}
+        {hike.data.cableCar.notes && (
+          <p style="font-size: 13px; color: var(--ink); margin: 10px 0 0; line-height: 1.5;">{hike.data.cableCar.notes}</p>
+        )}
+      </div>
+    </section>
+  )}
+
   {/* Route highlights */}
   {hike.data.routeHighlights.length > 0 && (
     <section class="stagger" style="padding: 18px var(--page-x);">
