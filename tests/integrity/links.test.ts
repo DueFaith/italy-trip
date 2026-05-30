@@ -276,6 +276,26 @@ describe('§3.11 booking-required pill renders when mustBook=true', () => {
   });
 });
 
+describe('§3.12 every hike has a valid AllTrails URL', () => {
+  it('alltrailsUrl is present and matches the alltrails.com pattern', () => {
+    const broken: { hike: string; reason: string }[] = [];
+
+    for (const file of fs.readdirSync(HIKES_DIR).filter((f) => f.endsWith('.md'))) {
+      const slug = file.replace(/\.md$/, '');
+      const raw = fs.readFileSync(path.join(HIKES_DIR, file), 'utf8');
+      const fm = parseFrontmatter(raw);
+      const url = fm.alltrailsUrl;
+      if (!url) {
+        broken.push({ hike: slug, reason: 'missing alltrailsUrl' });
+      } else if (typeof url !== 'string' || !/^https:\/\/www\.alltrails\.com\/trail\//.test(url)) {
+        broken.push({ hike: slug, reason: `invalid format: ${url}` });
+      }
+    }
+
+    expect(broken, `Hikes with invalid alltrailsUrl: ${JSON.stringify(broken, null, 2)}`).toEqual([]);
+  });
+});
+
 describe('§3.5 activity-card destinations', () => {
   it('every <a href="/activities/SLUG"> points at a real activity file', () => {
     const slugs = new Set(listSlugs(ACTIVITIES_DIR, '.yaml'));
