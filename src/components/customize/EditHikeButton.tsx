@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocalState } from '@/stores/localState';
 import HikeForm from './HikeForm';
 import type { HikeShape } from '@/stores/types';
@@ -6,7 +6,8 @@ import type { HikeShape } from '@/stores/types';
 export default function EditHikeButton({ canonical }: { canonical: HikeShape }) {
   const [open, setOpen] = useState(false);
   const editHike = useLocalState((s) => s.editHike);
-  const current = useLocalState((s) => ({ ...canonical, ...(s.hikeEdits[canonical.slug] ?? {}) }));
+  const edits = useLocalState((s) => s.hikeEdits[canonical.slug]);
+  const current = useMemo(() => ({ ...canonical, ...(edits ?? {}) }), [canonical, edits]);
 
   return (
     <>

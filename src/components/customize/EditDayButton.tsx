@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocalState } from '@/stores/localState';
 import type { DayShape } from '@/stores/types';
 
@@ -6,7 +6,8 @@ export default function EditDayButton({ canonical }: { canonical: DayShape }) {
   const [open, setOpen] = useState(false);
   const editDay = useLocalState((s) => s.editDay);
   const changeDayDate = useLocalState((s) => s.changeDayDate);
-  const current = useLocalState((s) => ({ ...canonical, ...(s.dayEdits[canonical.date] ?? {}) }));
+  const edits = useLocalState((s) => s.dayEdits[canonical.date]);
+  const current = useMemo(() => ({ ...canonical, ...(edits ?? {}) }), [canonical, edits]);
   const [theme, setTheme] = useState(current.theme);
   const [date, setDate] = useState(current.date);
 
