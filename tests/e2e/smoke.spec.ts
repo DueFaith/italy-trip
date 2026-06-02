@@ -311,3 +311,69 @@ test('clicking "Full map" on a hike page focuses that hike on /map', async ({ pa
   // MapLibre renders each pin as a .maplibregl-marker element — expect exactly 1.
   await expect(page.locator('.maplibregl-marker')).toHaveCount(1);
 });
+
+test('/customize mounts with at least one draggable day card and no errors', async ({ page }) => {
+  const consoleErrors: string[] = [];
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') consoleErrors.push(msg.text());
+  });
+
+  await page.goto('/customize');
+  await page.waitForLoadState('networkidle');
+
+  // The drag affordance uses `cursor: grab` on a chip + a ⋮⋮ glyph (CustomizePanel.tsx).
+  // We don't actually drag — we just confirm the component mounted with affordances.
+  const dragHandles = page.locator('.cursor-grab');
+  await expect(dragHandles.first()).toBeVisible();
+  expect(await dragHandles.count(), 'at least one drag-grab affordance').toBeGreaterThan(0);
+
+  expect(consoleErrors, `Console errors on /customize:\n${consoleErrors.join('\n')}`).toEqual([]);
+});
+
+test('ShareLinkButton writes a ?plan= URL to the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/customize');
+  await page.waitForLoadState('networkidle');
+
+  const shareButton = page.getByRole('button', { name: 'Copy share link to clipboard' });
+  await expect(shareButton).toBeVisible();
+  await shareButton.click();
+
+  // After click, button text flips to "Copied!" for 2s.
+  await expect(shareButton).toHaveText('Copied!');
+
+  const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+  expect(clipboardText, 'clipboard should contain a share URL').toMatch(/\?plan=.+/);
+});
+
+test('Edit-hike modal opens, lets you change the name, and persists across reload', async ({ page }) => {
+  await page.goto('/hike/tre-cime');
+  await page.waitForLoadState('networkidle');
+
+  const editButton = page.getByRole('button', { name: 'Edit hike details' });
+  await expect(editButton).toBeVisible();
+  await editButton.click();
+
+  // Modal contains a HikeForm. The first text input is the Name field.
+  const nameInput = page.locator('form input').first();
+  await expect(nameInput).toBeVisible();
+  const originalName = await nameInput.inputValue();
+  const sentinel = `TEST-${Date.now()}`;
+
+  await nameInput.fill(sentinel);
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  // Modal closes; the heading reflects the new name.
+  await expect(page.locator('h1')).toContainText(sentinel);
+
+  // Reload and confirm persistence via localStorage (zustand persist).
+  await page.reload();
+  await expect(page.locator('h1')).toContainText(sentinel);
+
+  // Cleanup — revert via the edit modal so we don't poison subsequent runs.
+  await page.getByRole('button', { name: 'Edit hike details' }).click();
+  const nameInputAfter = page.locator('form input').first();
+  await nameInputAfter.fill(originalName);
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.locator('h1')).toContainText(originalName);
+});
