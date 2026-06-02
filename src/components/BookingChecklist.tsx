@@ -14,13 +14,14 @@ type Booking = {
   relatedHikeSlug?: string;
 };
 
-const categoryOrder = ['flight', 'car', 'lodging', 'parking', 'cable-car', 'restaurant', 'other'];
+const categoryOrder = ['flight', 'car', 'lodging', 'parking', 'cable-car', 'activity', 'restaurant', 'other'];
 const categoryLabel: Record<string, string> = {
   flight: 'Flights',
   car: 'Car Rental',
   lodging: 'Lodging',
   parking: 'Parking Permits',
   'cable-car': 'Cable Cars',
+  activity: 'Activities',
   restaurant: 'Restaurants',
   other: 'Other',
 };
