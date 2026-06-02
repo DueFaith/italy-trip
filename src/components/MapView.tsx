@@ -85,6 +85,19 @@ export default function MapView({ pins, focusId: focusIdProp, dayDate: dayDatePr
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     mapRef.current = map;
 
+    // Ensure any attribution links injected by MapLibre open in a new tab
+    // safely. MapLibre injects raw HTML anchors for its logo/OSM credit;
+    // we patch them after the map is idle so rel=noopener is always present.
+    map.once('idle', () => {
+      map.getContainer().querySelectorAll('a[href]').forEach((a) => {
+        const anchor = a as HTMLAnchorElement;
+        if (!anchor.href.startsWith(window.location.origin)) {
+          anchor.target = '_blank';
+          anchor.rel = 'noopener noreferrer';
+        }
+      });
+    });
+
     return () => {
       map.remove();
       mapRef.current = null;
