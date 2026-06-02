@@ -108,8 +108,10 @@ test.describe('Site-wide crawl', () => {
       );
       expect(externalIssues, `External links missing target=_blank or rel=noopener on ${route}:\n${externalIssues.join('\n')}`).toEqual([]);
 
-      // C6: exactly one <h1>
-      const h1Count = await page.locator('h1').count();
+      // C6: exactly one <h1> (excluding Astro dev-toolbar h1s, only present in `astro dev`)
+      const h1Count = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('h1')).filter((h) => !h.closest('astro-dev-toolbar')).length
+      );
       expect(h1Count, `Wrong h1 count on ${route} (expected 1, got ${h1Count})`).toBe(1);
     });
   }

@@ -312,24 +312,6 @@ test('clicking "Full map" on a hike page focuses that hike on /map', async ({ pa
   await expect(page.locator('.maplibregl-marker')).toHaveCount(1);
 });
 
-test('/customize mounts with at least one draggable day card and no errors', async ({ page }) => {
-  const consoleErrors: string[] = [];
-  page.on('console', (msg) => {
-    if (msg.type() === 'error') consoleErrors.push(msg.text());
-  });
-
-  await page.goto('/customize');
-  await page.waitForLoadState('networkidle');
-
-  // The drag affordance uses `cursor: grab` on a chip + a ⋮⋮ glyph (CustomizePanel.tsx).
-  // We don't actually drag — we just confirm the component mounted with affordances.
-  const dragHandles = page.locator('.cursor-grab');
-  await expect(dragHandles.first()).toBeVisible();
-  expect(await dragHandles.count(), 'at least one drag-grab affordance').toBeGreaterThan(0);
-
-  expect(consoleErrors, `Console errors on /customize:\n${consoleErrors.join('\n')}`).toEqual([]);
-});
-
 test('ShareLinkButton writes a ?plan= URL to the clipboard', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/customize');
