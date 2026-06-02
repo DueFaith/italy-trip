@@ -30,7 +30,7 @@ const canonicalHikes = hikes.map((h) => ({ ...h.data, slug: h.slug }));
   </section>
 
   <section class="stagger" style="padding: 6px var(--page-x) 12px;">
-    <CustomizePanel canonicalDays={canonicalDays} canonicalHikes={canonicalHikes} client:load />
+    <CustomizePanel canonicalDays={canonicalDays} canonicalHikes={canonicalHikes} client:only="react" />
   </section>
 
   {/* Sticky share bar — always visible while you're on /customize */}

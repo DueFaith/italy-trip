@@ -47,19 +47,27 @@ function DroppableDay({ date, hikeSlugs, theme, fmt, isCustom }: { date: string;
 }
 
 export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props) {
-  const state = useLocalState();
-  const days = listEffectiveDays(canonicalDays, state);
-  const hikes = listEffectiveHikes(canonicalHikes, state);
+  const hikeEdits = useLocalState((s) => s.hikeEdits);
+  const dayEdits = useLocalState((s) => s.dayEdits);
+  const customHikes = useLocalState((s) => s.customHikes);
+  const customDays = useLocalState((s) => s.customDays);
+  const addHike = useLocalState((s) => s.addHike);
+  const addDay = useLocalState((s) => s.addDay);
+  const removeCustomHike = useLocalState((s) => s.removeCustomHike);
+  const moveHikeToDay = useLocalState((s) => s.moveHikeToDay);
+  const stateSnapshot = { hikeEdits, dayEdits, customHikes, customDays, bookings: {}, schemaVersion: 1 as const };
+  const days = listEffectiveDays(canonicalDays, stateSnapshot);
+  const hikes = listEffectiveHikes(canonicalHikes, stateSnapshot);
   const [showHikeForm, setShowHikeForm] = useState(false);
   const [showDayForm, setShowDayForm] = useState(false);
   const [newDayDate, setNewDayDate] = useState('');
   const [newDayTheme, setNewDayTheme] = useState('');
 
   const hasNoEdits =
-    Object.keys(state.hikeEdits).length === 0 &&
-    Object.keys(state.dayEdits).length === 0 &&
-    Object.keys(state.customHikes).length === 0 &&
-    Object.keys(state.customDays).length === 0;
+    Object.keys(hikeEdits).length === 0 &&
+    Object.keys(dayEdits).length === 0 &&
+    Object.keys(customHikes).length === 0 &&
+    Object.keys(customDays).length === 0;
 
   const fmt = (iso: string) => new Date(iso + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 
@@ -94,14 +102,14 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
         {showHikeForm && (
           <div className="card mb-2">
             <HikeForm
-              onSubmit={(h) => { state.addHike(h); setShowHikeForm(false); }}
+              onSubmit={(h) => { addHike(h); setShowHikeForm(false); }}
               onCancel={() => setShowHikeForm(false)}
             />
           </div>
         )}
         <div className="space-y-2">
           {hikes.map((h) => {
-            const isCustom = state.customHikes[h.slug] !== undefined;
+            const isCustom = customHikes[h.slug] !== undefined;
             return (
               <div key={h.slug} className="card flex justify-between items-center">
                 <div>
@@ -111,7 +119,7 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
                 <a href={`/hike/${h.slug}`} className="text-[11px] text-sage">Edit →</a>
                 {isCustom && (
                   <button
-                    onClick={() => state.removeCustomHike(h.slug)}
+                    onClick={() => removeCustomHike(h.slug)}
                     aria-label={`Delete ${h.name}`}
                     className="ml-2 text-[11px] text-red-700"
                     style={{ minHeight: 44, padding: '10px 4px' }}
@@ -147,7 +155,7 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
               <button
                 onClick={() => {
                   if (!newDayDate || !newDayTheme) return;
-                  state.addDay({
+                  addDay({
                     date: newDayDate, theme: newDayTheme,
                     driving: { legs: [] },
                     schedule: [], hikeSlugs: [],
@@ -178,12 +186,12 @@ export default function CustomizePanel({ canonicalDays, canonicalHikes }: Props)
             const fromDay = days.find((d) => d.hikeSlugs.includes(slug));
             const toDay = days.find((d) => d.date === toDate);
             if (!fromDay || !toDay || fromDay.date === toDate) return;
-            state.moveHikeToDay(slug, fromDay.date, toDate, fromDay.hikeSlugs, toDay.hikeSlugs);
+            moveHikeToDay(slug, fromDay.date, toDate, fromDay.hikeSlugs, toDay.hikeSlugs);
           }}
         >
           <div className="space-y-2">
             {days.map((d) => (
-              <DroppableDay key={d.date} date={d.date} hikeSlugs={d.hikeSlugs} theme={d.theme} fmt={fmt} isCustom={state.customDays[d.date] !== undefined} />
+              <DroppableDay key={d.date} date={d.date} hikeSlugs={d.hikeSlugs} theme={d.theme} fmt={fmt} isCustom={customDays[d.date] !== undefined} />
             ))}
           </div>
         </DndContext>
