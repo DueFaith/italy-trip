@@ -352,6 +352,7 @@ test('Edit-hike modal opens, lets you change the name, and persists across reloa
 
   const editButton = page.getByRole('button', { name: 'Edit hike details' });
   await expect(editButton).toBeVisible();
+  await editButton.scrollIntoViewIfNeeded();
   await editButton.click();
 
   // Modal contains a HikeForm. The first text input is the Name field.
@@ -361,7 +362,9 @@ test('Edit-hike modal opens, lets you change the name, and persists across reloa
   const sentinel = `TEST-${Date.now()}`;
 
   await nameInput.fill(sentinel);
-  await page.getByRole('button', { name: 'Save' }).click();
+  const saveButton1 = page.getByRole('button', { name: 'Save' });
+  await saveButton1.scrollIntoViewIfNeeded();
+  await saveButton1.click();
 
   // Modal closes; the heading reflects the new name.
   await expect(page.locator('h1')).toContainText(sentinel);
@@ -371,9 +374,13 @@ test('Edit-hike modal opens, lets you change the name, and persists across reloa
   await expect(page.locator('h1')).toContainText(sentinel);
 
   // Cleanup — revert via the edit modal so we don't poison subsequent runs.
-  await page.getByRole('button', { name: 'Edit hike details' }).click();
+  const editButtonAfter = page.getByRole('button', { name: 'Edit hike details' });
+  await editButtonAfter.scrollIntoViewIfNeeded();
+  await editButtonAfter.click();
   const nameInputAfter = page.locator('form input').first();
   await nameInputAfter.fill(originalName);
-  await page.getByRole('button', { name: 'Save' }).click();
+  const saveButton2 = page.getByRole('button', { name: 'Save' });
+  await saveButton2.scrollIntoViewIfNeeded();
+  await saveButton2.click();
   await expect(page.locator('h1')).toContainText(originalName);
 });
