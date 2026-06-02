@@ -35,7 +35,11 @@ test.describe('Site-wide crawl', () => {
       const failedRequests: string[] = [];
 
       page.on('console', (msg) => {
-        if (msg.type() === 'error') consoleErrors.push(msg.text());
+        if (msg.type() !== 'error') return;
+        const text = msg.text();
+        // Drop network-resource failures — C2 covers same-origin; cross-origin is out of our control.
+        if (text.startsWith('Failed to load resource:')) return;
+        consoleErrors.push(text);
       });
 
       page.on('response', (response) => {
@@ -90,6 +94,9 @@ test.describe('Site-wide crawl', () => {
             try {
               const u = new URL(href);
               if (u.host === location.host) return false;
+              // Astro dev-toolbar links — only present in `astro dev`, never in production build.
+              if (/(^|\.)astro\.build$/.test(u.host)) return false;
+              if (u.host === 'github.com' && u.pathname.startsWith('/withastro')) return false;
             } catch {
               return false;
             }
